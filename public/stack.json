@@ -1,0 +1,5020 @@
+{
+  "h": "399",
+  "w": "399",
+  "stack": {
+    "stack": {
+      "composite-op": "svg:src-over",
+      "name": "Root",
+      "opacity": "1.0",
+      "visibility": "visible",
+      "stack": [
+        {
+          "composite-op": "svg:src-over",
+          "name": "Accessory",
+          "opacity": "1.0",
+          "visibility": "hidden",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Prescription Shades",
+              "opacity": "1.0",
+              "src": "data/001-001-000.png",
+              "visibility": "hidden",
+              "x": "178",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Widowmaker Visor",
+              "opacity": "1.0",
+              "src": "data/001-001-001.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "150"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Trace Goggles",
+              "opacity": "1.0",
+              "src": "data/001-001-002.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Travis Glasses",
+              "opacity": "1.0",
+              "src": "data/001-001-003.png",
+              "visibility": "hidden",
+              "x": "172",
+              "y": "132"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Undeniable Visor",
+              "opacity": "1.0",
+              "src": "data/001-001-004.png",
+              "visibility": "hidden",
+              "x": "172",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Paris Autumn Shades",
+              "opacity": "1.0",
+              "src": "data/001-001-005.png",
+              "visibility": "hidden",
+              "x": "178",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Paris Winter Shades",
+              "opacity": "1.0",
+              "src": "data/001-001-006.png",
+              "visibility": "hidden",
+              "x": "178",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Paris Spring Shades",
+              "opacity": "1.0",
+              "src": "data/001-001-007.png",
+              "visibility": "hidden",
+              "x": "178",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Paris Summer Shades",
+              "opacity": "1.0",
+              "src": "data/001-001-008.png",
+              "visibility": "hidden",
+              "x": "178",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Magnanimous Specs",
+              "opacity": "1.0",
+              "src": "data/001-001-009.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brow Glasses Laurel",
+              "opacity": "1.0",
+              "src": "data/001-001-010.png",
+              "visibility": "hidden",
+              "x": "172",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Lemon Spectacles",
+              "opacity": "1.0",
+              "src": "data/001-001-011.png",
+              "visibility": "hidden",
+              "x": "172",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cruise Missile Aviators",
+              "opacity": "1.0",
+              "src": "data/001-001-012.png",
+              "visibility": "hidden",
+              "x": "172",
+              "y": "138"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Headgear",
+          "opacity": "1.0",
+          "visibility": "hidden",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cyberjack Headset",
+              "opacity": "1.0",
+              "src": "data/001-002-000.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "120"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Hulk Bandana",
+              "opacity": "1.0",
+              "src": "data/001-002-001.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brown Bandana",
+              "opacity": "1.0",
+              "src": "data/001-002-002.png",
+              "visibility": "hidden",
+              "x": "172",
+              "y": "120"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Red Bandana",
+              "opacity": "1.0",
+              "src": "data/001-002-003.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "126"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Hat of Wealth and Respect",
+              "opacity": "1.0",
+              "src": "data/001-002-004.png",
+              "visibility": "hidden",
+              "x": "136",
+              "y": "78"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Red Cap",
+              "opacity": "1.0",
+              "src": "data/001-002-005.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Nomad Bandana",
+              "opacity": "1.0",
+              "src": "data/001-002-006.png",
+              "visibility": "hidden",
+              "x": "130",
+              "y": "126"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Jeweled Headband",
+              "opacity": "1.0",
+              "src": "data/001-002-007.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Meteor Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-008.png",
+              "visibility": "hidden",
+              "x": "163",
+              "y": "117"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Neko Headset",
+              "opacity": "1.0",
+              "src": "data/001-002-009.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "105"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Long Red Bandana",
+              "opacity": "1.0",
+              "src": "data/001-002-010.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Black Headband",
+              "opacity": "1.0",
+              "src": "data/001-002-011.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "126"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "White Headband",
+              "opacity": "1.0",
+              "src": "data/001-002-012.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "126"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Green Bandana",
+              "opacity": "1.0",
+              "src": "data/001-002-013.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "102"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brawler Blue Bandana",
+              "opacity": "1.0",
+              "src": "data/001-002-014.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brawler Red Bandana",
+              "opacity": "1.0",
+              "src": "data/001-002-015.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Standard Headset",
+              "opacity": "1.0",
+              "src": "data/001-002-016.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Horned Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-017.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "90"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bandana Bangle",
+              "opacity": "1.0",
+              "src": "data/001-002-018.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "120"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Pink Neko Headset",
+              "opacity": "1.0",
+              "src": "data/001-002-019.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "105"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Neko Ears",
+              "opacity": "1.0",
+              "src": "data/001-002-020.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brawler Black Bandana",
+              "opacity": "1.0",
+              "src": "data/001-002-021.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Centurion Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-022.png",
+              "visibility": "hidden",
+              "x": "136",
+              "y": "75"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Honor Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-023.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "87"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Green Hoodie",
+              "opacity": "1.0",
+              "src": "data/001-002-024.png",
+              "visibility": "hidden",
+              "x": "151",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Black Hoodie",
+              "opacity": "1.0",
+              "src": "data/001-002-025.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Wizardly Hat",
+              "opacity": "1.0",
+              "src": "data/001-002-026.png",
+              "visibility": "hidden",
+              "x": "109",
+              "y": "102"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Purple Hood",
+              "opacity": "1.0",
+              "src": "data/001-002-027.png",
+              "visibility": "hidden",
+              "x": "145",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Green Hood",
+              "opacity": "1.0",
+              "src": "data/001-002-028.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gray Hood",
+              "opacity": "1.0",
+              "src": "data/001-002-029.png",
+              "visibility": "hidden",
+              "x": "142",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bomber Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-030.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "105"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Master Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-031.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "117"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cybernetic Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-032.png",
+              "visibility": "hidden",
+              "x": "163",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Beetle Helmet",
+              "opacity": "1.0",
+              "src": "data/001-002-033.png",
+              "visibility": "hidden",
+              "x": "154",
+              "y": "90"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Noble Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-034.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Closed Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-035.png",
+              "visibility": "hidden",
+              "x": "172",
+              "y": "120"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Grinning Skull Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-036.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Plumed Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-037.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "93"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Dark Knight Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-038.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "120"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Flaming Skull Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-039.png",
+              "visibility": "hidden",
+              "x": "154",
+              "y": "84"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ultimate Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-040.png",
+              "visibility": "hidden",
+              "x": "151",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Hollow Mask",
+              "opacity": "1.0",
+              "src": "data/001-002-041.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "120"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Law Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-042.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "99"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Samurai Helm",
+              "opacity": "1.0",
+              "src": "data/001-002-043.png",
+              "visibility": "hidden",
+              "x": "151",
+              "y": "93"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Oni Mask",
+              "opacity": "1.0",
+              "src": "data/001-002-044.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "117"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ninja Mask",
+              "opacity": "1.0",
+              "src": "data/001-002-045.png",
+              "visibility": "visible",
+              "x": "154",
+              "y": "102"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Hairstyle",
+          "opacity": "1.0",
+          "visibility": "hidden",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Long Blonde",
+              "opacity": "1.0",
+              "src": "data/001-003-000.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Messy",
+              "opacity": "1.0",
+              "src": "data/001-003-001.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "103"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blonde",
+              "opacity": "1.0",
+              "src": "data/001-003-002.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Frizzy",
+              "opacity": "1.0",
+              "src": "data/001-003-003.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Wanderer",
+              "opacity": "1.0",
+              "src": "data/001-003-004.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Dirty Blonde",
+              "opacity": "1.0",
+              "src": "data/001-003-005.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Travis",
+              "opacity": "1.0",
+              "src": "data/001-003-006.png",
+              "visibility": "hidden",
+              "x": "154",
+              "y": "87"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Black Pony",
+              "opacity": "1.0",
+              "src": "data/001-003-007.png",
+              "visibility": "hidden",
+              "x": "118",
+              "y": "102"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blue Bob",
+              "opacity": "1.0",
+              "src": "data/001-003-008.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brawler Cut",
+              "opacity": "1.0",
+              "src": "data/001-003-009.png",
+              "visibility": "hidden",
+              "x": "163",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Raider",
+              "opacity": "1.0",
+              "src": "data/001-003-010.png",
+              "visibility": "hidden",
+              "x": "163",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Rider",
+              "opacity": "1.0",
+              "src": "data/001-003-011.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "105"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sakura",
+              "opacity": "1.0",
+              "src": "data/001-003-012.png",
+              "visibility": "hidden",
+              "x": "151",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brunette Pony",
+              "opacity": "1.0",
+              "src": "data/001-003-013.png",
+              "visibility": "hidden",
+              "x": "145",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blonde Pony",
+              "opacity": "1.0",
+              "src": "data/001-003-014.png",
+              "visibility": "hidden",
+              "x": "145",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Red Cascade",
+              "opacity": "1.0",
+              "src": "data/001-003-015.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Strawberry",
+              "opacity": "1.0",
+              "src": "data/001-003-016.png",
+              "visibility": "hidden",
+              "x": "163",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Kabuki Coiffe",
+              "opacity": "1.0",
+              "src": "data/001-003-017.png",
+              "visibility": "hidden",
+              "x": "142",
+              "y": "105"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brunette Cascade",
+              "opacity": "1.0",
+              "src": "data/001-003-018.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brunette Tied",
+              "opacity": "1.0",
+              "src": "data/001-003-019.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Close Shave",
+              "opacity": "1.0",
+              "src": "data/001-003-020.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blonde Bun",
+              "opacity": "1.0",
+              "src": "data/001-003-021.png",
+              "visibility": "hidden",
+              "x": "154",
+              "y": "105"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Riven White",
+              "opacity": "1.0",
+              "src": "data/001-003-022.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Green Long",
+              "opacity": "1.0",
+              "src": "data/001-003-023.png",
+              "visibility": "hidden",
+              "x": "142",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Green Short",
+              "opacity": "1.0",
+              "src": "data/001-003-024.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Brown Rat Tail",
+              "opacity": "1.0",
+              "src": "data/001-003-025.png",
+              "visibility": "hidden",
+              "x": "130",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Light Blonde",
+              "opacity": "1.0",
+              "src": "data/001-003-026.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "105"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "High Pony",
+              "opacity": "1.0",
+              "src": "data/001-003-027.png",
+              "visibility": "hidden",
+              "x": "121",
+              "y": "102"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Decker Mohawk",
+              "opacity": "1.0",
+              "src": "data/001-003-028.png",
+              "visibility": "hidden",
+              "x": "163",
+              "y": "90"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Wild",
+              "opacity": "1.0",
+              "src": "data/001-003-029.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Undercroft",
+              "opacity": "1.0",
+              "src": "data/001-003-030.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Dark Rat Tail",
+              "opacity": "1.0",
+              "src": "data/001-003-031.png",
+              "visibility": "hidden",
+              "x": "121",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Scorpion",
+              "opacity": "1.0",
+              "src": "data/001-003-032.png",
+              "visibility": "hidden",
+              "x": "163",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Short White",
+              "opacity": "1.0",
+              "src": "data/001-003-033.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Green Pony",
+              "opacity": "1.0",
+              "src": "data/001-003-034.png",
+              "visibility": "hidden",
+              "x": "121",
+              "y": "99"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Red Pony",
+              "opacity": "1.0",
+              "src": "data/001-003-035.png",
+              "visibility": "hidden",
+              "x": "133",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Super Dragon",
+              "opacity": "1.0",
+              "src": "data/001-003-036.png",
+              "visibility": "hidden",
+              "x": "145",
+              "y": "87"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Buzzcut Buzzcut",
+              "opacity": "1.0",
+              "src": "data/001-003-037.png",
+              "visibility": "hidden",
+              "x": "178",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Orien",
+              "opacity": "1.0",
+              "src": "data/001-003-038.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blonde Buzzcut",
+              "opacity": "1.0",
+              "src": "data/001-003-039.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Mohawk",
+              "opacity": "1.0",
+              "src": "data/001-003-040.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "99"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Fonz",
+              "opacity": "1.0",
+              "src": "data/001-003-041.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "99"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Protag",
+              "opacity": "1.0",
+              "src": "data/001-003-042.png",
+              "visibility": "hidden",
+              "x": "151",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bleached",
+              "opacity": "1.0",
+              "src": "data/001-003-043.png",
+              "visibility": "visible",
+              "x": "175",
+              "y": "114"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Eyes",
+          "opacity": "1.0",
+          "visibility": "hidden",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Kabuki",
+              "opacity": "1.0",
+              "src": "data/001-004-000.png",
+              "visibility": "hidden",
+              "x": "187",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Corrosive",
+              "opacity": "1.0",
+              "src": "data/001-004-001.png",
+              "visibility": "hidden",
+              "x": "187",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Infernal",
+              "opacity": "1.0",
+              "src": "data/001-004-002.png",
+              "visibility": "hidden",
+              "x": "187",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Arctic",
+              "opacity": "1.0",
+              "src": "data/001-004-003.png",
+              "visibility": "hidden",
+              "x": "187",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Furrowed",
+              "opacity": "1.0",
+              "src": "data/001-004-004.png",
+              "visibility": "hidden",
+              "x": "184",
+              "y": "132"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Surprised",
+              "opacity": "1.0",
+              "src": "data/001-004-005.png",
+              "visibility": "hidden",
+              "x": "187",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Friendly",
+              "opacity": "1.0",
+              "src": "data/001-004-006.png",
+              "visibility": "hidden",
+              "x": "187",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Suspicious",
+              "opacity": "1.0",
+              "src": "data/001-004-007.png",
+              "visibility": "hidden",
+              "x": "187",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Rage",
+              "opacity": "1.0",
+              "src": "data/001-004-008.png",
+              "visibility": "hidden",
+              "x": "187",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bright",
+              "opacity": "1.0",
+              "src": "data/001-004-009.png",
+              "visibility": "hidden",
+              "x": "186",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Poison",
+              "opacity": "1.0",
+              "src": "data/001-004-010.png",
+              "visibility": "hidden",
+              "x": "190",
+              "y": "141"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Fire",
+              "opacity": "1.0",
+              "src": "data/001-004-011.png",
+              "visibility": "hidden",
+              "x": "190",
+              "y": "141"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ice",
+              "opacity": "1.0",
+              "src": "data/001-004-012.png",
+              "visibility": "hidden",
+              "x": "190",
+              "y": "141"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bushy",
+              "opacity": "1.0",
+              "src": "data/001-004-013.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shellshock",
+              "opacity": "1.0",
+              "src": "data/001-004-014.png",
+              "visibility": "hidden",
+              "x": "190",
+              "y": "141"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Happy",
+              "opacity": "1.0",
+              "src": "data/001-004-015.png",
+              "visibility": "hidden",
+              "x": "190",
+              "y": "144"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sneaky",
+              "opacity": "1.0",
+              "src": "data/001-004-016.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "144"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Anger",
+              "opacity": "1.0",
+              "src": "data/001-004-017.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "144"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Original",
+              "opacity": "1.0",
+              "src": "data/001-004-018.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "141"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Scar",
+              "opacity": "1.0",
+              "src": "data/001-004-019.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "132"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Wink",
+              "opacity": "1.0",
+              "src": "data/001-004-020.png",
+              "visibility": "hidden",
+              "x": "190",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Patch",
+              "opacity": "1.0",
+              "src": "data/001-004-021.png",
+              "visibility": "hidden",
+              "x": "178",
+              "y": "132"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "uwu-eyed",
+              "opacity": "1.0",
+              "src": "data/001-004-022.png",
+              "visibility": "hidden",
+              "x": "187",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Mischief",
+              "opacity": "1.0",
+              "src": "data/001-004-023.png",
+              "visibility": "visible",
+              "x": "190",
+              "y": "135"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Left Hand",
+          "opacity": "1.0",
+          "visibility": "hidden",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shaken Not Stirred L",
+              "opacity": "1.0",
+              "src": "data/001-005-000.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "174"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Discarded Rod L",
+              "opacity": "1.0",
+              "src": "data/001-005-001.png",
+              "visibility": "hidden",
+              "x": "253",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Handy Stick L",
+              "opacity": "1.0",
+              "src": "data/001-005-002.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "129"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sturdy Branch L",
+              "opacity": "1.0",
+              "src": "data/001-005-003.png",
+              "visibility": "hidden",
+              "x": "259",
+              "y": "144"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Tome of Incantations L",
+              "opacity": "1.0",
+              "src": "data/001-005-004.png",
+              "visibility": "hidden",
+              "x": "223",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Grimoire of Arcana L",
+              "opacity": "1.0",
+              "src": "data/001-005-005.png",
+              "visibility": "hidden",
+              "x": "229",
+              "y": "186"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sacred Vessel of the Divine L",
+              "opacity": "1.0",
+              "src": "data/001-005-006.png",
+              "visibility": "hidden",
+              "x": "253",
+              "y": "183"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Serpent Scepter L",
+              "opacity": "1.0",
+              "src": "data/001-005-007.png",
+              "visibility": "hidden",
+              "x": "238",
+              "y": "69"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Staff of the Archmage L",
+              "opacity": "1.0",
+              "src": "data/001-005-008.png",
+              "visibility": "hidden",
+              "x": "208",
+              "y": "36"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Royal Wand of Power L",
+              "opacity": "1.0",
+              "src": "data/001-005-009.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "81"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Netherworld Wand L",
+              "opacity": "1.0",
+              "src": "data/001-005-010.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "153"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gavel of Sacred Judgment L",
+              "opacity": "1.0",
+              "src": "data/001-005-011.png",
+              "visibility": "hidden",
+              "x": "217",
+              "y": "27"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Neptune's Wrath L",
+              "opacity": "1.0",
+              "src": "data/001-005-012.png",
+              "visibility": "hidden",
+              "x": "229",
+              "y": "42"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Vile Scepter of Janeman the Mad L",
+              "opacity": "1.0",
+              "src": "data/001-005-013.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "117"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Magna-Staff L",
+              "opacity": "1.0",
+              "src": "data/001-005-014.png",
+              "visibility": "hidden",
+              "x": "259",
+              "y": "90"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Resonating Blade L",
+              "opacity": "1.0",
+              "src": "data/001-005-015.png",
+              "visibility": "hidden",
+              "x": "142",
+              "y": "177"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Constellation Scribe L",
+              "opacity": "1.0",
+              "src": "data/001-005-016.png",
+              "visibility": "hidden",
+              "x": "253",
+              "y": "174"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Radiant Manuscript L",
+              "opacity": "1.0",
+              "src": "data/001-005-017.png",
+              "visibility": "hidden",
+              "x": "247",
+              "y": "177"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Endless Potion of Possibilities L",
+              "opacity": "1.0",
+              "src": "data/001-005-018.png",
+              "visibility": "hidden",
+              "x": "220",
+              "y": "198"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Luminescent Gauntlets L",
+              "opacity": "1.0",
+              "src": "data/001-005-019.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "201"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Screw Turner L",
+              "opacity": "1.0",
+              "src": "data/001-005-020.png",
+              "visibility": "hidden",
+              "x": "256",
+              "y": "154"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Engineer's Autowrench L",
+              "opacity": "1.0",
+              "src": "data/001-005-021.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "177"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Maul of Blood L",
+              "opacity": "1.0",
+              "src": "data/001-005-022.png",
+              "visibility": "hidden",
+              "x": "232",
+              "y": "147"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cudgel of Paul the Wise L",
+              "opacity": "1.0",
+              "src": "data/001-005-023.png",
+              "visibility": "hidden",
+              "x": "238",
+              "y": "126"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Axe of Strings L",
+              "opacity": "1.0",
+              "src": "data/001-005-024.png",
+              "visibility": "hidden",
+              "x": "232",
+              "y": "96"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "VenkaTech Mk2000 L",
+              "opacity": "1.0",
+              "src": "data/001-005-025.png",
+              "visibility": "hidden",
+              "x": "256",
+              "y": "201"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Hacker Chase Cyberdeck 88 L",
+              "opacity": "1.0",
+              "src": "data/001-005-026.png",
+              "visibility": "hidden",
+              "x": "232",
+              "y": "186"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Crystal Sword L",
+              "opacity": "1.0",
+              "src": "data/001-005-027.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "30"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cyberpunk Sword L",
+              "opacity": "1.0",
+              "src": "data/001-005-028.png",
+              "visibility": "hidden",
+              "x": "238",
+              "y": "66"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ichika's Doomblade L",
+              "opacity": "1.0",
+              "src": "data/001-005-029.png",
+              "visibility": "hidden",
+              "x": "253",
+              "y": "42"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Widowmaker L",
+              "opacity": "1.0",
+              "src": "data/001-005-030.png",
+              "visibility": "hidden",
+              "x": "247",
+              "y": "69"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Massive Greatsword L",
+              "opacity": "1.0",
+              "src": "data/001-005-031.png",
+              "visibility": "hidden",
+              "x": "247",
+              "y": "30"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "The Blade of Deep Thought L",
+              "opacity": "1.0",
+              "src": "data/001-005-032.png",
+              "visibility": "hidden",
+              "x": "256",
+              "y": "48"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Neuromantic Saber L",
+              "opacity": "1.0",
+              "src": "data/001-005-033.png",
+              "visibility": "hidden",
+              "x": "238",
+              "y": "66"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Edge of the Eastern Winds L",
+              "opacity": "1.0",
+              "src": "data/001-005-034.png",
+              "visibility": "hidden",
+              "x": "247",
+              "y": "24"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Master Cleaver L",
+              "opacity": "1.0",
+              "src": "data/001-005-035.png",
+              "visibility": "hidden",
+              "x": "253",
+              "y": "129"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Levitating Blade of Justice L",
+              "opacity": "1.0",
+              "src": "data/001-005-036.png",
+              "visibility": "hidden",
+              "x": "256",
+              "y": "147"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blade of Duty L",
+              "opacity": "1.0",
+              "src": "data/001-005-037.png",
+              "visibility": "hidden",
+              "x": "256",
+              "y": "111"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blade of Honor L",
+              "opacity": "1.0",
+              "src": "data/001-005-038.png",
+              "visibility": "hidden",
+              "x": "259",
+              "y": "54"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cyberpunk Katana L",
+              "opacity": "1.0",
+              "src": "data/001-005-039.png",
+              "visibility": "hidden",
+              "x": "256",
+              "y": "63"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Travis Sword L",
+              "opacity": "1.0",
+              "src": "data/001-005-040.png",
+              "visibility": "hidden",
+              "x": "247",
+              "y": "27"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Common Broadsword L",
+              "opacity": "1.0",
+              "src": "data/001-005-041.png",
+              "visibility": "hidden",
+              "x": "244",
+              "y": "45"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Scorpion Blade L",
+              "opacity": "1.0",
+              "src": "data/001-005-042.png",
+              "visibility": "hidden",
+              "x": "247",
+              "y": "48"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Dark Blade of Zulax L",
+              "opacity": "1.0",
+              "src": "data/001-005-043.png",
+              "visibility": "hidden",
+              "x": "232",
+              "y": "63"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Atomizer Bat L",
+              "opacity": "1.0",
+              "src": "data/001-005-044.png",
+              "visibility": "hidden",
+              "x": "253",
+              "y": "90"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Common Axe L",
+              "opacity": "1.0",
+              "src": "data/001-005-045.png",
+              "visibility": "hidden",
+              "x": "229",
+              "y": "141"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Death Scythe L",
+              "opacity": "1.0",
+              "src": "data/001-005-046.png",
+              "visibility": "hidden",
+              "x": "247",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Reaperblade L",
+              "opacity": "1.0",
+              "src": "data/001-005-047.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "147"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Common Sai L",
+              "opacity": "1.0",
+              "src": "data/001-005-048.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Mechanic's Handy Wrench L",
+              "opacity": "1.0",
+              "src": "data/001-005-049.png",
+              "visibility": "hidden",
+              "x": "253",
+              "y": "132"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gadgeteer's Multitool L",
+              "opacity": "1.0",
+              "src": "data/001-005-050.png",
+              "visibility": "hidden",
+              "x": "238",
+              "y": "45"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Valorous Blade L",
+              "opacity": "1.0",
+              "src": "data/001-005-051.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "90"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Lich Sword L",
+              "opacity": "1.0",
+              "src": "data/001-005-052.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "99"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Flame Tongue L",
+              "opacity": "1.0",
+              "src": "data/001-005-053.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "39"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ranger's Edge L",
+              "opacity": "1.0",
+              "src": "data/001-005-054.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "48"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Dragon's Fury L",
+              "opacity": "1.0",
+              "src": "data/001-005-055.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Energy Blade L",
+              "opacity": "1.0",
+              "src": "data/001-005-056.png",
+              "visibility": "hidden",
+              "x": "259",
+              "y": "201"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Energy Sword L",
+              "opacity": "1.0",
+              "src": "data/001-005-057.png",
+              "visibility": "hidden",
+              "x": "235",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cypher Sword L",
+              "opacity": "1.0",
+              "src": "data/001-005-058.png",
+              "visibility": "hidden",
+              "x": "226",
+              "y": "204"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Stainless Chainsaw L",
+              "opacity": "1.0",
+              "src": "data/001-005-059.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "66"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Squire's Lance L",
+              "opacity": "1.0",
+              "src": "data/001-005-060.png",
+              "visibility": "hidden",
+              "x": "247",
+              "y": "27"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Poseidon's Demise L",
+              "opacity": "1.0",
+              "src": "data/001-005-061.png",
+              "visibility": "hidden",
+              "x": "229",
+              "y": "48"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "The Caliber Saber L",
+              "opacity": "1.0",
+              "src": "data/001-005-062.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "18"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Magnetronic Bazooka L",
+              "opacity": "1.0",
+              "src": "data/001-005-063.png",
+              "visibility": "hidden",
+              "x": "232",
+              "y": "180"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Vaporizer L",
+              "opacity": "1.0",
+              "src": "data/001-005-064.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "186"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Fizzy Fury L",
+              "opacity": "1.0",
+              "src": "data/001-005-065.png",
+              "visibility": "hidden",
+              "x": "232",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "The Light of the Heavens L",
+              "opacity": "1.0",
+              "src": "data/001-005-066.png",
+              "visibility": "hidden",
+              "x": "211",
+              "y": "183"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ian's Disintegrator L",
+              "opacity": "1.0",
+              "src": "data/001-005-067.png",
+              "visibility": "hidden",
+              "x": "217",
+              "y": "195"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Annihilator L",
+              "opacity": "1.0",
+              "src": "data/001-005-068.png",
+              "visibility": "hidden",
+              "x": "217",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Night Hunter L",
+              "opacity": "1.0",
+              "src": "data/001-005-069.png",
+              "visibility": "hidden",
+              "x": "235",
+              "y": "186"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Heavy Machine Gun L",
+              "opacity": "1.0",
+              "src": "data/001-005-070.png",
+              "visibility": "hidden",
+              "x": "235",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gravimetric Cannon L",
+              "opacity": "1.0",
+              "src": "data/001-005-071.png",
+              "visibility": "hidden",
+              "x": "214",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Peacemaker L",
+              "opacity": "1.0",
+              "src": "data/001-005-072.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "195"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sand Falcon L",
+              "opacity": "1.0",
+              "src": "data/001-005-073.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Arcane Revolver L",
+              "opacity": "1.0",
+              "src": "data/001-005-074.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "198"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Artifact Hunter L",
+              "opacity": "1.0",
+              "src": "data/001-005-075.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "201"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Inferno L",
+              "opacity": "1.0",
+              "src": "data/001-005-076.png",
+              "visibility": "hidden",
+              "x": "235",
+              "y": "186"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Explosive Rain L",
+              "opacity": "1.0",
+              "src": "data/001-005-077.png",
+              "visibility": "hidden",
+              "x": "235",
+              "y": "186"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Thunderbolt L",
+              "opacity": "1.0",
+              "src": "data/001-005-078.png",
+              "visibility": "hidden",
+              "x": "229",
+              "y": "177"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Doom Bringer L",
+              "opacity": "1.0",
+              "src": "data/001-005-079.png",
+              "visibility": "hidden",
+              "x": "214",
+              "y": "144"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bullseye Sniper Rifle L",
+              "opacity": "1.0",
+              "src": "data/001-005-080.png",
+              "visibility": "hidden",
+              "x": "226",
+              "y": "174"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blue Flashfire Gun L",
+              "opacity": "1.0",
+              "src": "data/001-005-081.png",
+              "visibility": "hidden",
+              "x": "232",
+              "y": "198"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Thunder Punch L",
+              "opacity": "1.0",
+              "src": "data/001-005-082.png",
+              "visibility": "hidden",
+              "x": "235",
+              "y": "201"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Vapor Darts L",
+              "opacity": "1.0",
+              "src": "data/001-005-083.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shadow Spikes L",
+              "opacity": "1.0",
+              "src": "data/001-005-084.png",
+              "visibility": "hidden",
+              "x": "244",
+              "y": "177"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Knight's Mark L",
+              "opacity": "1.0",
+              "src": "data/001-005-085.png",
+              "visibility": "hidden",
+              "x": "244",
+              "y": "153"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Venomous Talons L",
+              "opacity": "1.0",
+              "src": "data/001-005-086.png",
+              "visibility": "hidden",
+              "x": "245",
+              "y": "207"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Savage Fangs L",
+              "opacity": "1.0",
+              "src": "data/001-005-087.png",
+              "visibility": "hidden",
+              "x": "229",
+              "y": "210"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shadow Striker L",
+              "opacity": "1.0",
+              "src": "data/001-005-088.png",
+              "visibility": "hidden",
+              "x": "226",
+              "y": "201"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Iron Fist L",
+              "opacity": "1.0",
+              "src": "data/001-005-089.png",
+              "visibility": "hidden",
+              "x": "226",
+              "y": "207"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Treasure Hunter's Delight L",
+              "opacity": "1.0",
+              "src": "data/001-005-090.png",
+              "visibility": "hidden",
+              "x": "244",
+              "y": "210"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Iron Fan L",
+              "opacity": "1.0",
+              "src": "data/001-005-091.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Kite Shield L",
+              "opacity": "1.0",
+              "src": "data/001-005-092.png",
+              "visibility": "hidden",
+              "x": "241",
+              "y": "183"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shining Barrier L",
+              "opacity": "1.0",
+              "src": "data/001-005-093.png",
+              "visibility": "hidden",
+              "x": "238",
+              "y": "183"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Noble Tail L",
+              "opacity": "1.0",
+              "src": "data/001-005-094.png",
+              "visibility": "hidden",
+              "x": "181",
+              "y": "186"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bulletstorm L",
+              "opacity": "1.0",
+              "src": "data/001-005-095.png",
+              "visibility": "hidden",
+              "x": "250",
+              "y": "207"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shards of Shadow L",
+              "opacity": "1.0",
+              "src": "data/001-005-096.png",
+              "visibility": "hidden",
+              "x": "232",
+              "y": "183"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Friendship Chain L",
+              "opacity": "1.0",
+              "src": "data/001-005-097.png",
+              "visibility": "visible",
+              "x": "247",
+              "y": "210"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Diamond Chain L",
+              "opacity": "1.0",
+              "src": "data/001-005-098.png",
+              "visibility": "visible",
+              "x": "247",
+              "y": "210"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Right Hand",
+          "opacity": "1.0",
+          "visibility": "hidden",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Discarded Rod R",
+              "opacity": "1.0",
+              "src": "data/001-006-000.png",
+              "visibility": "hidden",
+              "x": "118",
+              "y": "150"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Handy Stick R",
+              "opacity": "1.0",
+              "src": "data/001-006-001.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "153"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sturdy Branch R",
+              "opacity": "1.0",
+              "src": "data/001-006-002.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "153"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Neptune's Wrath R",
+              "opacity": "1.0",
+              "src": "data/001-006-003.png",
+              "visibility": "hidden",
+              "x": "106",
+              "y": "54"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Royal Wand of Power R",
+              "opacity": "1.0",
+              "src": "data/001-006-004.png",
+              "visibility": "hidden",
+              "x": "118",
+              "y": "132"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Engineer's Autowrench R",
+              "opacity": "1.0",
+              "src": "data/001-006-005.png",
+              "visibility": "hidden",
+              "x": "121",
+              "y": "189"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gadgeteer's Multitool R",
+              "opacity": "1.0",
+              "src": "data/001-006-006.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "54"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Flame Tongue R",
+              "opacity": "1.0",
+              "src": "data/001-006-007.png",
+              "visibility": "hidden",
+              "x": "70",
+              "y": "51"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Widowmaker R",
+              "opacity": "1.0",
+              "src": "data/001-006-008.png",
+              "visibility": "hidden",
+              "x": "46",
+              "y": "126"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Vapor Darts R",
+              "opacity": "1.0",
+              "src": "data/001-006-009.png",
+              "visibility": "hidden",
+              "x": "106",
+              "y": "183"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shadow Spikes R",
+              "opacity": "1.0",
+              "src": "data/001-006-010.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "186"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Knight's Mark R",
+              "opacity": "1.0",
+              "src": "data/001-006-011.png",
+              "visibility": "hidden",
+              "x": "100",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Noble Tail R",
+              "opacity": "1.0",
+              "src": "data/001-006-012.png",
+              "visibility": "hidden",
+              "x": "79",
+              "y": "198"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bulletstorm R",
+              "opacity": "1.0",
+              "src": "data/001-006-013.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "216"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Staff of the Archmage R",
+              "opacity": "1.0",
+              "src": "data/001-006-014.png",
+              "visibility": "hidden",
+              "x": "64",
+              "y": "45"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Serpent Scepter R",
+              "opacity": "1.0",
+              "src": "data/001-006-015.png",
+              "visibility": "hidden",
+              "x": "67",
+              "y": "75"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Vile Scepter of Janeman the Mad R",
+              "opacity": "1.0",
+              "src": "data/001-006-016.png",
+              "visibility": "hidden",
+              "x": "121",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Netherworld Wand R",
+              "opacity": "1.0",
+              "src": "data/001-006-017.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Constellation Scribe R",
+              "opacity": "1.0",
+              "src": "data/001-006-018.png",
+              "visibility": "hidden",
+              "x": "85",
+              "y": "183"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Grimoire of Arcana R",
+              "opacity": "1.0",
+              "src": "data/001-006-019.png",
+              "visibility": "hidden",
+              "x": "133",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Tome of Incantations R",
+              "opacity": "1.0",
+              "src": "data/001-006-020.png",
+              "visibility": "hidden",
+              "x": "130",
+              "y": "177"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sacred Vessel of the Divine R",
+              "opacity": "1.0",
+              "src": "data/001-006-021.png",
+              "visibility": "hidden",
+              "x": "124",
+              "y": "183"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Radiant Manuscript R",
+              "opacity": "1.0",
+              "src": "data/001-006-022.png",
+              "visibility": "hidden",
+              "x": "100",
+              "y": "195"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Endless Potion of Possibilities R",
+              "opacity": "1.0",
+              "src": "data/001-006-023.png",
+              "visibility": "hidden",
+              "x": "87",
+              "y": "213"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Hacker Chase Cyberdeck 88 R",
+              "opacity": "1.0",
+              "src": "data/001-006-024.png",
+              "visibility": "hidden",
+              "x": "100",
+              "y": "195"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "VenkaTech Mk2000 R",
+              "opacity": "1.0",
+              "src": "data/001-006-025.png",
+              "visibility": "hidden",
+              "x": "130",
+              "y": "204"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Luminescent Gauntlets R",
+              "opacity": "1.0",
+              "src": "data/001-006-026.png",
+              "visibility": "hidden",
+              "x": "115",
+              "y": "213"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Resonating Blade R",
+              "opacity": "1.0",
+              "src": "data/001-006-027.png",
+              "visibility": "hidden",
+              "x": "115",
+              "y": "180"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Squire's Lance R",
+              "opacity": "1.0",
+              "src": "data/001-006-028.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "33"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Poseidon's Demise R",
+              "opacity": "1.0",
+              "src": "data/001-006-029.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "51"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Magna-Staff R",
+              "opacity": "1.0",
+              "src": "data/001-006-030.png",
+              "visibility": "hidden",
+              "x": "133",
+              "y": "117"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gavel of Sacred Judgment R",
+              "opacity": "1.0",
+              "src": "data/001-006-031.png",
+              "visibility": "hidden",
+              "x": "82",
+              "y": "36"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Maul of Blood R",
+              "opacity": "1.0",
+              "src": "data/001-006-032.png",
+              "visibility": "hidden",
+              "x": "109",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Axe of Strings R",
+              "opacity": "1.0",
+              "src": "data/001-006-033.png",
+              "visibility": "hidden",
+              "x": "88",
+              "y": "102"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Common Axe R",
+              "opacity": "1.0",
+              "src": "data/001-006-034.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "147"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cudgel of Paul the Wise R",
+              "opacity": "1.0",
+              "src": "data/001-006-035.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Atomizer Bat R",
+              "opacity": "1.0",
+              "src": "data/001-006-036.png",
+              "visibility": "hidden",
+              "x": "115",
+              "y": "96"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Mechanic's Handy Wrench R",
+              "opacity": "1.0",
+              "src": "data/001-006-037.png",
+              "visibility": "hidden",
+              "x": "124",
+              "y": "141"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Stainless Chainsaw R",
+              "opacity": "1.0",
+              "src": "data/001-006-038.png",
+              "visibility": "hidden",
+              "x": "79",
+              "y": "75"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Screw Turner R",
+              "opacity": "1.0",
+              "src": "data/001-006-039.png",
+              "visibility": "hidden",
+              "x": "133",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cyberpunk Katana R",
+              "opacity": "1.0",
+              "src": "data/001-006-040.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "72"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Crystal Sword R",
+              "opacity": "1.0",
+              "src": "data/001-006-041.png",
+              "visibility": "hidden",
+              "x": "121",
+              "y": "57"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cyberpunk Sword R",
+              "opacity": "1.0",
+              "src": "data/001-006-042.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "66"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Neuromantic Saber R",
+              "opacity": "1.0",
+              "src": "data/001-006-043.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "72"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Scorpion Blade R",
+              "opacity": "1.0",
+              "src": "data/001-006-044.png",
+              "visibility": "hidden",
+              "x": "115",
+              "y": "54"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Travis Sword R",
+              "opacity": "1.0",
+              "src": "data/001-006-045.png",
+              "visibility": "hidden",
+              "x": "121",
+              "y": "42"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blade of Duty R",
+              "opacity": "1.0",
+              "src": "data/001-006-046.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "114"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Dark Blade of Zulax R",
+              "opacity": "1.0",
+              "src": "data/001-006-047.png",
+              "visibility": "hidden",
+              "x": "109",
+              "y": "75"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ichika's Doomblade R",
+              "opacity": "1.0",
+              "src": "data/001-006-048.png",
+              "visibility": "hidden",
+              "x": "118",
+              "y": "51"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Common Broadsword R",
+              "opacity": "1.0",
+              "src": "data/001-006-049.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "54"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blade of Honor R",
+              "opacity": "1.0",
+              "src": "data/001-006-050.png",
+              "visibility": "hidden",
+              "x": "124",
+              "y": "66"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "The Caliber Saber R",
+              "opacity": "1.0",
+              "src": "data/001-006-051.png",
+              "visibility": "hidden",
+              "x": "106",
+              "y": "27"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "The Blade of Deep Thought R",
+              "opacity": "1.0",
+              "src": "data/001-006-052.png",
+              "visibility": "hidden",
+              "x": "124",
+              "y": "69"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Edge of the Eastern Winds R",
+              "opacity": "1.0",
+              "src": "data/001-006-053.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "18"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Death Scythe R",
+              "opacity": "1.0",
+              "src": "data/001-006-054.png",
+              "visibility": "hidden",
+              "x": "73",
+              "y": "147"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Reaperblade R",
+              "opacity": "1.0",
+              "src": "data/001-006-055.png",
+              "visibility": "hidden",
+              "x": "88",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Levitating Blade of Justice R",
+              "opacity": "1.0",
+              "src": "data/001-006-056.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Master Cleaver R",
+              "opacity": "1.0",
+              "src": "data/001-006-057.png",
+              "visibility": "hidden",
+              "x": "109",
+              "y": "147"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Common Sai R",
+              "opacity": "1.0",
+              "src": "data/001-006-058.png",
+              "visibility": "hidden",
+              "x": "115",
+              "y": "147"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Massive Greatsword R",
+              "opacity": "1.0",
+              "src": "data/001-006-059.png",
+              "visibility": "hidden",
+              "x": "100",
+              "y": "39"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ranger's Edge R",
+              "opacity": "1.0",
+              "src": "data/001-006-060.png",
+              "visibility": "hidden",
+              "x": "70",
+              "y": "57"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Dragon's Fury R",
+              "opacity": "1.0",
+              "src": "data/001-006-061.png",
+              "visibility": "hidden",
+              "x": "91",
+              "y": "78"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Valorous Blade R",
+              "opacity": "1.0",
+              "src": "data/001-006-062.png",
+              "visibility": "hidden",
+              "x": "88",
+              "y": "105"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Lich Sword R",
+              "opacity": "1.0",
+              "src": "data/001-006-063.png",
+              "visibility": "hidden",
+              "x": "82",
+              "y": "108"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Energy Sword R",
+              "opacity": "1.0",
+              "src": "data/001-006-064.png",
+              "visibility": "hidden",
+              "x": "31",
+              "y": "198"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Energy Blade R",
+              "opacity": "1.0",
+              "src": "data/001-006-065.png",
+              "visibility": "hidden",
+              "x": "73",
+              "y": "210"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Cypher Sword R",
+              "opacity": "1.0",
+              "src": "data/001-006-066.png",
+              "visibility": "hidden",
+              "x": "40",
+              "y": "210"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shadow Striker R",
+              "opacity": "1.0",
+              "src": "data/001-006-067.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "210"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Treasure Hunter's Delight R",
+              "opacity": "1.0",
+              "src": "data/001-006-068.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "216"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shining Barrier R",
+              "opacity": "1.0",
+              "src": "data/001-006-069.png",
+              "visibility": "hidden",
+              "x": "106",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Iron Fan R",
+              "opacity": "1.0",
+              "src": "data/001-006-070.png",
+              "visibility": "hidden",
+              "x": "91",
+              "y": "177"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Iron Fist R",
+              "opacity": "1.0",
+              "src": "data/001-006-071.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "213"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Venomous Talons R",
+              "opacity": "1.0",
+              "src": "data/001-006-072.png",
+              "visibility": "hidden",
+              "x": "100",
+              "y": "219"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Savage Fangs R",
+              "opacity": "1.0",
+              "src": "data/001-006-073.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "216"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Kite Shield R",
+              "opacity": "1.0",
+              "src": "data/001-006-074.png",
+              "visibility": "hidden",
+              "x": "100",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Peacemaker R",
+              "opacity": "1.0",
+              "src": "data/001-006-075.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "207"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Artifact Hunter R",
+              "opacity": "1.0",
+              "src": "data/001-006-076.png",
+              "visibility": "hidden",
+              "x": "100",
+              "y": "210"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Arcane Revolver R",
+              "opacity": "1.0",
+              "src": "data/001-006-077.png",
+              "visibility": "hidden",
+              "x": "97",
+              "y": "207"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Thunderbolt R",
+              "opacity": "1.0",
+              "src": "data/001-006-078.png",
+              "visibility": "hidden",
+              "x": "70",
+              "y": "204"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Annihilator R",
+              "opacity": "1.0",
+              "src": "data/001-006-079.png",
+              "visibility": "hidden",
+              "x": "52",
+              "y": "177"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gravimetric Cannon R",
+              "opacity": "1.0",
+              "src": "data/001-006-080.png",
+              "visibility": "hidden",
+              "x": "79",
+              "y": "180"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Night Hunter R",
+              "opacity": "1.0",
+              "src": "data/001-006-081.png",
+              "visibility": "hidden",
+              "x": "58",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "The Light of the Heavens R",
+              "opacity": "1.0",
+              "src": "data/001-006-082.png",
+              "visibility": "hidden",
+              "x": "25",
+              "y": "201"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Vaporizer R",
+              "opacity": "1.0",
+              "src": "data/001-006-083.png",
+              "visibility": "hidden",
+              "x": "76",
+              "y": "195"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Magnetronic Bazooka R",
+              "opacity": "1.0",
+              "src": "data/001-006-084.png",
+              "visibility": "hidden",
+              "x": "64",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Fizzy Fury R",
+              "opacity": "1.0",
+              "src": "data/001-006-085.png",
+              "visibility": "hidden",
+              "x": "70",
+              "y": "207"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Heavy Machine Gun R",
+              "opacity": "1.0",
+              "src": "data/001-006-086.png",
+              "visibility": "hidden",
+              "x": "10",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sand Falcon R",
+              "opacity": "1.0",
+              "src": "data/001-006-087.png",
+              "visibility": "hidden",
+              "x": "84",
+              "y": "201"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Doom Bringer R",
+              "opacity": "1.0",
+              "src": "data/001-006-088.png",
+              "visibility": "hidden",
+              "x": "61",
+              "y": "141"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bullseye Sniper Rifle R",
+              "opacity": "1.0",
+              "src": "data/001-006-089.png",
+              "visibility": "hidden",
+              "x": "-17",
+              "y": "189"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ian's Disintegrator R",
+              "opacity": "1.0",
+              "src": "data/001-006-090.png",
+              "visibility": "hidden",
+              "x": "40",
+              "y": "180"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Inferno R",
+              "opacity": "1.0",
+              "src": "data/001-006-091.png",
+              "visibility": "hidden",
+              "x": "55",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Explosive Rain R",
+              "opacity": "1.0",
+              "src": "data/001-006-092.png",
+              "visibility": "hidden",
+              "x": "76",
+              "y": "192"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Thunder Punch R",
+              "opacity": "1.0",
+              "src": "data/001-006-093.png",
+              "visibility": "hidden",
+              "x": "109",
+              "y": "204"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blue Flashfire Gun R",
+              "opacity": "1.0",
+              "src": "data/001-006-094.png",
+              "visibility": "hidden",
+              "x": "88",
+              "y": "210"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shards of Shadow R",
+              "opacity": "1.0",
+              "src": "data/001-006-095.png",
+              "visibility": "hidden",
+              "x": "115",
+              "y": "195"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shaken Not Stirred R",
+              "opacity": "1.0",
+              "src": "data/001-006-096.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "183"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Friendship Chain R",
+              "opacity": "1.0",
+              "src": "data/001-006-097.png",
+              "visibility": "visible",
+              "x": "127",
+              "y": "219"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Diamond Chain R",
+              "opacity": "1.0",
+              "src": "data/001-006-098.png",
+              "visibility": "visible",
+              "x": "127",
+              "y": "219"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Mouth",
+          "opacity": "1.0",
+          "visibility": "hidden",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Frown",
+              "opacity": "1.0",
+              "src": "data/001-007-000.png",
+              "visibility": "hidden",
+              "x": "196",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Flat",
+              "opacity": "1.0",
+              "src": "data/001-007-001.png",
+              "visibility": "hidden",
+              "x": "196",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shout",
+              "opacity": "1.0",
+              "src": "data/001-007-002.png",
+              "visibility": "hidden",
+              "x": "196",
+              "y": "150"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Beard",
+              "opacity": "1.0",
+              "src": "data/001-007-003.png",
+              "visibility": "hidden",
+              "x": "196",
+              "y": "150"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Moustache",
+              "opacity": "1.0",
+              "src": "data/001-007-004.png",
+              "visibility": "hidden",
+              "x": "184",
+              "y": "150"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Big Smile",
+              "opacity": "1.0",
+              "src": "data/001-007-005.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Full Beard",
+              "opacity": "1.0",
+              "src": "data/001-007-006.png",
+              "visibility": "hidden",
+              "x": "181",
+              "y": "147"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Okay",
+              "opacity": "1.0",
+              "src": "data/001-007-007.png",
+              "visibility": "hidden",
+              "x": "199",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Very Sad",
+              "opacity": "1.0",
+              "src": "data/001-007-008.png",
+              "visibility": "hidden",
+              "x": "196",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sad",
+              "opacity": "1.0",
+              "src": "data/001-007-009.png",
+              "visibility": "hidden",
+              "x": "199",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Toothless",
+              "opacity": "1.0",
+              "src": "data/001-007-010.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gleaming Grin",
+              "opacity": "1.0",
+              "src": "data/001-007-011.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Slight Smile",
+              "opacity": "1.0",
+              "src": "data/001-007-012.png",
+              "visibility": "hidden",
+              "x": "196",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Smile",
+              "opacity": "1.0",
+              "src": "data/001-007-013.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Fang",
+              "opacity": "1.0",
+              "src": "data/001-007-014.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Vampire",
+              "opacity": "1.0",
+              "src": "data/001-007-015.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "uWu",
+              "opacity": "1.0",
+              "src": "data/001-007-016.png",
+              "visibility": "hidden",
+              "x": "193",
+              "y": "153"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Pucker",
+              "opacity": "1.0",
+              "src": "data/001-007-017.png",
+              "visibility": "hidden",
+              "x": "202",
+              "y": "156"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Distinctive Moustache",
+              "opacity": "1.0",
+              "src": "data/001-007-018.png",
+              "visibility": "visible",
+              "x": "190",
+              "y": "156"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Top",
+          "opacity": "1.0",
+          "visibility": "visible",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Merlin Robes",
+              "opacity": "1.0",
+              "src": "data/001-008-000.png",
+              "visibility": "hidden",
+              "x": "121",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Angel Robes",
+              "opacity": "1.0",
+              "src": "data/001-008-001.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "153"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Strange Robe",
+              "opacity": "1.0",
+              "src": "data/001-008-002.png",
+              "visibility": "hidden",
+              "x": "136",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Academy Robe",
+              "opacity": "1.0",
+              "src": "data/001-008-003.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Archlich Robe",
+              "opacity": "1.0",
+              "src": "data/001-008-004.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Basic Robes",
+              "opacity": "1.0",
+              "src": "data/001-008-005.png",
+              "visibility": "hidden",
+              "x": "145",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Spartan Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-006.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "153"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Marine Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-007.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "135"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Assault Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-008.png",
+              "visibility": "hidden",
+              "x": "124",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Otaku Jacket",
+              "opacity": "1.0",
+              "src": "data/001-008-009.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Galactic Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-010.png",
+              "visibility": "hidden",
+              "x": "133",
+              "y": "153"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Crusader Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-011.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "147"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Rescued Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-012.png",
+              "visibility": "hidden",
+              "x": "118",
+              "y": "141"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Midas Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-013.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "150"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Tiamat Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-014.png",
+              "visibility": "hidden",
+              "x": "124",
+              "y": "144"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Arthur Breastplate",
+              "opacity": "1.0",
+              "src": "data/001-008-015.png",
+              "visibility": "hidden",
+              "x": "97",
+              "y": "129"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gilded Top",
+              "opacity": "1.0",
+              "src": "data/001-008-016.png",
+              "visibility": "hidden",
+              "x": "172",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Corporal Shirt",
+              "opacity": "1.0",
+              "src": "data/001-008-017.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Redshirt Shirt",
+              "opacity": "1.0",
+              "src": "data/001-008-018.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Muscle Shirt",
+              "opacity": "1.0",
+              "src": "data/001-008-019.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Topaz Tank",
+              "opacity": "1.0",
+              "src": "data/001-008-020.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sapphire Tank",
+              "opacity": "1.0",
+              "src": "data/001-008-021.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Emerald Tank",
+              "opacity": "1.0",
+              "src": "data/001-008-022.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Oak Shirt",
+              "opacity": "1.0",
+              "src": "data/001-008-023.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Shirt (Brown)",
+              "opacity": "1.0",
+              "src": "data/001-008-024.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Shirt (Orange)",
+              "opacity": "1.0",
+              "src": "data/001-008-025.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Shirt (Green)",
+              "opacity": "1.0",
+              "src": "data/001-008-026.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Shirt (Pink)",
+              "opacity": "1.0",
+              "src": "data/001-008-027.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Shirt (Red)",
+              "opacity": "1.0",
+              "src": "data/001-008-028.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Shirt (Blue)",
+              "opacity": "1.0",
+              "src": "data/001-008-029.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Tank (Brown)",
+              "opacity": "1.0",
+              "src": "data/001-008-030.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Tank (Blue)",
+              "opacity": "1.0",
+              "src": "data/001-008-031.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Tank (Red)",
+              "opacity": "1.0",
+              "src": "data/001-008-032.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Tank (Pink)",
+              "opacity": "1.0",
+              "src": "data/001-008-033.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Tank (Green)",
+              "opacity": "1.0",
+              "src": "data/001-008-034.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Training Tank (Orange)",
+              "opacity": "1.0",
+              "src": "data/001-008-035.png",
+              "visibility": "hidden",
+              "x": "166",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bleached Robe",
+              "opacity": "1.0",
+              "src": "data/001-008-036.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Penguin Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-037.png",
+              "visibility": "hidden",
+              "x": "148",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Dark Arts Robe",
+              "opacity": "1.0",
+              "src": "data/001-008-038.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "153"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Nokizaru Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-039.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "The Vest",
+              "opacity": "1.0",
+              "src": "data/001-008-040.png",
+              "visibility": "hidden",
+              "x": "154",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shinobi Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-041.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Galahad Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-042.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ember Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-043.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Consecrated Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-044.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bloody Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-045.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Arsenal Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-046.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Celestial Robe",
+              "opacity": "1.0",
+              "src": "data/001-008-047.png",
+              "visibility": "hidden",
+              "x": "151",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Divine Robe",
+              "opacity": "1.0",
+              "src": "data/001-008-048.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "138"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Turtleneck Top",
+              "opacity": "1.0",
+              "src": "data/001-008-049.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bond Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-050.png",
+              "visibility": "hidden",
+              "x": "124",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Boris Top",
+              "opacity": "1.0",
+              "src": "data/001-008-051.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Adams Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-052.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shadow Runner Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-053.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Techxpert Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-054.png",
+              "visibility": "hidden",
+              "x": "175",
+              "y": "174"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Labyrinth Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-055.png",
+              "visibility": "hidden",
+              "x": "73",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Crimson Hakama",
+              "opacity": "1.0",
+              "src": "data/001-008-056.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Coman Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-057.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Diana Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-058.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Slayer Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-059.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sniper Tunic",
+              "opacity": "1.0",
+              "src": "data/001-008-060.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Romanova Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-061.png",
+              "visibility": "hidden",
+              "x": "151",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Matrix Jacket",
+              "opacity": "1.0",
+              "src": "data/001-008-062.png",
+              "visibility": "hidden",
+              "x": "151",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Lara Top",
+              "opacity": "1.0",
+              "src": "data/001-008-063.png",
+              "visibility": "hidden",
+              "x": "172",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Recruit Top",
+              "opacity": "1.0",
+              "src": "data/001-008-064.png",
+              "visibility": "hidden",
+              "x": "169",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Hacker Hoodie",
+              "opacity": "1.0",
+              "src": "data/001-008-065.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "171"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Citrus Top",
+              "opacity": "1.0",
+              "src": "data/001-008-066.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "162"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ayane Robe",
+              "opacity": "1.0",
+              "src": "data/001-008-067.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "159"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Resistance Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-068.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Kunoichi Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-069.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "168"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bloodshot Armor",
+              "opacity": "1.0",
+              "src": "data/001-008-070.png",
+              "visibility": "hidden",
+              "x": "145",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Diamond Cutoff",
+              "opacity": "1.0",
+              "src": "data/001-008-071.png",
+              "visibility": "visible",
+              "x": "148",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Friendship Cutoff",
+              "opacity": "1.0",
+              "src": "data/001-008-072.png",
+              "visibility": "visible",
+              "x": "148",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Stylish Cutoff",
+              "opacity": "1.0",
+              "src": "data/001-008-073.png",
+              "visibility": "visible",
+              "x": "148",
+              "y": "165"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Honor Wrappings",
+              "opacity": "1.0",
+              "src": "data/001-008-074.png",
+              "visibility": "hidden",
+              "x": "145",
+              "y": "165"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Bottom",
+          "opacity": "1.0",
+          "visibility": "visible",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Archlich Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-000.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "234"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Levi Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-001.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "231"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bloodshot Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-002.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Strange Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-003.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "234"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Blitzkrieg Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-004.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "234"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Assault Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-005.png",
+              "visibility": "hidden",
+              "x": "133",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Spartan Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-006.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Jag Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-007.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "234"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Galactic Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-008.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "231"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Necromantic Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-009.png",
+              "visibility": "hidden",
+              "x": "133",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Autumn Underwear",
+              "opacity": "1.0",
+              "src": "data/001-009-010.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Pink Underwear",
+              "opacity": "1.0",
+              "src": "data/001-009-011.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Red Underwear",
+              "opacity": "1.0",
+              "src": "data/001-009-012.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Green Underwear",
+              "opacity": "1.0",
+              "src": "data/001-009-013.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Teal Underwear",
+              "opacity": "1.0",
+              "src": "data/001-009-014.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Orange Underwear",
+              "opacity": "1.0",
+              "src": "data/001-009-015.png",
+              "visibility": "hidden",
+              "x": "157",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Forgotmy Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-016.png",
+              "visibility": "hidden",
+              "x": "160",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Crusader Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-017.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "231"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Midas Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-018.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "234"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Tiamat Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-019.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Arthur Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-020.png",
+              "visibility": "visible",
+              "x": "139",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Streetpop Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-021.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "231"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Hannibal Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-022.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Midnight Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-023.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Citrus Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-024.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Commander Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-025.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Guileless Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-026.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ranger Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-027.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Natalya Pocket Legs",
+              "opacity": "1.0",
+              "src": "data/001-009-028.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "231"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bleached Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-029.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "234"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Nokizaru Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-030.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Otaku Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-031.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "234"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shinobi Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-032.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Celestial Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-033.png",
+              "visibility": "hidden",
+              "x": "112",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Galahad Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-034.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "231"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Divine Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-035.png",
+              "visibility": "hidden",
+              "x": "134",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bloody Raiments",
+              "opacity": "1.0",
+              "src": "data/001-009-036.png",
+              "visibility": "hidden",
+              "x": "103",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Hermione Raiments",
+              "opacity": "1.0",
+              "src": "data/001-009-037.png",
+              "visibility": "hidden",
+              "x": "88",
+              "y": "222"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Consecrated Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-038.png",
+              "visibility": "hidden",
+              "x": "131",
+              "y": "219"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Strider Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-039.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "219"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bond Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-040.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Canary Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-041.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "222"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Corporal Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-042.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Adams Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-043.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shadow Runner Legs",
+              "opacity": "1.0",
+              "src": "data/001-009-044.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Techxpert Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-045.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Power Suit Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-046.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Bladed Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-047.png",
+              "visibility": "hidden",
+              "x": "140",
+              "y": "213"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Labyrinth Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-048.png",
+              "visibility": "hidden",
+              "x": "140",
+              "y": "219"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Yoroi Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-049.png",
+              "visibility": "hidden",
+              "x": "136",
+              "y": "222"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Coman Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-050.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Diana Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-051.png",
+              "visibility": "hidden",
+              "x": "136",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Slayer Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-052.png",
+              "visibility": "hidden",
+              "x": "137",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Sniper Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-053.png",
+              "visibility": "hidden",
+              "x": "140",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Angel Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-054.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Matrix Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-055.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Craft Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-056.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Recruit Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-057.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Mandarin Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-058.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "225"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Ayane Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-059.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Resistance Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-060.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "228"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Kunoichi Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-061.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "213"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Crimson Leggings",
+              "opacity": "1.0",
+              "src": "data/001-009-062.png",
+              "visibility": "hidden",
+              "x": "139",
+              "y": "225"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Skin",
+          "opacity": "1.0",
+          "visibility": "visible",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "NB Pale",
+              "opacity": "1.0",
+              "src": "data/001-010-000.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "NB Light",
+              "opacity": "1.0",
+              "src": "data/001-010-001.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "NB Sand",
+              "opacity": "1.0",
+              "src": "data/001-010-002.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "NB Medium",
+              "opacity": "1.0",
+              "src": "data/001-010-003.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "NB MDark",
+              "opacity": "1.0",
+              "src": "data/001-010-004.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "NB Dark",
+              "opacity": "1.0",
+              "src": "data/001-010-005.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "F Sand",
+              "opacity": "1.0",
+              "src": "data/001-010-006.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "F Pale",
+              "opacity": "1.0",
+              "src": "data/001-010-007.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "F Light",
+              "opacity": "1.0",
+              "src": "data/001-010-008.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "F Medium",
+              "opacity": "1.0",
+              "src": "data/001-010-009.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "F MDark",
+              "opacity": "1.0",
+              "src": "data/001-010-010.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "F Dark",
+              "opacity": "1.0",
+              "src": "data/001-010-011.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "M Pale",
+              "opacity": "1.0",
+              "src": "data/001-010-012.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "M Sand",
+              "opacity": "1.0",
+              "src": "data/001-010-013.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "M Light",
+              "opacity": "1.0",
+              "src": "data/001-010-014.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "M Medium",
+              "opacity": "1.0",
+              "src": "data/001-010-015.png",
+              "visibility": "visible",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "M MDark",
+              "opacity": "1.0",
+              "src": "data/001-010-016.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "M Dark",
+              "opacity": "1.0",
+              "src": "data/001-010-017.png",
+              "visibility": "hidden",
+              "x": "127",
+              "y": "123"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Shadow",
+          "opacity": "1.0",
+          "visibility": "visible",
+          "layer": {
+            "composite-op": "svg:src-over",
+            "name": "Base",
+            "opacity": "1.0",
+            "src": "data/001-011-000.png",
+            "visibility": "visible",
+            "x": "130",
+            "y": "336"
+          }
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Class",
+          "opacity": "1.0",
+          "visibility": "hidden",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Wizard",
+              "opacity": "1.0",
+              "src": "data/001-012-000.png",
+              "visibility": "visible",
+              "x": "83",
+              "y": "105"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Tech",
+              "opacity": "1.0",
+              "src": "data/001-012-001.png",
+              "visibility": "visible",
+              "x": "107",
+              "y": "125"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Knight",
+              "opacity": "1.0",
+              "src": "data/001-012-002.png",
+              "visibility": "visible",
+              "x": "114",
+              "y": "132"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gunner",
+              "opacity": "1.0",
+              "src": "data/001-012-003.png",
+              "visibility": "visible",
+              "x": "98",
+              "y": "127"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Assassin",
+              "opacity": "1.0",
+              "src": "data/001-012-004.png",
+              "visibility": "visible",
+              "x": "103",
+              "y": "129"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Gender",
+          "opacity": "1.0",
+          "visibility": "hidden",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Non-Binary",
+              "opacity": "1.0",
+              "src": "data/001-013-000.png",
+              "visibility": "visible",
+              "x": "124",
+              "y": "123"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Male",
+              "opacity": "1.0",
+              "src": "data/001-013-001.png",
+              "visibility": "visible",
+              "x": "103",
+              "y": "129"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Female",
+              "opacity": "1.0",
+              "src": "data/001-013-002.png",
+              "visibility": "visible",
+              "x": "136",
+              "y": "133"
+            }
+          ]
+        },
+        {
+          "composite-op": "svg:src-over",
+          "name": "Background",
+          "opacity": "1.0",
+          "visibility": "visible",
+          "layer": [
+            {
+              "composite-op": "svg:src-over",
+              "name": "Legendary Dunes",
+              "opacity": "1.0",
+              "src": "data/001-014-000.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Epic Vintage",
+              "opacity": "1.0",
+              "src": "data/001-014-001.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Rare Skyway",
+              "opacity": "1.0",
+              "src": "data/001-014-002.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Uncommon Vista",
+              "opacity": "1.0",
+              "src": "data/001-014-003.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Common Shoals",
+              "opacity": "1.0",
+              "src": "data/001-014-004.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Echoes of Eternity",
+              "opacity": "1.0",
+              "src": "data/001-014-005.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Azure Sky Port",
+              "opacity": "1.0",
+              "src": "data/001-014-006.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Arcanum Outpost",
+              "opacity": "1.0",
+              "src": "data/001-014-007.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Starlight Refuge",
+              "opacity": "1.0",
+              "src": "data/001-014-008.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Astral Grotto",
+              "opacity": "1.0",
+              "src": "data/001-014-009.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Celestial Temple",
+              "opacity": "1.0",
+              "src": "data/001-014-010.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Lunar Citadel",
+              "opacity": "1.0",
+              "src": "data/001-014-011.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Skytower City",
+              "opacity": "1.0",
+              "src": "data/001-014-012.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "The Infinite Ocean",
+              "opacity": "1.0",
+              "src": "data/001-014-013.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Skullcrusher Mountain",
+              "opacity": "1.0",
+              "src": "data/001-014-014.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Knowhere",
+              "opacity": "1.0",
+              "src": "data/001-014-015.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Eldritch Marsh",
+              "opacity": "1.0",
+              "src": "data/001-014-016.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Taufik's Last Stand",
+              "opacity": "1.0",
+              "src": "data/001-014-017.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Raptor's Aerie",
+              "opacity": "1.0",
+              "src": "data/001-014-018.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Poseidon's Rest",
+              "opacity": "1.0",
+              "src": "data/001-014-019.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Voidgate Tower",
+              "opacity": "1.0",
+              "src": "data/001-014-020.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Gravity Rift Fortress",
+              "opacity": "1.0",
+              "src": "data/001-014-021.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Stormwarden Stronghold",
+              "opacity": "1.0",
+              "src": "data/001-014-022.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Nexus Bastion",
+              "opacity": "1.0",
+              "src": "data/001-014-023.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Solaria Kingdom",
+              "opacity": "1.0",
+              "src": "data/001-014-024.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Starlight Village",
+              "opacity": "1.0",
+              "src": "data/001-014-025.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Thunderhead Peak",
+              "opacity": "1.0",
+              "src": "data/001-014-026.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shadowvale Woods",
+              "opacity": "1.0",
+              "src": "data/001-014-027.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Starfall Keep",
+              "opacity": "1.0",
+              "src": "data/001-014-028.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Elemental Glade",
+              "opacity": "1.0",
+              "src": "data/001-014-029.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Shimmering Isles",
+              "opacity": "1.0",
+              "src": "data/001-014-030.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Dragonfire Canyon",
+              "opacity": "1.0",
+              "src": "data/001-014-031.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Eldertree Grove",
+              "opacity": "1.0",
+              "src": "data/001-014-032.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Crystalhaven Sanctuary",
+              "opacity": "1.0",
+              "src": "data/001-014-033.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            },
+            {
+              "composite-op": "svg:src-over",
+              "name": "Astonishmint",
+              "opacity": "1.0",
+              "src": "data/001-014-034.png",
+              "visibility": "visible",
+              "x": "0",
+              "y": "0"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

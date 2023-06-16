@@ -4,16 +4,16 @@ import "@babylonjs/loaders/glTF";
 import * as BABYLON from "@babylonjs/core/Legacy/legacy";
 import mergeImages from 'merge-images';
 
-import { Engine, Scene, Vector3, Mesh, ArcRotateCamera, HemisphericLight, Color3, Color4, UniversalCamera, FollowCamera, ShadowGenerator, GlowLayer, PointLight, FreeCamera, CubeTexture, Sound, PostProcess, Effect, SceneLoader, Matrix, MeshBuilder, Quaternion, AssetsManager } from "@babylonjs/core";
-import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui";
+import { Engine, Scene, Vector3, Mesh, HemisphericLight, Color3, Color4, FreeCamera, Sound, Effect, SceneLoader } from "@babylonjs/core";
+import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui";
 import * as CANNON from "cannon";
 
 interface MetadataSlot {
-    item_contract_address: string,
+    // item_contract_address: string,
     item_id: number,
     trait_type: string,
     value: string,
-    is_base_item: boolean
+    // is_base_item: boolean
 }
 interface ItemMap {
     "composite-op": string,
@@ -66,6 +66,11 @@ class App {
 
     private selectedCharacterId: number;
 
+    private _stack: SlotMap[];
+
+    private ground: Mesh;
+    private _projetile: Mesh;
+
     constructor() {
         this._canvas = this._createCanvas();
 
@@ -110,14 +115,16 @@ class App {
         const grassMaterial = new BABYLON.StandardMaterial("grassMaterial", this._scene);
         grassMaterial.ambientTexture = grassTexture;
         
-        const fieldFimensions = new Vector3(40, 0, 25)
-        const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 40, height: 25}, this._scene);
-        ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 0, restitution: 0.5});
-        ground.position = new Vector3(20, 0, 12.5);
-        ground.metadata = "ground";
-        ground.material = grassMaterial;
+        const fieldFimensions = new Vector3(20, 0, 15)
+        this.ground = BABYLON.MeshBuilder.CreateGround("ground", {width: fieldFimensions.x, height: fieldFimensions.z}, this._scene);
+        this.ground.physicsImpostor = new BABYLON.PhysicsImpostor(this.ground, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 0, restitution: 0.5});
+        this.ground.position = new Vector3(fieldFimensions.x/2, 0, fieldFimensions.z/2);
+        this.ground.metadata = "ground";
+        this.ground.material = grassMaterial;
 
-        ground.actionManager = new BABYLON.ActionManager();
+        this.ground.actionManager = new BABYLON.ActionManager();
+
+        this._stack = (await fetch("stack.json").then((res)=>res.json())).stack.stack.stack
 
         let counter = 0;
         for (let i = 5; i < fieldFimensions.z; i+=10) {
@@ -139,24 +146,69 @@ class App {
             this._scene.render();
         });
 
+        this.createProjectile();
+
         // Handle pointer clicks
         this._scene.onPointerDown = (event: BABYLON.IPointerEvent, pickInfo: BABYLON.PickingInfo) => {
-            if (this.selectedCharacterId && pickInfo.hit && pickInfo.pickedMesh.metadata == "ground") {
-                this.moveCharacter(this.selectedCharacterId, pickInfo.pickedPoint);
-                this.selectedCharacterId = 0;
-            } else if (pickInfo.pickedMesh.metadata == "arcadian") {
-                this.selectedCharacterId = pickInfo.pickedMesh.uniqueId;
+            if (event.button == 0 && pickInfo.hit) {
+                if (this.selectedCharacterId && pickInfo.hit && pickInfo.pickedMesh.metadata == "ground") {
+                    this.moveCharacter(this.selectedCharacterId, pickInfo.pickedPoint);
+                    this.selectedCharacterId = 0;
+                } else if (pickInfo.pickedMesh.metadata == "arcadian") {
+                    this.selectedCharacterId = pickInfo.pickedMesh.uniqueId;
+                }
             }
         }
+
+        window.addEventListener("keydown", (ev) => {
+            if (ev.keyCode === 32) {
+                if (this.selectedCharacterId) {
+                    const projectile = this.cloneProjectile();
+                    const characterMesh = this.getMesh(this.selectedCharacterId);
+                    projectile.position = characterMesh.position.add(new Vector3(characterMesh.scaling.x*-1, 0.5, 0));
+                    const force = new Vector3(characterMesh.scaling.x*-10, 5, 0);
+                    projectile.physicsImpostor.registerAfterPhysicsStep(()=>{projectile.physicsImpostor.setAngularVelocity(Vector3.Zero())});
+                    projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
+                }
+            }
+        });
+    }
+
+    private cloneProjectile(): Mesh {
+        const clone = this._projetile.clone("projectileClone");
+        clone.physicsImpostor = new BABYLON.PhysicsImpostor(clone, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.7, friction: 1});
+        clone.actionManager = new BABYLON.ActionManager(this._scene);
+        clone.physicsImpostor.registerOnPhysicsCollide(
+            this.ground.physicsImpostor, 
+            ()=>{
+                setTimeout(() => {
+                    clone.dispose();
+                }, 2000);
+            }
+        );
+        clone.setEnabled(true);
+        return clone;
+    }
+
+    private createProjectile() {
+        const material = new BABYLON.StandardMaterial("mat", this._scene);
+        material.roughness = 1;
+        material.emissiveColor = new Color3(1, 0.2, 0);
+        let projetile = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.5}, this._scene);
+        projetile.material = material;
+
+        
+        projetile.position = new Vector3(10, 2, 2);
+        projetile.setEnabled(false);
+        this._projetile = projetile;
     }
 
     private async loadArcadian(arcadianId: number, position: Vector3 = Vector3.Zero()) {
+        
         const metadataUrl = "https://arcadians.prod.outplay.games/v2/arcadians/" + arcadianId;
         const metadata = await fetch(metadataUrl).then((result)=>result.json())
-        const attributes: MetadataSlot[] = metadata.attributes;
 
-        const stackResponse = (await fetch("stack.json").then((res)=>res.json()));
-        const stack: SlotMap[] = stackResponse.stack.stack.stack
+        const attributes: MetadataSlot[] = metadata.attributes;
 
         // body to detect interactions
         const arcadianHeight = 2.8;
@@ -168,8 +220,7 @@ class App {
         body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.5, friction: 1});
         body.physicsImpostor.physicsBody.angularDamping = 1;
         const nodeUniqueId = body.uniqueId;
-
-        const result = await SceneLoader.ImportMeshAsync(null, "ArcadianAvatar", ".gltf", this._scene)
+        const result = await SceneLoader.ImportMeshAsync(null, "ArcadianAvatar", ".gltf", this._scene);
         const arcadianMesh = result.meshes[0];
         arcadianMesh.setParent(body);
         arcadianMesh.position = new Vector3(0, -arcadianHeight/2, 0);
@@ -189,14 +240,13 @@ class App {
             if (slotName == "Class" || slotName == "Gender" || slotName == "Background") 
                 continue;
 
-            const itemsSlot = stack.find((v)=>v.name == slotName)
+            const itemsSlot = this._stack.find((v)=>v.name == slotName)
             const itemSlot = itemsSlot.layer.find((v)=>v.name == att.value)
 
             const itemFilename = itemSlot.src.split("/")[1];
             const itemPath = "parts/" + itemFilename;
             const blankPath = "empty399x399.png";
             const textureImage = await mergeImages([blankPath, {src: itemPath, x: itemSlot.x, y: itemSlot.y}]);
-
             let tex = new BABYLON.Texture(textureImage, this._scene, true, false, BABYLON.Texture.NEAREST_SAMPLINGMODE);
             tex.name = itemFilename;
             tex.hasAlpha = true;
@@ -217,7 +267,7 @@ class App {
                     trigger: BABYLON.ActionManager.OnPickDownTrigger,
                 },
                 () => {
-                    console.log("character selected:", this.selectedCharacterId)
+                    console.log("character selected")
                 }
             )
         )
@@ -225,7 +275,7 @@ class App {
     }
 
     private moveCharacter(nodeUniqueId: number, destination: Vector3) {
-        const characterMesh = this.getNode(nodeUniqueId) as BABYLON.Mesh;
+        const characterMesh = this.getMesh(nodeUniqueId);
         const speed = 4.5;
         let distance = destination.subtract(characterMesh.position);
 
@@ -233,8 +283,16 @@ class App {
             distance = destination.subtract(characterMesh.position);
             distance.y = 0;
             if (distance.length() < 0.1) {
+                // set velocity as 0
                 characterMesh.physicsImpostor.setLinearVelocity(new Vector3(0,0,0));
-                // characterMesh.physicsImpostor.applyForce(new Vector3(-5,0,-5), characterMesh.getAbsolutePosition())
+                const resetVelocity = function(){
+                    characterMesh.physicsImpostor.setLinearVelocity(Vector3.Zero())
+                }
+                characterMesh.physicsImpostor.registerAfterPhysicsStep(()=>{
+                    resetVelocity();
+                    characterMesh.physicsImpostor.unregisterAfterPhysicsStep(resetVelocity);
+                });
+
                 this.setAnimation(characterMesh.uniqueId, ANIMATION_LIST.idle);
                 this._scene.unregisterBeforeRender(arcadianPhysics);
             }
@@ -254,8 +312,8 @@ class App {
         this._scene.registerBeforeRender(arcadianPhysics);
     }
 
-    private getNode(nodeUniqueId: number): BABYLON.Node {
-        return this._scene.rootNodes.find((v)=>v.uniqueId == nodeUniqueId);
+    private getMesh(nodeUniqueId: number): Mesh {
+        return this._scene.rootNodes.find((v)=>v.uniqueId == nodeUniqueId) as Mesh;
     }
     private setAnimation(uniqueId: number, animationName: string, loop: boolean = true) {
         console.log("uniqueId+animationName", uniqueId+animationName)

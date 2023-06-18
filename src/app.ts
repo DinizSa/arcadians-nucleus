@@ -63,6 +63,7 @@ class App {
 
     //Scene - related
     private _state: number = 0;
+    private SEPARATOR = '_';
 
     private selectedCharacterId: number;
 
@@ -129,7 +130,6 @@ class App {
             for (let j = 5; j < fieldFimensions.x; j+=10) {
                 ++counter;
                 await this.loadArcadian(counter, new Vector3(j, 5, i));
-                // this.setAnimation(arcadianNodeId, Object.values(ANIMATION_LIST)[Math.floor(Math.random()*(Object.values(ANIMATION_LIST).length - 1))]);
             }
         }
         
@@ -138,9 +138,6 @@ class App {
         let camera = new FreeCamera("camera1", new Vector3(fieldFimensions.x/2, 10, fieldFimensions.z+5), this._scene);
         camera.setTarget(new Vector3(fieldFimensions.x/2, 0, fieldFimensions.z*1/4))
         camera.attachControl(this._canvas, true);
-
-        // let obj = BABYLON.MeshBuilder.CreateBox("box", {size: 4}, this._scene)
-        // obj.position = new Vector3(8,2, 5)
 
         // run the main render loop
         this._engine.runRenderLoop(() => {
@@ -170,6 +167,19 @@ class App {
         });
     }
 
+    private createProjectile() {
+        const material = new BABYLON.StandardMaterial("mat", this._scene);
+        material.roughness = 1;
+        material.emissiveColor = new Color3(1, 0.2, 0);
+        let projetile = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.5}, this._scene);
+        projetile.material = material;
+
+        
+        projetile.position = new Vector3(10, 2, 2);
+        projetile.setEnabled(false);
+        this._projetile = projetile;
+    }
+
     private cloneProjectile(): Mesh {
         const clone = this._projetile.clone("projectileClone");
         clone.physicsImpostor = new BABYLON.PhysicsImpostor(clone, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.1, friction: 0.1});
@@ -186,21 +196,7 @@ class App {
         return clone;
     }
 
-    private createProjectile() {
-        const material = new BABYLON.StandardMaterial("mat", this._scene);
-        material.roughness = 1;
-        material.emissiveColor = new Color3(1, 0.2, 0);
-        let projetile = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.5}, this._scene);
-        projetile.material = material;
-
-        
-        projetile.position = new Vector3(10, 2, 2);
-        projetile.setEnabled(false);
-        this._projetile = projetile;
-    }
-
     private shotNearestEnemy(characterUniqueId: number) {
-        const projectile = this.cloneProjectile();
         const characterMesh = this.getRootMesh(characterUniqueId);
         
         const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != characterMesh.uniqueId);
@@ -233,10 +229,14 @@ class App {
         const deltaPosition = nearestTarget.position.subtract(characterMesh.position);
         characterMesh.scaling = new Vector3(-Math.sign(deltaPosition.x)*1, 1, 1);
 
-        projectile.position = characterMesh.position.add(new Vector3(-Math.sign(characterMesh.scaling.x), 1, 0));
-        projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
-        const force = deltaPosition.normalize().scale(8);
-        projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
+        this.setAnimation(characterMesh.uniqueId, ANIMATION_LIST.attackAssassin, false)
+        setTimeout(() => {
+            const projectile = this.cloneProjectile();
+            projectile.position = characterMesh.position.add(new Vector3(-Math.sign(characterMesh.scaling.x), 1, 0));
+            projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
+            const force = deltaPosition.normalize().scale(8);
+            projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
+        }, 300);
     }
 
     private async loadArcadian(arcadianId: number, position: Vector3 = Vector3.Zero()) {
@@ -268,7 +268,7 @@ class App {
             childMesh.isPickable = false;
         }
         for (const group of result.animationGroups) {
-            group.name = nodeUniqueId + group.name
+            group.name = nodeUniqueId + this.SEPARATOR + group.name
         }
 
         for (const att of attributes) {
@@ -309,6 +309,7 @@ class App {
                 }
             )
         )
+        this.stopAnimations(nodeUniqueId);
         this.setAnimation(nodeUniqueId, ANIMATION_LIST.idle);
     }
 
@@ -344,12 +345,17 @@ class App {
     private getRootMesh(nodeUniqueId: number): Mesh {
         return this._scene.rootNodes.find((v)=>v.uniqueId == nodeUniqueId) as Mesh;
     }
-    private setAnimation(uniqueId: number, animationName: string, loop: boolean = true) {
-        const activeAnimations = this._scene.animationGroups.filter((v)=>v.isPlaying && v.name.includes(uniqueId.toString()));
+    private stopAnimations(uniqueId: number) {
+        const activeAnimations = this._scene.animationGroups.filter((v)=>v.isPlaying && v.name.split(this.SEPARATOR)[0] == uniqueId.toString());
         activeAnimations.forEach((v)=>v.stop())
-
-        var anim = this._scene.getAnimationGroupByName(uniqueId+animationName);
+    }
+    private setAnimation(uniqueId: number, animationName: string, loop: boolean = true) {
+        var anim = this._scene.getAnimationGroupByName(this.getAnimationGroupByName(uniqueId, animationName));
         anim.start(loop);
+    }
+
+    private getAnimationGroupByName(uniqueId: number, animationName: string) {
+        return  uniqueId + this.SEPARATOR + animationName
     }
 
     private _createCanvas(): HTMLCanvasElement {

@@ -62,7 +62,6 @@ class App {
     private _engine: Engine;
 
     //Scene - related
-    private _state: number = 0;
     private SEPARATOR = '_';
 
     private selectedCharacterId: number;
@@ -71,21 +70,14 @@ class App {
 
     private ground: Mesh;
     private _projetile: Mesh;
+    private _selectedMark: Mesh;
+
+    private fieldFimensions = new Vector3(30, 0, 15)
+    private FPS = 60;
+    private GRAVITY = -9.81;
 
     constructor() {
-        this._canvas = this._createCanvas();
-
-
-        // initialize babylon scene and engine
-        this._engine = new Engine(this._canvas, true);
-        this._scene = new Scene(this._engine);
-
-        const fps = 60;
-        const gravity = -9.81;
-        this._scene.gravity = new Vector3(0, gravity/fps, 0);
-        this._scene.collisionsEnabled = true;
-        this._scene.enablePhysics(new Vector3(0, gravity, 0), new BABYLON.CannonJSPlugin(true, 10, CANNON));
-
+        this._canvas = this._createCanvas()
 
         // hide/show the Inspector
         window.addEventListener("keydown", (ev) => {
@@ -103,48 +95,21 @@ class App {
     }
 
     private async _main(): Promise<void> {
-
-        // await this._goToStart();
         
-        const grassTexture = new BABYLON.Texture("environment/Grass Tile.png", this._scene);
-        grassTexture.hasAlpha = true;
-        grassTexture.vScale = 40;
-        grassTexture.uScale = 40;
-        
-        const grassMaterial = new BABYLON.StandardMaterial("grassMaterial", this._scene);
-        grassMaterial.ambientTexture = grassTexture;
-        
-        const fieldFimensions = new Vector3(30, 0, 15)
-        this.ground = BABYLON.MeshBuilder.CreateGround("ground", {width: fieldFimensions.x, height: fieldFimensions.z}, this._scene);
-        this.ground.physicsImpostor = new BABYLON.PhysicsImpostor(this.ground, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 0, restitution: 1});
-        this.ground.position = new Vector3(fieldFimensions.x/2, 0, fieldFimensions.z/2);
-        this.ground.metadata = "ground";
-        this.ground.material = grassMaterial;
-
-        this.ground.actionManager = new BABYLON.ActionManager();
-
         this._stack = (await fetch("stack.json").then((res)=>res.json())).stack.stack.stack
 
-        let counter = 0;
-        for (let i = 5; i < fieldFimensions.z; i+=10) {
-            for (let j = 5; j < fieldFimensions.x; j+=10) {
-                ++counter;
-                await this.loadArcadian(counter, new Vector3(j, 5, i));
-            }
-        }
-        
-        var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(fieldFimensions.x, fieldFimensions.x, fieldFimensions.z), this._scene);
+        this.createScene();
 
-        let camera = new FreeCamera("camera1", new Vector3(fieldFimensions.x/2, 10, fieldFimensions.z+5), this._scene);
-        camera.setTarget(new Vector3(fieldFimensions.x/2, 0, fieldFimensions.z*1/4))
-        camera.attachControl(this._canvas, true);
+        this.createTerrain();
+
+        this.setupSelectedMark();
 
         // run the main render loop
         this._engine.runRenderLoop(() => {
             this._scene.render();
         });
 
-        this.createProjectile();
+        this.setupProjectile();
 
         // Handle pointer clicks
         this._scene.onPointerDown = (event: BABYLON.IPointerEvent, pickInfo: BABYLON.PickingInfo) => {
@@ -152,8 +117,10 @@ class App {
                 if (this.selectedCharacterId && pickInfo.hit && pickInfo.pickedMesh.metadata == "ground") {
                     this.moveCharacter(this.selectedCharacterId, pickInfo.pickedPoint);
                     this.selectedCharacterId = 0;
+                    this._selectedMark.setEnabled(false);
                 } else if (pickInfo.pickedMesh.metadata == "arcadian") {
                     this.selectedCharacterId = pickInfo.pickedMesh.uniqueId;
+                    this.startSelectedMarkAnim(this.selectedCharacterId);
                 }
             }
         }
@@ -167,14 +134,64 @@ class App {
         });
     }
 
-    private createProjectile() {
+    private startSelectedMarkAnim(parentUniqueId: number) {
+        const parentMesh = this.getRootMesh(parentUniqueId)
+        this._selectedMark.setEnabled(true);
+        this._selectedMark.parent = parentMesh;
+        this._selectedMark.position.y = parentMesh.getBoundingInfo().maximum.y + 0.6;
+        this._scene.beginAnimation(this._selectedMark, 0, this.FPS * 2, true);
+    }
+
+    private setupSelectedMark() {
+        const texture = new BABYLON.Texture("environment/Gem.png", this._scene);
+        texture.hasAlpha = true;
+        texture.uScale = 1;
+        texture.vScale = 1;
+        const material = new BABYLON.StandardMaterial("mat", this._scene);
+        material.diffuseTexture = texture;
+        material.backFaceCulling = false;
+        let mark = BABYLON.MeshBuilder.CreatePlane("plane", {width: 1, height: 1})
+        mark.isPickable = false;
+        mark.material = material;
+
+        const waveFrames = [];
+        const waveAnim = new BABYLON.Animation(
+            "waveVertical", 
+            "scalingDeterminant", 
+            this.FPS, 
+            BABYLON.Animation.ANIMATIONTYPE_FLOAT, 
+            BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+        )
+        waveFrames.push({frame: 0, value: 1})
+        waveFrames.push({frame: this.FPS, value: 1.5})
+        waveFrames.push({frame: this.FPS * 2, value: 1})
+        waveAnim.setKeys(waveFrames);
+        mark.animations.push(waveAnim);
+
+        const colorSwitchFrames = [];
+        const colorSwitchAnim = new BABYLON.Animation(
+            "colorSwitch", 
+            "material.emissiveColor", 
+            this.FPS, 
+            BABYLON.Animation.ANIMATIONTYPE_COLOR3, 
+            BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+        )
+        colorSwitchFrames.push({frame: 0, value: Color3.Purple()})
+        colorSwitchFrames.push({frame: this.FPS, value: Color3.Red()})
+        colorSwitchFrames.push({frame: this.FPS * 2, value: Color3.Purple()})
+        colorSwitchAnim.setKeys(colorSwitchFrames);
+        mark.animations.push(colorSwitchAnim);
+        this._selectedMark = mark;
+        mark.setEnabled(false);
+    }
+
+    private setupProjectile() {
         const material = new BABYLON.StandardMaterial("mat", this._scene);
         material.roughness = 1;
         material.emissiveColor = new Color3(1, 0.2, 0);
         let projetile = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.5}, this._scene);
         projetile.material = material;
-
-        
+        projetile.isPickable = false;
         projetile.position = new Vector3(10, 2, 2);
         projetile.setEnabled(false);
         this._projetile = projetile;
@@ -202,6 +219,7 @@ class App {
         const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != characterMesh.uniqueId);
         if (!targets || targets.length == 0) 
             return;
+
         targets.sort((a, b)=>a.position.subtract(characterMesh.position).length() - b.position.subtract(characterMesh.position).length())
         let nearestTarget: BABYLON.Mesh;
 
@@ -254,11 +272,12 @@ class App {
         BABYLON.Tags.AddTagsTo(body, "arcadian");
         body.visibility = 0;
         body.position = position;
-        body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.5, friction: 0.3});
+        body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.3, friction: 0.3});
         body.physicsImpostor.physicsBody.angularDamping = 1;
         const nodeUniqueId = body.uniqueId;
-        const result = await SceneLoader.ImportMeshAsync(null, "ArcadianAvatar", ".gltf", this._scene);
-        const arcadianMesh = result.meshes[0];
+        const {meshes, animationGroups} = await SceneLoader.ImportMeshAsync(null, "ArcadianAvatar", ".gltf", this._scene);
+        const arcadianMesh = meshes[0];
+        animationGroups[0].stop();
         arcadianMesh.setParent(body);
         arcadianMesh.position = new Vector3(0, -arcadianHeight/2, 0);
         arcadianMesh.isPickable = false;
@@ -267,7 +286,7 @@ class App {
         for (const childMesh of childMeshes) {
             childMesh.isPickable = false;
         }
-        for (const group of result.animationGroups) {
+        for (const group of animationGroups) {
             group.name = nodeUniqueId + this.SEPARATOR + group.name
         }
 
@@ -309,7 +328,7 @@ class App {
                 }
             )
         )
-        this.setAnimation(nodeUniqueId, ANIMATION_LIST.idle);
+        this.setAnimation(nodeUniqueId, ANIMATION_LIST.idle, true, false);
     }
 
     private moveCharacter(nodeUniqueId: number, destination: Vector3) {
@@ -341,6 +360,22 @@ class App {
         this._scene.registerBeforeRender(arcadianPhysics);
     }
 
+    private createTerrain() {
+        const grassTexture = new BABYLON.Texture("environment/Grass Tile.png", this._scene);
+        grassTexture.hasAlpha = true;
+        grassTexture.vScale = 40;
+        grassTexture.uScale = 40;
+        
+        const grassMaterial = new BABYLON.StandardMaterial("grassMaterial", this._scene);
+        grassMaterial.ambientTexture = grassTexture;
+        
+        this.ground = BABYLON.MeshBuilder.CreateGround("ground", {width: this.fieldFimensions.x, height: this.fieldFimensions.z}, this._scene);
+        this.ground.physicsImpostor = new BABYLON.PhysicsImpostor(this.ground, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 0, restitution: 1});
+        this.ground.position = new Vector3(this.fieldFimensions.x/2, 0, this.fieldFimensions.z/2);
+        this.ground.metadata = "ground";
+        this.ground.material = grassMaterial;
+    }
+
     private getRootMesh(nodeUniqueId: number): Mesh {
         return this._scene.rootNodes.find((v)=>v.uniqueId == nodeUniqueId) as Mesh;
     }
@@ -358,6 +393,31 @@ class App {
 
     private getAnimationGroupByName(uniqueId: number, animationName: string) {
         return  uniqueId + this.SEPARATOR + animationName
+    }
+
+    private async createScene() {
+        // initialize babylon scene and engine
+        this._engine = new Engine(this._canvas, true);
+        this._scene = new Scene(this._engine);
+
+        var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(this.fieldFimensions.x, this.fieldFimensions.x, this.fieldFimensions.z), this._scene);
+        let camera = new FreeCamera("camera1", new Vector3(this.fieldFimensions.x/2, 10, this.fieldFimensions.z+5), this._scene);
+        camera.setTarget(new Vector3(this.fieldFimensions.x/2, 0, this.fieldFimensions.z*1/4))
+        camera.attachControl(this._canvas, true);
+
+        this._scene.gravity = new Vector3(0, this.GRAVITY / this.FPS, 0);
+        this._scene.collisionsEnabled = true;
+        this._scene.enablePhysics(new Vector3(0, this.GRAVITY, 0), new BABYLON.CannonJSPlugin(true, 10, CANNON));
+        
+
+        let counter = 0;
+        for (let i = 5; i < this.fieldFimensions.z; i+=10) {
+            for (let j = 5; j < this.fieldFimensions.x; j+=10) {
+                ++counter;
+                await this.loadArcadian(counter, new Vector3(j, 5, i));
+            }
+        }
+
     }
 
     private _createCanvas(): HTMLCanvasElement {
@@ -383,84 +443,6 @@ class App {
         document.body.appendChild(this._canvas);
 
         return this._canvas;
-    }
-
-    // goToStart
-    private async _goToStart() {
-        this._engine.displayLoadingUI(); //make sure to wait for start to load
-
-        //--SCENE SETUP--
-        //dont detect any inputs from this ui while the game is loading
-        this._scene.detachControl();
-        let scene = new Scene(this._engine);
-        scene.clearColor = new Color4(0, 0, 0, 1);
-        //creates and positions a free camera
-        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
-        camera.setTarget(Vector3.Zero()); //targets the camera to scene origin
-
-        //--SOUNDS--
-        const start = new Sound("startSong", "./sounds/copycat(revised).mp3", scene, function () {
-        }, {
-            volume: 0.25,
-            loop: true,
-            autoplay: true
-        });
-        const sfx = new Sound("selection", "./sounds/vgmenuselect.wav", scene, function () {
-        });
-
-        //--GUI--
-        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720;
-
-        //background image
-        const imageRect = new Rectangle("titleContainer");
-        imageRect.width = 0.8;
-        imageRect.thickness = 0;
-        guiMenu.addControl(imageRect);
-
-        const startbg = new Image("startbg", "sprites/start.jpeg");
-        imageRect.addControl(startbg);
-
-        const title = new TextBlock("title", "SUMMER'S FESTIVAL");
-        title.resizeToFit = true;
-        title.fontFamily = "Ceviche One";
-        title.fontSize = "64px";
-        title.color = "white";
-        title.resizeToFit = true;
-        title.top = "14px";
-        title.width = 0.8;
-        title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        imageRect.addControl(title);
-
-        const startBtn = Button.CreateSimpleButton("start", "PLAY");
-        startBtn.fontFamily = "Viga";
-        startBtn.width = 0.2
-        startBtn.height = "40px";
-        startBtn.color = "white";
-        startBtn.top = "-14px";
-        startBtn.thickness = 0;
-        startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        imageRect.addControl(startBtn);
-
-        //set up transition effect : modified version of https://www.babylonjs-playground.com/#2FGYE8#0
-        Effect.RegisterShader("fade",
-            "precision highp float;" +
-            "varying vec2 vUV;" +
-            "uniform sampler2D textureSampler; " +
-            "uniform float fadeLevel; " +
-            "void main(void){" +
-            "vec4 baseColor = texture2D(textureSampler, vUV) * fadeLevel;" +
-            "baseColor.a = 1.0;" +
-            "gl_FragColor = baseColor;" +
-            "}");
-
-        //--SCENE FINISHED LOADING--
-        await scene.whenReadyAsync();
-        this._engine.hideLoadingUI(); //when the scene is ready, hide loading
-        //lastly set the current state to the start state and set the scene to the start scene
-        this._scene.dispose();
-        this._scene = scene;
-        this._state = State.START;
     }
 }
 new App();

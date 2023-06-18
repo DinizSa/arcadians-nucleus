@@ -229,7 +229,7 @@ class App {
         const deltaPosition = nearestTarget.position.subtract(characterMesh.position);
         characterMesh.scaling = new Vector3(-Math.sign(deltaPosition.x)*1, 1, 1);
 
-        this.setAnimation(characterMesh.uniqueId, ANIMATION_LIST.attackAssassin, false)
+        this.setAnimation(characterMesh.uniqueId, ANIMATION_LIST.attackAssassin, false, false)
         setTimeout(() => {
             const projectile = this.cloneProjectile();
             projectile.position = characterMesh.position.add(new Vector3(-Math.sign(characterMesh.scaling.x), 1, 0));
@@ -309,7 +309,6 @@ class App {
                 }
             )
         )
-        this.stopAnimations(nodeUniqueId);
         this.setAnimation(nodeUniqueId, ANIMATION_LIST.idle);
     }
 
@@ -349,7 +348,10 @@ class App {
         const activeAnimations = this._scene.animationGroups.filter((v)=>v.isPlaying && v.name.split(this.SEPARATOR)[0] == uniqueId.toString());
         activeAnimations.forEach((v)=>v.stop())
     }
-    private setAnimation(uniqueId: number, animationName: string, loop: boolean = true) {
+    private setAnimation(uniqueId: number, animationName: string, loop: boolean = true, stopPreviousAnimations: boolean = true) {
+        if (stopPreviousAnimations) {
+            this.stopAnimations(uniqueId);
+        }
         var anim = this._scene.getAnimationGroupByName(this.getAnimationGroupByName(uniqueId, animationName));
         anim.start(loop);
     }

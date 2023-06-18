@@ -104,8 +104,6 @@ class App {
     private async _main(): Promise<void> {
 
         // await this._goToStart();
-
-        
         
         const grassTexture = new BABYLON.Texture("environment/Grass Tile.png", this._scene);
         grassTexture.hasAlpha = true;
@@ -115,9 +113,9 @@ class App {
         const grassMaterial = new BABYLON.StandardMaterial("grassMaterial", this._scene);
         grassMaterial.ambientTexture = grassTexture;
         
-        const fieldFimensions = new Vector3(20, 0, 15)
+        const fieldFimensions = new Vector3(30, 0, 15)
         this.ground = BABYLON.MeshBuilder.CreateGround("ground", {width: fieldFimensions.x, height: fieldFimensions.z}, this._scene);
-        this.ground.physicsImpostor = new BABYLON.PhysicsImpostor(this.ground, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 0, restitution: 0.5});
+        this.ground.physicsImpostor = new BABYLON.PhysicsImpostor(this.ground, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 0, restitution: 1});
         this.ground.position = new Vector3(fieldFimensions.x/2, 0, fieldFimensions.z/2);
         this.ground.metadata = "ground";
         this.ground.material = grassMaterial;
@@ -141,6 +139,9 @@ class App {
         camera.setTarget(new Vector3(fieldFimensions.x/2, 0, fieldFimensions.z*1/4))
         camera.attachControl(this._canvas, true);
 
+        // let obj = BABYLON.MeshBuilder.CreateBox("box", {size: 4}, this._scene)
+        // obj.position = new Vector3(8,2, 5)
+
         // run the main render loop
         this._engine.runRenderLoop(() => {
             this._scene.render();
@@ -163,12 +164,7 @@ class App {
         window.addEventListener("keydown", (ev) => {
             if (ev.keyCode === 32) {
                 if (this.selectedCharacterId) {
-                    const projectile = this.cloneProjectile();
-                    const characterMesh = this.getMesh(this.selectedCharacterId);
-                    projectile.position = characterMesh.position.add(new Vector3(characterMesh.scaling.x*-1, 0.5, 0));
-                    const force = new Vector3(characterMesh.scaling.x*-10, 5, 0);
-                    projectile.physicsImpostor.registerAfterPhysicsStep(()=>{projectile.physicsImpostor.setAngularVelocity(Vector3.Zero())});
-                    projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
+                    this.shotNearestEnemy(this.selectedCharacterId);
                 }
             }
         });
@@ -176,7 +172,7 @@ class App {
 
     private cloneProjectile(): Mesh {
         const clone = this._projetile.clone("projectileClone");
-        clone.physicsImpostor = new BABYLON.PhysicsImpostor(clone, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.7, friction: 1});
+        clone.physicsImpostor = new BABYLON.PhysicsImpostor(clone, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.1, friction: 0.1});
         clone.actionManager = new BABYLON.ActionManager(this._scene);
         clone.physicsImpostor.registerOnPhysicsCollide(
             this.ground.physicsImpostor, 
@@ -203,6 +199,46 @@ class App {
         this._projetile = projetile;
     }
 
+    private shotNearestEnemy(characterUniqueId: number) {
+        const projectile = this.cloneProjectile();
+        const characterMesh = this.getRootMesh(characterUniqueId);
+        
+        const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != characterMesh.uniqueId);
+        if (!targets || targets.length == 0) 
+            return;
+        targets.sort((a, b)=>a.position.subtract(characterMesh.position).length() - b.position.subtract(characterMesh.position).length())
+        let nearestTarget: BABYLON.Mesh;
+
+        for (let i = 0; i < targets.length; i++) {
+            const target = targets[i];
+            const deltaPosition = target.position.subtract(characterMesh.position);
+            const origin = characterMesh.position;
+            const ray = new BABYLON.Ray(origin, deltaPosition);
+            
+            // let rayHelper = new BABYLON.RayHelper(ray);		
+            // rayHelper.show(this._scene);
+            characterMesh.isPickable = false;
+            const hit = this._scene.pickWithRay(ray);
+            characterMesh.isPickable = true;
+
+            const tags = BABYLON.Tags.GetTags(hit.pickedMesh) || [];
+            if (tags.includes("arcadian")) {
+                nearestTarget = targets[i];
+                break;
+            }
+        }
+        if (!nearestTarget)
+            return;
+        
+        const deltaPosition = nearestTarget.position.subtract(characterMesh.position);
+        characterMesh.scaling = new Vector3(-Math.sign(deltaPosition.x)*1, 1, 1);
+
+        projectile.position = characterMesh.position.add(new Vector3(-Math.sign(characterMesh.scaling.x), 1, 0));
+        projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
+        const force = deltaPosition.normalize().scale(8);
+        projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
+    }
+
     private async loadArcadian(arcadianId: number, position: Vector3 = Vector3.Zero()) {
         
         const metadataUrl = "https://arcadians.prod.outplay.games/v2/arcadians/" + arcadianId;
@@ -215,9 +251,10 @@ class App {
         let body = BABYLON.MeshBuilder.CreateBox("body", {size: 1.2, height: arcadianHeight});
         body.metadata = "arcadian";
         body.name = "arcadian_" + arcadianId;
+        BABYLON.Tags.AddTagsTo(body, "arcadian");
         body.visibility = 0;
         body.position = position;
-        body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.5, friction: 1});
+        body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.5, friction: 0.3});
         body.physicsImpostor.physicsBody.angularDamping = 1;
         const nodeUniqueId = body.uniqueId;
         const result = await SceneLoader.ImportMeshAsync(null, "ArcadianAvatar", ".gltf", this._scene);
@@ -248,6 +285,7 @@ class App {
             const blankPath = "empty399x399.png";
             const textureImage = await mergeImages([blankPath, {src: itemPath, x: itemSlot.x, y: itemSlot.y}]);
             let tex = new BABYLON.Texture(textureImage, this._scene, true, false, BABYLON.Texture.NEAREST_SAMPLINGMODE);
+
             tex.name = itemFilename;
             tex.hasAlpha = true;
 
@@ -275,7 +313,7 @@ class App {
     }
 
     private moveCharacter(nodeUniqueId: number, destination: Vector3) {
-        const characterMesh = this.getMesh(nodeUniqueId);
+        const characterMesh = this.getRootMesh(nodeUniqueId);
         const speed = 4.5;
         let distance = destination.subtract(characterMesh.position);
 
@@ -283,14 +321,9 @@ class App {
             distance = destination.subtract(characterMesh.position);
             distance.y = 0;
             if (distance.length() < 0.1) {
-                // set velocity as 0
-                characterMesh.physicsImpostor.setLinearVelocity(new Vector3(0,0,0));
-                const resetVelocity = function(){
-                    characterMesh.physicsImpostor.setLinearVelocity(Vector3.Zero())
-                }
+                // TODO: find another way to avoid mini jump at the end of walking
                 characterMesh.physicsImpostor.registerAfterPhysicsStep(()=>{
-                    resetVelocity();
-                    characterMesh.physicsImpostor.unregisterAfterPhysicsStep(resetVelocity);
+                    characterMesh.physicsImpostor.setLinearVelocity(Vector3.Zero())
                 });
 
                 this.setAnimation(characterMesh.uniqueId, ANIMATION_LIST.idle);
@@ -303,20 +336,15 @@ class App {
 
         this.setAnimation(nodeUniqueId, ANIMATION_LIST.walk);
 
-        if (distance.x > 0) {
-            characterMesh.scaling = new Vector3(-1, 1, 1);
-        } else {
-            characterMesh.scaling = new Vector3(1, 1, 1);
-        }
+        characterMesh.scaling = new Vector3(-Math.sign(distance.x)*1, 1, 1);
 
         this._scene.registerBeforeRender(arcadianPhysics);
     }
 
-    private getMesh(nodeUniqueId: number): Mesh {
+    private getRootMesh(nodeUniqueId: number): Mesh {
         return this._scene.rootNodes.find((v)=>v.uniqueId == nodeUniqueId) as Mesh;
     }
     private setAnimation(uniqueId: number, animationName: string, loop: boolean = true) {
-        console.log("uniqueId+animationName", uniqueId+animationName)
         const activeAnimations = this._scene.animationGroups.filter((v)=>v.isPlaying && v.name.includes(uniqueId.toString()));
         activeAnimations.forEach((v)=>v.stop())
 

@@ -182,7 +182,7 @@ class App {
 
     private cloneProjectile(): Mesh {
         const clone = this._projetile.clone("projectileClone");
-        clone.physicsImpostor = new BABYLON.PhysicsImpostor(clone, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.1, friction: 0.1});
+        clone.physicsImpostor = new BABYLON.PhysicsImpostor(clone, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.1, friction: 0});
         clone.actionManager = new BABYLON.ActionManager(this._scene);
         clone.physicsImpostor.registerOnPhysicsCollide(
             this.ground.physicsImpostor, 
@@ -247,8 +247,8 @@ class App {
         const attributes: MetadataSlot[] = metadata.attributes;
 
         // body to detect interactions
-        const arcadianHeight = 2.8;
-        let body = BABYLON.MeshBuilder.CreateBox("body", {size: 1.2, height: arcadianHeight});
+        const arcadianHeight = 2.7;
+        let body = BABYLON.MeshBuilder.CreateCylinder("body", {diameter: 1.2, height: arcadianHeight});
         body.metadata = "arcadian";
         body.name = "arcadian_" + arcadianId;
         BABYLON.Tags.AddTagsTo(body, "arcadian");

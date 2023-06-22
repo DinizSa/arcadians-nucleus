@@ -47,7 +47,7 @@ interface Weapon {
     radiusArea: number;
     isSpell: boolean;
     slotName?: string;
-  };
+};
 
 const slotsNames = {
     eyes: "Eyes",
@@ -104,6 +104,8 @@ class App {
     private ground: Mesh;
     private _projetile: Mesh;
     private _selectedMark: Mesh;
+    private _hpBarMax: BABYLON.Mesh
+    private _hpBar: BABYLON.Mesh
 
     private fieldFimensions = new Vector3(30, 0, 15)
     private FPS = 60;
@@ -136,6 +138,7 @@ class App {
         this.createTerrain();
 
         this.setupSelectedMark();
+        this.setupHpBar()
 
         // run the main render loop
         this._engine.runRenderLoop(() => {
@@ -173,7 +176,7 @@ class App {
         const parentMesh = this.getRootMesh(parentUniqueId)
         this._selectedMark.setEnabled(true);
         this._selectedMark.parent = parentMesh;
-        this._selectedMark.position.y = parentMesh.getBoundingInfo().maximum.y + 0.6;
+        this._selectedMark.position.y = parentMesh.getBoundingInfo().maximum.y + 1;
         this._scene.beginAnimation(this._selectedMark, 0, this.FPS * 2, true);
     }
 
@@ -227,7 +230,7 @@ class App {
         let projetile = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.5}, this._scene);
         projetile.material = material;
         projetile.isPickable = false;
-        projetile.position = new Vector3(10, 2, 2);
+        // projetile.position = new Vector3(10, 2, 2);
         projetile.setEnabled(false);
         projetile.checkCollisions = true;
         this._projetile = projetile;
@@ -278,14 +281,18 @@ class App {
             }
         );
 
-
         const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian").map((v: Mesh)=>v.physicsImpostor);
         projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, (collider: BABYLON.PhysicsImpostor, collidedAgainst: BABYLON.PhysicsImpostor) => {
             console.log("collidedAgainst", collidedAgainst)
+            if ((collidedAgainst.object as Mesh).metadata == "arcadian") {
+                this.updateHpBar((collidedAgainst.object as Mesh).uniqueId, -10);
+            }
         });
         // projectile.physicsImpostor.onCollideEvent = (collider: BABYLON.PhysicsImpostor, collidedWith: BABYLON.PhysicsImpostor) => {
         //     console.log("collidedWith", collidedWith)
         // }
+        // this can be useful when we just want to trigger, but not impact, can be useful to colide bullets on multiple inimigas
+        // projectile.collisionResponse = false;
 
         setTimeout(() => {
             projectile.setEnabled(true);
@@ -341,6 +348,52 @@ class App {
                 return hit.pickedPoint;
             }
         }
+    }
+
+    private setupHpBar() {
+        const materialMaxHp = new BABYLON.StandardMaterial("materialMaxHp", this._scene);
+        materialMaxHp.diffuseColor = Color3.Red();
+        materialMaxHp.backFaceCulling = false;
+        this._hpBarMax = BABYLON.CreatePlane("maxHp", {width: 1, height: 0.3})
+        this._hpBarMax.material = materialMaxHp;
+        this._hpBarMax.setEnabled(false);
+
+        const materialHp = new BABYLON.StandardMaterial("materialHp", this._scene);
+        materialHp.diffuseColor = Color3.Blue();
+        materialHp.backFaceCulling = false;
+        this._hpBar = BABYLON.CreatePlane("hp", {width: 1, height: 0.3})
+        this._hpBar.material = materialHp;
+        this._hpBar.setEnabled(false);
+    }
+
+    private createHpBar(parent: Mesh, maxHp: number) {
+        const boundingInfo = parent.getBoundingInfo();
+        const hpBarMax = this._hpBarMax.clone("hpMax", parent);
+        hpBarMax.position.y += boundingInfo.maximum.y + 0.5;
+        hpBarMax.metadata = maxHp;
+        hpBarMax.setEnabled(true);
+        const hpBar = this._hpBar.clone("hp", parent);
+        hpBar.position.y += boundingInfo.maximum.y + 0.5;
+        hpBar.position.z += 0.01;
+        hpBar.metadata = maxHp;
+        hpBar.setEnabled(true);
+    }
+
+    private updateHpBar(parentUniqueId: number, deltaHp: number): number {
+        const parentMesh = this.getRootMesh(parentUniqueId);
+        const hpBar = parentMesh.getChildMeshes(true, (node)=>node.name == "hp")[0] as Mesh;
+        const hpBarMax = parentMesh.getChildMeshes(true, (node)=>node.name == "hpMax")[0] as Mesh;
+        const maxHp = Number(hpBarMax.metadata);
+        const currentHp = Number(hpBar.metadata);
+        const newHp = Math.max(currentHp + deltaHp, 0);
+        const maxHpBarWidth = 1;
+        hpBar.position.x -= (deltaHp / maxHp * maxHpBarWidth) / 2;
+        hpBar.scaling.x = newHp / maxHp;
+        hpBar.metadata = newHp;
+        if (newHp == 0) {
+            this.setAnimation(parentUniqueId, ANIMATION_LIST.death, false, true);
+        }
+        return newHp;
     }
 
     private async loadArcadian(arcadianId: number, position: Vector3 = Vector3.Zero()) {
@@ -409,6 +462,10 @@ class App {
                 material.metadata = att.value || "";
             }
         }
+
+        // Set hp bars
+        const maxHp = 100;
+        this.createHpBar(body, maxHp);
 
         body.actionManager = new BABYLON.ActionManager(this._scene);
         body.actionManager.registerAction(
@@ -498,6 +555,8 @@ class App {
         this._scene = new Scene(this._engine);
 
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(this.fieldFimensions.x, this.fieldFimensions.x, this.fieldFimensions.z), this._scene);
+        // var light1 = new BABYLON.DirectionalLight("DirectionalLight", new BABYLON.Vector3(0, -1, -1), this._scene);
+        light1.intensity = 2;
         let camera = new FreeCamera("camera1", new Vector3(this.fieldFimensions.x/2, 10, this.fieldFimensions.z+5), this._scene);
         camera.setTarget(new Vector3(this.fieldFimensions.x/2, 0, this.fieldFimensions.z*1/4))
         camera.attachControl(this._canvas, true);

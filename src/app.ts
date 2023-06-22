@@ -4,8 +4,7 @@ import "@babylonjs/loaders/glTF";
 import * as BABYLON from "@babylonjs/core/Legacy/legacy";
 import mergeImages from 'merge-images';
 
-import { Engine, Scene, Vector3, Mesh, HemisphericLight, Color3, Color4, FreeCamera, Sound, Effect, SceneLoader } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui";
+import { Engine, Scene, Vector3, Mesh, HemisphericLight, Color3, FreeCamera, SceneLoader } from "@babylonjs/core";
 import * as CANNON from "cannon";
 
 interface MetadataSlot {
@@ -32,6 +31,41 @@ interface SlotMap {
     layer: ItemMap[]
 }
 
+interface Weapon {
+    id: number;
+    image: string;
+    name: string;
+    rarity: string;
+    speed: number,
+    weight: number,
+    isRanged: boolean;
+    range: number;
+    rechargeTime: number;
+    damageDirect: number;
+    multipleHitDirect: boolean;
+    damageArea: number;
+    radiusArea: number;
+    isSpell: boolean;
+    slotName?: string;
+  };
+
+const slotsNames = {
+    eyes: "Eyes",
+    mouth: "Mouth",
+    skin: "Skin",
+    gender: "Gender",
+    hairstyle: "Hairstyle",
+    background: "Background",
+    rightHand: "Right Hand",
+    bottom: "Bottom",
+    top: "Top",
+    class: "Class",
+    shadow: "Shadow",
+    headgear: "Headgear",
+    leftHand: "Left Hand",
+    accessory: "Accessory"
+};
+
 const ANIMATION_LIST = {
     idle: "m.idle",
     walk: "m.walk",
@@ -52,8 +86,6 @@ const ANIMATION_LIST = {
     attackTech: "m.atkTec",
     attackWizard: "m.atkWiz",
 }
-//enum for states
-enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
 
 class App {
     // General Entire Application
@@ -67,6 +99,7 @@ class App {
     private selectedCharacterId: number;
 
     private _stack: SlotMap[];
+    private weaponsList: Weapon[];
 
     private ground: Mesh;
     private _projetile: Mesh;
@@ -95,8 +128,8 @@ class App {
     }
 
     private async _main(): Promise<void> {
-        
-        this._stack = (await fetch("stack.json").then((res)=>res.json())).stack.stack.stack
+
+        this.loadFilesToMemory();
 
         this.createScene();
 
@@ -128,7 +161,8 @@ class App {
         window.addEventListener("keydown", (ev) => {
             if (ev.keyCode === 32) {
                 if (this.selectedCharacterId) {
-                    this.shotNearestEnemy(this.selectedCharacterId);
+                    const positionToAttack = this.getNearestAttackTarget(this.selectedCharacterId);
+                    this.attackTarget(this.selectedCharacterId, positionToAttack);
                 }
             }
         });
@@ -197,23 +231,74 @@ class App {
         this._projetile = projetile;
     }
 
-    private cloneProjectile(): Mesh {
-        const clone = this._projetile.clone("projectileClone");
-        clone.physicsImpostor = new BABYLON.PhysicsImpostor(clone, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.1, friction: 0});
-        clone.actionManager = new BABYLON.ActionManager(this._scene);
-        clone.physicsImpostor.registerOnPhysicsCollide(
+    private attackTarget(attackerUniqueId: number, target: Vector3) {
+        const attacker = this.getRootMesh(attackerUniqueId);
+        const deltaPosition = target.subtract(attacker.position);
+        const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
+
+        console.log("distance:", deltaPosition.length())
+        let weaponToUse: Weapon = weapons.find((weapon) => weapon?.range >= deltaPosition.length());
+        console.log("weaponToUse", weaponToUse)
+        if (!weaponToUse)
+            return false;
+
+        attacker.scaling = new Vector3(-Math.sign(deltaPosition.x), 1, 1);
+        
+        // attack animation
+        let animationName: string;
+        if (weaponToUse.isRanged) {
+            if (weaponToUse.isSpell) {
+                animationName = ANIMATION_LIST.attackWizard;
+            } else {
+                animationName = ANIMATION_LIST.attackGunner;
+            }
+        } else {
+            const isRightHandWeapon = weaponToUse.slotName == slotsNames.rightHand;
+            if (isRightHandWeapon) {
+                animationName = ANIMATION_LIST.attackKnight
+            } else {
+                animationName = ANIMATION_LIST.attackAssassin;
+            }
+        }
+        this.setAnimation(attacker.uniqueId, animationName, false, false);
+
+        // Create projectile
+        const projectile = this._projetile.clone("projectileClone");
+        projectile.physicsImpostor = new BABYLON.PhysicsImpostor(projectile, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.1, friction: 0});
+        projectile.physicsImpostor.registerOnPhysicsCollide(
             this.ground.physicsImpostor, 
             ()=>{
                 setTimeout(() => {
-                    clone.dispose();
+                    projectile.dispose();
                 }, 2000);
             }
         );
-        clone.setEnabled(true);
-        return clone;
+
+        setTimeout(() => {
+            projectile.setEnabled(true);
+            projectile.position = attacker.position.add(new Vector3(-Math.sign(attacker.scaling.x), 1, 0));
+            projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
+            const force = deltaPosition.normalize().scale(8);
+            projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
+            // projectile.metadata = weaponToUse;
+        }, 300);
     }
 
-    private shotNearestEnemy(characterUniqueId: number) {
+    // Returns the equipped weapons sorted by damage
+    private getEquippedWeapons(characterUniqueId: number): Weapon[] {
+        return [slotsNames.rightHand, slotsNames.leftHand]
+            .map((slotName) => ({slotName: slotName, material: this._scene.getMaterialById(this.getItemMaterialId(characterUniqueId, slotName))}))
+            .filter((resp) => !!resp?.material)
+            .map((resp) => {
+                const weapon = this.weaponsList.find((weapon) => weapon.name == resp.material.metadata)
+                weapon.slotName = resp.slotName
+                return weapon;
+            })
+            .sort((a, b)=> b.damageDirect - a.damageDirect)
+    }
+
+    // Returns true if the a shot ocurred, false otherwise
+    private getNearestAttackTarget(characterUniqueId: number): Vector3 {
         const characterMesh = this.getRootMesh(characterUniqueId);
         
         const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != characterMesh.uniqueId);
@@ -221,11 +306,11 @@ class App {
             return;
 
         targets.sort((a, b)=>a.position.subtract(characterMesh.position).length() - b.position.subtract(characterMesh.position).length())
-        let nearestTarget: BABYLON.Mesh;
 
         for (let i = 0; i < targets.length; i++) {
             const target = targets[i];
             const deltaPosition = target.position.subtract(characterMesh.position);
+
             const origin = characterMesh.position;
             const ray = new BABYLON.Ray(origin, deltaPosition);
             
@@ -237,24 +322,9 @@ class App {
 
             const tags = BABYLON.Tags.GetTags(hit.pickedMesh) || [];
             if (tags.includes("arcadian")) {
-                nearestTarget = targets[i];
-                break;
+                return hit.pickedPoint;
             }
         }
-        if (!nearestTarget)
-            return;
-        
-        const deltaPosition = nearestTarget.position.subtract(characterMesh.position);
-        characterMesh.scaling = new Vector3(-Math.sign(deltaPosition.x)*1, 1, 1);
-
-        this.setAnimation(characterMesh.uniqueId, ANIMATION_LIST.attackAssassin, false, false)
-        setTimeout(() => {
-            const projectile = this.cloneProjectile();
-            projectile.position = characterMesh.position.add(new Vector3(-Math.sign(characterMesh.scaling.x), 1, 0));
-            projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
-            const force = deltaPosition.normalize().scale(8);
-            projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
-        }, 300);
     }
 
     private async loadArcadian(arcadianId: number, position: Vector3 = Vector3.Zero()) {
@@ -266,7 +336,8 @@ class App {
 
         // body to detect interactions
         const arcadianHeight = 2.7;
-        let body = BABYLON.MeshBuilder.CreateCylinder("body", {diameter: 1.2, height: arcadianHeight});
+        const arcadianWidth = 1.2;
+        let body = BABYLON.MeshBuilder.CreateCylinder("body", {diameter: arcadianWidth, height: arcadianHeight});
         body.metadata = "arcadian";
         body.name = "arcadian_" + arcadianId;
         BABYLON.Tags.AddTagsTo(body, "arcadian");
@@ -287,13 +358,13 @@ class App {
             childMesh.isPickable = false;
         }
         for (const group of animationGroups) {
-            group.name = nodeUniqueId + this.SEPARATOR + group.name
+            group.name = body.uniqueId + this.SEPARATOR + group.name
         }
 
         for (const att of attributes) {
             const slotName = att.trait_type;
-
-            if (slotName == "Class" || slotName == "Gender" || slotName == "Background") 
+            
+            if (slotName == slotsNames.class || slotName == slotsNames.gender || slotName == slotsNames.background) 
                 continue;
 
             const itemsSlot = this._stack.find((v)=>v.name == slotName)
@@ -303,18 +374,23 @@ class App {
             const itemPath = "parts/" + itemFilename;
             const blankPath = "empty399x399.png";
             const textureImage = await mergeImages([blankPath, {src: itemPath, x: itemSlot.x, y: itemSlot.y}]);
-            let tex = new BABYLON.Texture(textureImage, this._scene, true, false, BABYLON.Texture.NEAREST_SAMPLINGMODE);
+            let texture = new BABYLON.Texture(textureImage, this._scene, true, false, BABYLON.Texture.NEAREST_SAMPLINGMODE);
 
-            tex.name = itemFilename;
-            tex.hasAlpha = true;
+            texture.name = itemFilename;
+            texture.hasAlpha = true;
 
             const matsMatch = this._scene.materials.filter((m)=>m.id == slotName)
-            const lastMatch = matsMatch.at(-1)
-            
-            var material = this._scene.getMaterialByUniqueID(lastMatch.uniqueId, true);
-            material.backFaceCulling = false;
+            const material = matsMatch.at(-1);
+            material.id = nodeUniqueId + this.SEPARATOR + slotName;
 
-            (material as any).albedoTexture = tex;
+            (material as any).albedoTexture = texture;
+            material.name = slotName;
+
+            if (slotName == slotsNames.rightHand || slotName == slotsNames.leftHand) {
+                material.metadata = att.value.slice(0,-2) || "";
+            } else {
+                material.metadata = att.value || "";
+            }
         }
 
         body.actionManager = new BABYLON.ActionManager(this._scene);
@@ -387,12 +463,16 @@ class App {
         if (stopPreviousAnimations) {
             this.stopAnimations(uniqueId);
         }
-        var anim = this._scene.getAnimationGroupByName(this.getAnimationGroupByName(uniqueId, animationName));
+        var anim = this._scene.getAnimationGroupByName(this.getGroupAnimationName(uniqueId, animationName));
         anim.start(loop);
     }
 
-    private getAnimationGroupByName(uniqueId: number, animationName: string) {
-        return  uniqueId + this.SEPARATOR + animationName
+    private getGroupAnimationName(animatedUniqueId: number, animationName: string): string {
+        return animatedUniqueId + this.SEPARATOR + animationName
+    }
+
+    private getItemMaterialId(characterUniqueId: number, slotName: string): string {
+        return characterUniqueId + this.SEPARATOR + slotName;
     }
 
     private async createScene() {
@@ -417,7 +497,6 @@ class App {
                 await this.loadArcadian(counter, new Vector3(j, 5, i));
             }
         }
-
     }
 
     private _createCanvas(): HTMLCanvasElement {
@@ -443,6 +522,30 @@ class App {
         document.body.appendChild(this._canvas);
 
         return this._canvas;
+    }
+
+    private async loadFilesToMemory() {
+        this._stack = (await fetch("stack.json").then((res)=>res.json())).stack.stack.stack
+        const weaponsList = (await fetch("weapons.json").then((res)=>res.json()))
+        this.weaponsList = weaponsList.map((weapon)=> {
+            weapon.id = Number(weapon.id);
+            weapon.range = Number(weapon.range);
+            weapon.rechargeTime = Number(weapon.rechargeTime);
+            weapon.damageDirect = Number(weapon.damageDirect);
+            weapon.damageArea = Number(weapon.damageArea);
+            weapon.multipleHitMax = Number(weapon.multipleHitMax);
+            if (weapon.isRanged == "TRUE") {
+                weapon.isRanged = true;
+            } else if (weapon.isRanged == "FALSE") {
+                weapon.isRanged = false;
+            }
+            if (weapon.isSpell == "TRUE") {
+                weapon.isSpell = true;
+            } else if (weapon.isSpell == "FALSE") {
+                weapon.isSpell = false;
+            }
+            return weapon;
+        })
     }
 }
 new App();

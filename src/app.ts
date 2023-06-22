@@ -143,6 +143,7 @@ class App {
         });
 
         this.setupProjectile();
+    
 
         // Handle pointer clicks
         this._scene.onPointerDown = (event: BABYLON.IPointerEvent, pickInfo: BABYLON.PickingInfo) => {
@@ -228,6 +229,7 @@ class App {
         projetile.isPickable = false;
         projetile.position = new Vector3(10, 2, 2);
         projetile.setEnabled(false);
+        projetile.checkCollisions = true;
         this._projetile = projetile;
     }
 
@@ -264,6 +266,8 @@ class App {
 
         // Create projectile
         const projectile = this._projetile.clone("projectileClone");
+
+        projectile.checkCollisions = true;
         projectile.physicsImpostor = new BABYLON.PhysicsImpostor(projectile, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.1, friction: 0});
         projectile.physicsImpostor.registerOnPhysicsCollide(
             this.ground.physicsImpostor, 
@@ -274,13 +278,25 @@ class App {
             }
         );
 
+
+        const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian").map((v: Mesh)=>v.physicsImpostor);
+        projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, (collider: BABYLON.PhysicsImpostor, collidedAgainst: BABYLON.PhysicsImpostor) => {
+            console.log("collidedAgainst", collidedAgainst)
+        });
+        // projectile.physicsImpostor.onCollideEvent = (collider: BABYLON.PhysicsImpostor, collidedWith: BABYLON.PhysicsImpostor) => {
+        //     console.log("collidedWith", collidedWith)
+        // }
+
         setTimeout(() => {
             projectile.setEnabled(true);
             projectile.position = attacker.position.add(new Vector3(-Math.sign(attacker.scaling.x), 1, 0));
             projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
             const force = deltaPosition.normalize().scale(8);
             projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
-            // projectile.metadata = weaponToUse;
+
+            projectile.onCollide = function (mesh) {
+                console.log("mesh.name", mesh.name)
+            }
         }, 300);
     }
 
@@ -345,6 +361,7 @@ class App {
         body.position = position;
         body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.3, friction: 0.3});
         body.physicsImpostor.physicsBody.angularDamping = 1;
+        body.checkCollisions = true;
         const nodeUniqueId = body.uniqueId;
         const {meshes, animationGroups} = await SceneLoader.ImportMeshAsync(null, "ArcadianAvatar", ".gltf", this._scene);
         const arcadianMesh = meshes[0];

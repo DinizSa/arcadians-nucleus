@@ -241,7 +241,6 @@ class App {
         const deltaPosition = target.position.subtract(attacker.position);
         const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
 
-        console.log("distance:", deltaPosition.length())
         let weaponToUse: Weapon = weapons.find((weapon) => weapon?.range >= deltaPosition.length());
         console.log("weaponToUse", weaponToUse)
         if (!weaponToUse)
@@ -272,8 +271,14 @@ class App {
         const projectile = this._projetile.clone("projectileClone");
         projectile.position = attacker.position.add(new Vector3(-Math.sign(attacker.scaling.x), 1, 0));
         
-        // projectile.checkCollisions = true;
-        projectile.physicsImpostor = new BABYLON.PhysicsImpostor(projectile, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.1, friction: 0});
+        projectile.physicsImpostor = new BABYLON.PhysicsImpostor(
+            projectile, 
+            BABYLON.PhysicsImpostor.BoxImpostor, {
+                mass: weaponToUse.projectileWeight, 
+                restitution: 0.1, 
+                friction: 0
+            }
+        );
         projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
         projectile.physicsImpostor.registerOnPhysicsCollide(
             this.ground.physicsImpostor, 
@@ -303,14 +308,16 @@ class App {
         //     console.log("collidedWith", collidedWith)
         // }
 
-        const force = deltaPosition.normalize().scale(10);
         setTimeout(() => {
             projectile.setEnabled(true);
-            projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
 
-            projectile.onCollide = function (mesh) {
-                console.log("mesh.name", mesh.name)
-            }
+            let time = deltaPosition.length() / weaponToUse.projectileSpeed;
+
+            const forceX = deltaPosition.x / time;
+            const forceY = target.position.y + deltaPosition.y / time - this.GRAVITY * time * (1/2);
+            const forceZ = deltaPosition.z / time;
+            const impulse = new Vector3(forceX, forceY, forceZ).scale(weaponToUse.projectileWeight);
+            projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
         }, 300);
     }
 
@@ -568,7 +575,7 @@ class App {
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(this.fieldFimensions.x, this.fieldFimensions.x, this.fieldFimensions.z), this._scene);
         // var light1 = new BABYLON.DirectionalLight("DirectionalLight", new BABYLON.Vector3(0, -1, -1), this._scene);
         light1.intensity = 2;
-        let camera = new FreeCamera("camera1", new Vector3(this.fieldFimensions.x/2, 10, this.fieldFimensions.z+5), this._scene);
+        let camera = new FreeCamera("camera1", new Vector3(this.fieldFimensions.x/2, 10, this.fieldFimensions.z+10), this._scene);
         camera.setTarget(new Vector3(this.fieldFimensions.x/2, 0, this.fieldFimensions.z*1/4))
         camera.attachControl(this._canvas, true);
 
@@ -617,7 +624,6 @@ class App {
         this.weaponsList = weaponsList.map((weapon)=> {
             return this.convertKeysToNumbers(weapon);
         })
-        console.log("this.weaponsList", this.weaponsList)
     }
     private convertKeysToNumbers(obj: any) {
         const convertedObj = {};

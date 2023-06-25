@@ -35,17 +35,18 @@ interface Weapon {
     id: number;
     image: string;
     name: string;
-    rarity: string;
-    speed: number,
-    weight: number,
-    isRanged: boolean;
+    rarity: 'common' | 'uncommon' | 'rare' | 'legenday' | 'epic';
+    damage: number;
     range: number;
-    rechargeTime: number;
-    damageDirect: number;
-    multipleHitDirect: boolean;
-    damageArea: number;
+    weight: number,
+    reloadTime: number;
+    type: 'spell' | 'sword' | 'gun';
+    projectileSpeed: number;
+    projectileWeight: number;
+    accuracyRadius: number;
     radiusArea: number;
-    isSpell: boolean;
+    specialAbility: 'freeze' | 'none';
+    damageType: 'magic' | 'physical';
     slotName?: string;
 };
 
@@ -165,8 +166,8 @@ class App {
         window.addEventListener("keydown", (ev) => {
             if (ev.keyCode === 32) {
                 if (this.selectedCharacterId) {
-                    const positionToAttack = this.getNearestAttackTarget(this.selectedCharacterId);
-                    this.attackTarget(this.selectedCharacterId, positionToAttack);
+                    const target = this.getNearestAttackTarget(this.selectedCharacterId);
+                    this.attackTarget(this.selectedCharacterId, target);
                 }
             }
         });
@@ -230,15 +231,14 @@ class App {
         let projetile = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.5}, this._scene);
         projetile.material = material;
         projetile.isPickable = false;
-        // projetile.position = new Vector3(10, 2, 2);
         projetile.setEnabled(false);
         projetile.checkCollisions = true;
         this._projetile = projetile;
     }
 
-    private attackTarget(attackerUniqueId: number, target: Vector3) {
+    private attackTarget(attackerUniqueId: number, target: Mesh) {
         const attacker = this.getRootMesh(attackerUniqueId);
-        const deltaPosition = target.subtract(attacker.position);
+        const deltaPosition = target.position.subtract(attacker.position);
         const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
 
         console.log("distance:", deltaPosition.length())
@@ -247,12 +247,13 @@ class App {
         if (!weaponToUse)
             return false;
 
-        attacker.scaling = new Vector3(-Math.sign(deltaPosition.x), 1, 1);
+        attacker.scaling.x = -Math.sign(deltaPosition.x);
+        attacker.computeWorldMatrix(true);
         
         // attack animation
         let animationName: string;
-        if (weaponToUse.isRanged) {
-            if (weaponToUse.isSpell) {
+        if (weaponToUse.range > 1) {
+            if (weaponToUse.type == 'spell') {
                 animationName = ANIMATION_LIST.attackWizard;
             } else {
                 animationName = ANIMATION_LIST.attackGunner;
@@ -269,9 +270,11 @@ class App {
 
         // Create projectile
         const projectile = this._projetile.clone("projectileClone");
-
-        projectile.checkCollisions = true;
+        projectile.position = attacker.position.add(new Vector3(-Math.sign(attacker.scaling.x), 1, 0));
+        
+        // projectile.checkCollisions = true;
         projectile.physicsImpostor = new BABYLON.PhysicsImpostor(projectile, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, restitution: 0.1, friction: 0});
+        projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
         projectile.physicsImpostor.registerOnPhysicsCollide(
             this.ground.physicsImpostor, 
             ()=>{
@@ -281,24 +284,28 @@ class App {
             }
         );
 
-        const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian").map((v: Mesh)=>v.physicsImpostor);
-        projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, (collider: BABYLON.PhysicsImpostor, collidedAgainst: BABYLON.PhysicsImpostor) => {
-            console.log("collidedAgainst", collidedAgainst)
-            if ((collidedAgainst.object as Mesh).metadata == "arcadian") {
-                this.updateHpBar((collidedAgainst.object as Mesh).uniqueId, -10);
+        let collidedUniqueIds = [];
+        const onHit = (collider: BABYLON.PhysicsImpostor, collidedAgainst: BABYLON.PhysicsImpostor) => {
+            const collidedMesh = collidedAgainst.object as Mesh;
+            if (collidedUniqueIds.includes(collidedMesh.uniqueId)) {
+                return;
             }
-        });
+            if (collidedMesh.metadata == "arcadian") {
+                this.updateHpBar(collidedMesh.uniqueId, -weaponToUse.damage);
+                collidedUniqueIds.push(collidedMesh.uniqueId)
+            }
+        };
+        const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian" && attacker.uniqueId != v.uniqueId).map((v: Mesh)=>v.physicsImpostor);
+        projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, onHit);
+        // MBU: this can be useful when we just want to trigger, but not impact, can be useful to colide bullets on multiple inimigas
+        // projectile.collisionResponse = false;
         // projectile.physicsImpostor.onCollideEvent = (collider: BABYLON.PhysicsImpostor, collidedWith: BABYLON.PhysicsImpostor) => {
         //     console.log("collidedWith", collidedWith)
         // }
-        // this can be useful when we just want to trigger, but not impact, can be useful to colide bullets on multiple inimigas
-        // projectile.collisionResponse = false;
 
+        const force = deltaPosition.normalize().scale(10);
         setTimeout(() => {
             projectile.setEnabled(true);
-            projectile.position = attacker.position.add(new Vector3(-Math.sign(attacker.scaling.x), 1, 0));
-            projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
-            const force = deltaPosition.normalize().scale(8);
             projectile.physicsImpostor.applyImpulse(force, projectile.getAbsolutePosition());
 
             projectile.onCollide = function (mesh) {
@@ -317,11 +324,11 @@ class App {
                 weapon.slotName = resp.slotName
                 return weapon;
             })
-            .sort((a, b)=> b.damageDirect - a.damageDirect)
+            .sort((a, b)=> b.damage - a.damage)
     }
 
     // Returns true if the a shot ocurred, false otherwise
-    private getNearestAttackTarget(characterUniqueId: number): Vector3 {
+    private getNearestAttackTarget(characterUniqueId: number): Mesh {
         const characterMesh = this.getRootMesh(characterUniqueId);
         
         const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != characterMesh.uniqueId);
@@ -345,7 +352,7 @@ class App {
 
             const tags = BABYLON.Tags.GetTags(hit.pickedMesh) || [];
             if (tags.includes("arcadian")) {
-                return hit.pickedPoint;
+                return hit.pickedMesh as Mesh;
             }
         }
     }
@@ -388,6 +395,10 @@ class App {
         const newHp = Math.max(currentHp + deltaHp, 0);
         const maxHpBarWidth = 1;
         hpBar.position.x -= (deltaHp / maxHp * maxHpBarWidth) / 2;
+        // console.log("maxHp", maxHp)
+        // console.log("currentHp", currentHp)
+        // console.log("deltaHp", deltaHp)
+        // console.log("newHp", newHp)
         hpBar.scaling.x = newHp / maxHp;
         hpBar.metadata = newHp;
         if (newHp == 0) {
@@ -474,7 +485,7 @@ class App {
                     trigger: BABYLON.ActionManager.OnPickDownTrigger,
                 },
                 () => {
-                    console.log("character selected")
+                    // console.log("character selected")
                 }
             )
         )
@@ -604,24 +615,18 @@ class App {
         this._stack = (await fetch("stack.json").then((res)=>res.json())).stack.stack.stack
         const weaponsList = (await fetch("weapons.json").then((res)=>res.json()))
         this.weaponsList = weaponsList.map((weapon)=> {
-            weapon.id = Number(weapon.id);
-            weapon.range = Number(weapon.range);
-            weapon.rechargeTime = Number(weapon.rechargeTime);
-            weapon.damageDirect = Number(weapon.damageDirect);
-            weapon.damageArea = Number(weapon.damageArea);
-            weapon.multipleHitMax = Number(weapon.multipleHitMax);
-            if (weapon.isRanged == "TRUE") {
-                weapon.isRanged = true;
-            } else if (weapon.isRanged == "FALSE") {
-                weapon.isRanged = false;
-            }
-            if (weapon.isSpell == "TRUE") {
-                weapon.isSpell = true;
-            } else if (weapon.isSpell == "FALSE") {
-                weapon.isSpell = false;
-            }
-            return weapon;
+            return this.convertKeysToNumbers(weapon);
         })
+        console.log("this.weaponsList", this.weaponsList)
     }
+    private convertKeysToNumbers(obj: any) {
+        const convertedObj = {};
+        for (let key in obj) {
+            const parsed = parseFloat(obj[key]);
+            const numericKey = isNaN(parsed) ? obj[key] : parsed;
+            convertedObj[key] = numericKey;
+        }
+        return convertedObj;
+      }
 }
 new App();

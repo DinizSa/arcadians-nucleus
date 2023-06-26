@@ -244,30 +244,32 @@ class App {
         const distance = deltaPosition.length();
         const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
 
-        console.log("distance", distance);
         let weaponToUse: Weapon = weapons.find((weapon) => weapon?.range >= distance);
-        console.log("weaponToUse", weaponToUse);
         if (!weaponToUse)
             return false;
 
-        attacker.scaling.x = -Math.sign(deltaPosition.x);
+        if (attacker.scaling.x != -Math.sign(deltaPosition.x)) {
+            attacker.scaling.x = -Math.sign(deltaPosition.x);
+        }
         
         // attack animation
         let animationName: string;
-        if (weaponToUse.range > 1) {
-            if (weaponToUse.type == 'spell') {
+        switch (weaponToUse.type) {
+            case "spell":
                 animationName = ANIMATION_LIST.attackWizard;
-            } else {
+                break;
+            case "gun":
                 animationName = ANIMATION_LIST.attackGunner;
-            }
-        } else {
-            const isRightHandWeapon = weaponToUse.slotName == slotsNames.rightHand;
-            if (isRightHandWeapon) {
-                animationName = ANIMATION_LIST.attackKnight
-            } else {
-                animationName = ANIMATION_LIST.attackAssassin;
-            }
+                break;
+            case "sword":
+                const isRightHandWeapon = weaponToUse.slotName == slotsNames.rightHand;
+                animationName = isRightHandWeapon ? ANIMATION_LIST.attackKnight : ANIMATION_LIST.attackAssassin;
+                break;
+            default:
+                animationName = ANIMATION_LIST.attackTech;
+                break;
         }
+
         this.setAnimation(attacker.uniqueId, animationName, false, false);
 
         // Create projectile
@@ -354,8 +356,8 @@ class App {
             const origin = characterMesh.position;
             const ray = new BABYLON.Ray(origin, deltaPosition);
             
-            let rayHelper = new BABYLON.RayHelper(ray);		
-            rayHelper.show(this._scene);
+            // let rayHelper = new BABYLON.RayHelper(ray);		
+            // rayHelper.show(this._scene);
             characterMesh.isPickable = false;
             const hit = this._scene.pickWithRay(ray);
             characterMesh.isPickable = true;

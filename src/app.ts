@@ -473,8 +473,7 @@ class App {
             texture.name = itemFilename;
             texture.hasAlpha = true;
 
-            const matsMatch = this._scene.materials.filter((m)=>m.id == slotName)
-            const material = matsMatch.at(-1);
+            const material = childMeshes.find((mesh)=>mesh.material.id == slotName).material
             material.id = nodeUniqueId + this.SEPARATOR + slotName;
 
             (material as any).albedoTexture = texture;
@@ -592,7 +591,7 @@ class App {
         for (let i = 5; i < this.fieldFimensions.z; i+=10) {
             for (let j = 5; j < this.fieldFimensions.x; j+=10) {
                 ++counter;
-                await this.loadArcadian(counter, new Vector3(j, 5, i));
+                this.loadArcadian(counter, new Vector3(j, 5, i));
             }
         }
     }

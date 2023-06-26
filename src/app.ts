@@ -241,15 +241,16 @@ class App {
     private attackTarget(attackerUniqueId: number, target: Mesh) {
         const attacker = this.getRootMesh(attackerUniqueId);
         const deltaPosition = target.position.subtract(attacker.position);
+        const distance = deltaPosition.length();
         const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
 
-        let weaponToUse: Weapon = weapons.find((weapon) => weapon?.range >= deltaPosition.length());
-        console.log("weaponToUse", weaponToUse)
+        console.log("distance", distance);
+        let weaponToUse: Weapon = weapons.find((weapon) => weapon?.range >= distance);
+        console.log("weaponToUse", weaponToUse);
         if (!weaponToUse)
             return false;
 
         attacker.scaling.x = -Math.sign(deltaPosition.x);
-        attacker.computeWorldMatrix(true);
         
         // attack animation
         let animationName: string;
@@ -313,7 +314,7 @@ class App {
         setTimeout(() => {
             projectile.setEnabled(true);
 
-            let time = deltaPosition.length() / weaponToUse.projectileSpeed;
+            let time = distance / weaponToUse.projectileSpeed;
 
             const forceX = deltaPosition.x / time;
             const forceY = target.position.y + deltaPosition.y / time - this.GRAVITY * time * (1/2);
@@ -341,9 +342,9 @@ class App {
         const characterMesh = this.getRootMesh(characterUniqueId);
         
         const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != characterMesh.uniqueId);
-        if (!targets || targets.length == 0)
+        if (!targets || targets.length == 0) {
             return;
-
+        }
         targets.sort((a, b)=>a.position.subtract(characterMesh.position).length() - b.position.subtract(characterMesh.position).length())
 
         for (let i = 0; i < targets.length; i++) {
@@ -353,8 +354,8 @@ class App {
             const origin = characterMesh.position;
             const ray = new BABYLON.Ray(origin, deltaPosition);
             
-            // let rayHelper = new BABYLON.RayHelper(ray);		
-            // rayHelper.show(this._scene);
+            let rayHelper = new BABYLON.RayHelper(ray);		
+            rayHelper.show(this._scene);
             characterMesh.isPickable = false;
             const hit = this._scene.pickWithRay(ray);
             characterMesh.isPickable = true;
@@ -405,6 +406,7 @@ class App {
         if (newHp == 0) {
             this.setAnimation(parentUniqueId, ANIMATION_LIST.death, false, true);
             parentMesh.physicsImpostor.dispose();
+            parentMesh.isPickable = false;
             hpBar.dispose();
             hpBarMax.dispose();
             BABYLON.Tags.RemoveTagsFrom(parentMesh, "arcadian");

@@ -167,7 +167,9 @@ class App {
             if (ev.keyCode === 32) {
                 if (this.selectedCharacterId) {
                     const target = this.getNearestAttackTarget(this.selectedCharacterId);
-                    this.attackTarget(this.selectedCharacterId, target);
+                    if (target) {
+                        this.attackTarget(this.selectedCharacterId, target);
+                    }
                 }
             }
         });
@@ -339,7 +341,7 @@ class App {
         const characterMesh = this.getRootMesh(characterUniqueId);
         
         const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != characterMesh.uniqueId);
-        if (!targets || targets.length == 0) 
+        if (!targets || targets.length == 0)
             return;
 
         targets.sort((a, b)=>a.position.subtract(characterMesh.position).length() - b.position.subtract(characterMesh.position).length())
@@ -400,17 +402,17 @@ class App {
         const maxHp = Number(hpBarMax.metadata);
         const currentHp = Number(hpBar.metadata);
         const newHp = Math.max(currentHp + deltaHp, 0);
-        const maxHpBarWidth = 1;
-        hpBar.position.x -= (deltaHp / maxHp * maxHpBarWidth) / 2;
-        // console.log("maxHp", maxHp)
-        // console.log("currentHp", currentHp)
-        // console.log("deltaHp", deltaHp)
-        // console.log("newHp", newHp)
-        hpBar.scaling.x = newHp / maxHp;
-        hpBar.metadata = newHp;
         if (newHp == 0) {
             this.setAnimation(parentUniqueId, ANIMATION_LIST.death, false, true);
+            parentMesh.physicsImpostor.dispose();
+            hpBar.dispose();
+            hpBarMax.dispose();
+            BABYLON.Tags.RemoveTagsFrom(parentMesh, "arcadian");
         }
+        const maxHpBarWidth = 1;
+        hpBar.position.x -= (deltaHp / maxHp * maxHpBarWidth) / 2;
+        hpBar.scaling.x = newHp / maxHp;
+        hpBar.metadata = newHp;
         return newHp;
     }
 
@@ -491,9 +493,7 @@ class App {
                 {
                     trigger: BABYLON.ActionManager.OnPickDownTrigger,
                 },
-                () => {
-                    // console.log("character selected")
-                }
+                () => {}
             )
         )
         this.setAnimation(nodeUniqueId, ANIMATION_LIST.idle, true, false);

@@ -299,7 +299,9 @@ class App {
                 break;
         }
 
-        this.setAnimation(attacker.uniqueId, animationName, false, false);
+        const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
+        animation.start(false);
+
 
         // Create projectile
         let projectile: Mesh;
@@ -446,7 +448,9 @@ class App {
         const currentHp = Number(hpBar.metadata);
         const newHp = Math.max(currentHp + deltaHp, 0);
         if (newHp == 0) {
-            this.setAnimation(parentUniqueId, ANIMATION_LIST.death, false, true);
+            this.stopGroupAnimations(parentUniqueId);
+            const animation = this.getGroupAnimation(parentUniqueId, ANIMATION_LIST.death);
+            animation.start(false);
             parentMesh.physicsImpostor.dispose();
             parentMesh.isPickable = false;
             hpBar.dispose();
@@ -537,7 +541,9 @@ class App {
                 () => {}
             )
         )
-        this.setAnimation(nodeUniqueId, ANIMATION_LIST.idle, true, false);
+
+        const animation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.idle);
+        animation.start(true);
     }
 
     private moveCharacter(nodeUniqueId: number, destination: Vector3) {
@@ -567,9 +573,14 @@ class App {
         characterMesh.animations.push(animation);
 
         this._scene.stopAnimation(characterMesh, animationName);
-        this.setAnimation(nodeUniqueId, ANIMATION_LIST.walk);
+
+        const groupAnimation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.walk);
+        groupAnimation.start(true);
+
         this._scene.beginDirectAnimation(characterMesh, [animation], 0, totalFrames, false, 1, ()=>{
-            this.setAnimation(nodeUniqueId, ANIMATION_LIST.idle);
+            this.stopGroupAnimations(nodeUniqueId);
+            const groupAnimation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.idle);
+            groupAnimation.start(true);
         })
     }
 
@@ -592,16 +603,12 @@ class App {
     private getRootMesh(nodeUniqueId: number): Mesh {
         return this._scene.rootNodes.find((v)=>v.uniqueId == nodeUniqueId) as Mesh;
     }
-    private stopAnimations(uniqueId: number) {
+    private stopGroupAnimations(uniqueId: number) {
         const activeAnimations = this._scene.animationGroups.filter((v)=>v.isPlaying && v.name.split(this.SEPARATOR)[0] == uniqueId.toString());
         activeAnimations.forEach((v)=>v.stop())
     }
-    private setAnimation(uniqueId: number, animationName: string, loop: boolean = true, stopPreviousAnimations: boolean = true) {
-        if (stopPreviousAnimations) {
-            this.stopAnimations(uniqueId);
-        }
-        var anim = this._scene.getAnimationGroupByName(this.getGroupAnimationName(uniqueId, animationName));
-        anim.start(loop);
+    private getGroupAnimation(uniqueId: number, animationName: string) {
+        return this._scene.getAnimationGroupByName(this.getGroupAnimationName(uniqueId, animationName));
     }
 
     private getGroupAnimationName(animatedUniqueId: number, animationName: string): string {

@@ -262,6 +262,11 @@ class App {
     private attackTarget(attackerUniqueId: number, target: Mesh) {
         const attacker = this.getRootMesh(attackerUniqueId);
 
+        const tags = BABYLON.Tags.GetTags(attacker) || [];
+        if (tags.includes("attacking")) {
+            return;
+        }
+
         const deltaPosition = target.position.subtract(attacker.position);
         const horizontalDirection = -Math.sign(deltaPosition.x); // -1 || 1
         
@@ -301,6 +306,11 @@ class App {
 
         const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
         animation.start(false);
+
+        BABYLON.Tags.AddTagsTo(attacker, "attacking")
+        setTimeout(() => {
+            BABYLON.Tags.RemoveTagsFrom(attacker, "attacking")
+        }, weaponToUse.reloadTime * 1000);
 
         // Create projectile
         let projectile: Mesh;

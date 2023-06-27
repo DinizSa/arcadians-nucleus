@@ -302,7 +302,6 @@ class App {
         const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
         animation.start(false);
 
-
         // Create projectile
         let projectile: Mesh;
         
@@ -335,6 +334,9 @@ class App {
             if (collidedMesh.metadata == "arcadian") {
                 this.updateHpBar(collidedMesh.uniqueId, -weaponToUse.damage);
                 collidedUniqueIds.push(collidedMesh.uniqueId)
+
+                const animation = this.getGroupAnimation(collidedMesh.uniqueId, ANIMATION_LIST.hit);
+                animation.start(false);
             }
             setTimeout(() => {
                 projectile.dispose();
@@ -577,7 +579,7 @@ class App {
         const groupAnimation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.walk);
         groupAnimation.start(true);
 
-        this._scene.beginDirectAnimation(characterMesh, [animation], 0, totalFrames, false, 1, ()=>{
+        this._scene.beginDirectAnimation(characterMesh, [animation], 0, totalFrames, false, 1, () => {
             this.stopGroupAnimations(nodeUniqueId);
             const groupAnimation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.idle);
             groupAnimation.start(true);

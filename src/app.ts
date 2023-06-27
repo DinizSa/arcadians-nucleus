@@ -40,7 +40,7 @@ interface Weapon {
     range: number;
     weight: number,
     reloadTime: number;
-    type: 'spell' | 'sword' | 'gun';
+    type: 'spell' | 'melee' | 'gun';
     projectileSpeed: number;
     projectileWeight: number;
     accuracyRadius: number;
@@ -104,6 +104,7 @@ class App {
 
     private ground: Mesh;
     private _projetile: Mesh;
+    private _projetileSword: Mesh;
     private _selectedMark: Mesh;
     private _hpBarMax: BABYLON.Mesh
     private _hpBar: BABYLON.Mesh
@@ -111,6 +112,10 @@ class App {
     private fieldFimensions = new Vector3(30, 0, 15)
     private FPS = 60;
     private GRAVITY = -9.81;
+    private arcadiansSize = {
+        width: 1.2,
+        height: 2.7
+    }
 
     constructor() {
         this._canvas = this._createCanvas()
@@ -236,20 +241,44 @@ class App {
         projetile.setEnabled(false);
         projetile.checkCollisions = true;
         this._projetile = projetile;
+
+
+        const materialSword = new BABYLON.StandardMaterial("mat", this._scene);
+        materialSword.roughness = 1;
+        materialSword.emissiveColor = new Color3(1, 0.2, 0);
+        let projetileSword = BABYLON.MeshBuilder.CreateBox(
+            "box", {
+                width: 0.2, 
+                height: this.arcadiansSize.height, 
+                depth: 0.5
+            }, this._scene);
+        projetileSword.material = materialSword;
+        projetileSword.isPickable = false;
+        projetileSword.setEnabled(false);
+        projetileSword.checkCollisions = true;
+        this._projetileSword = projetileSword;
     }
 
     private attackTarget(attackerUniqueId: number, target: Mesh) {
         const attacker = this.getRootMesh(attackerUniqueId);
+
         const deltaPosition = target.position.subtract(attacker.position);
-        const distance = deltaPosition.length();
+        const horizontalDirection = -Math.sign(deltaPosition.x); // -1 || 1
+        
+        const attackPosition = attacker.position.add(
+            new Vector3(-horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
+        );
+        
+        const attackDirection = target.position.subtract(attackPosition);
+        const distance = attackDirection.length();
         const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
 
         let weaponToUse: Weapon = weapons.find((weapon) => weapon?.range >= distance);
         if (!weaponToUse)
             return false;
 
-        if (attacker.scaling.x != -Math.sign(deltaPosition.x)) {
-            attacker.scaling.x = -Math.sign(deltaPosition.x);
+        if (attacker.scaling.x != horizontalDirection) {
+            attacker.scaling.x = horizontalDirection;
         }
         
         // attack animation
@@ -261,7 +290,7 @@ class App {
             case "gun":
                 animationName = ANIMATION_LIST.attackGunner;
                 break;
-            case "sword":
+            case "melee":
                 const isRightHandWeapon = weaponToUse.slotName == slotsNames.rightHand;
                 animationName = isRightHandWeapon ? ANIMATION_LIST.attackKnight : ANIMATION_LIST.attackAssassin;
                 break;
@@ -273,8 +302,18 @@ class App {
         this.setAnimation(attacker.uniqueId, animationName, false, false);
 
         // Create projectile
-        const projectile = this._projetile.clone("projectileClone");
-        projectile.position = attacker.position.add(new Vector3(-Math.sign(attacker.scaling.x), 1, 0));
+        let projectile: Mesh;
+        
+        let delayProjectile: number;
+        if (weaponToUse.type == 'gun' || weaponToUse.type == 'spell') {
+            projectile = this._projetile.clone("projectileClone");
+            projectile.position = attackPosition.add(new Vector3(0, 1, 0));
+            delayProjectile = 300;
+        } else if (weaponToUse.type == "melee") {
+            projectile = this._projetileSword.clone("projectileSwordClone");
+            projectile.position = attackPosition.clone();
+            delayProjectile = 150;
+        }
         
         projectile.physicsImpostor = new BABYLON.PhysicsImpostor(
             projectile, 
@@ -282,15 +321,6 @@ class App {
                 mass: weaponToUse.projectileWeight, 
                 restitution: 0.1, 
                 friction: 0
-            }
-        );
-        projectile.physicsImpostor.physicsBody.angularDamping = 0.8;
-        projectile.physicsImpostor.registerOnPhysicsCollide(
-            this.ground.physicsImpostor, 
-            ()=>{
-                setTimeout(() => {
-                    projectile.dispose();
-                }, 2000);
             }
         );
 
@@ -304,26 +334,36 @@ class App {
                 this.updateHpBar(collidedMesh.uniqueId, -weaponToUse.damage);
                 collidedUniqueIds.push(collidedMesh.uniqueId)
             }
+            setTimeout(() => {
+                projectile.dispose();
+            }, 500);
         };
         const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian" && attacker.uniqueId != v.uniqueId).map((v: Mesh)=>v.physicsImpostor);
         projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, onHit);
-        // MBU: this can be useful when we just want to trigger, but not impact, can be useful to colide bullets on multiple inimigas
-        // projectile.collisionResponse = false;
-        // projectile.physicsImpostor.onCollideEvent = (collider: BABYLON.PhysicsImpostor, collidedWith: BABYLON.PhysicsImpostor) => {
-        //     console.log("collidedWith", collidedWith)
-        // }
 
         setTimeout(() => {
             projectile.setEnabled(true);
 
-            let time = distance / weaponToUse.projectileSpeed;
+            if (weaponToUse.type == 'gun' || weaponToUse.type == 'spell') {
+                let time = distance / weaponToUse.projectileSpeed;
+                const forceX = deltaPosition.x / time;
+                const forceY = target.position.y + deltaPosition.y / time - this.GRAVITY * time * (1/2);
+                const forceZ = deltaPosition.z / time;
+                const impulse = new Vector3(forceX, forceY, forceZ).scale(weaponToUse.projectileWeight);
 
-            const forceX = deltaPosition.x / time;
-            const forceY = target.position.y + deltaPosition.y / time - this.GRAVITY * time * (1/2);
-            const forceZ = deltaPosition.z / time;
-            const impulse = new Vector3(forceX, forceY, forceZ).scale(weaponToUse.projectileWeight);
-            projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
-        }, 300);
+                projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
+
+            } else if (weaponToUse.type == "melee") {
+                const direction = BABYLON.Vector3.Normalize(attackDirection);
+                const impulse = direction.scale(weaponToUse.projectileWeight).scale(weaponToUse.projectileSpeed);
+                projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
+                
+                const lifeTime = weaponToUse.range / weaponToUse.projectileSpeed;
+                setTimeout(() => {
+                    projectile.dispose();
+                }, 1000 * lifeTime);
+            }
+        }, delayProjectile);
     }
 
     // Returns the equipped weapons sorted by damage
@@ -428,9 +468,7 @@ class App {
         const attributes: MetadataSlot[] = metadata.attributes;
 
         // body to detect interactions
-        const arcadianHeight = 2.7;
-        const arcadianWidth = 1.2;
-        let body = BABYLON.MeshBuilder.CreateCylinder("body", {diameter: arcadianWidth, height: arcadianHeight});
+        let body = BABYLON.MeshBuilder.CreateCylinder("body", {diameter: this.arcadiansSize.width, height: this.arcadiansSize.height});
         body.metadata = "arcadian";
         body.name = "arcadian_" + arcadianId;
         BABYLON.Tags.AddTagsTo(body, "arcadian");
@@ -444,7 +482,7 @@ class App {
         const arcadianMesh = meshes[0];
         animationGroups[0].stop();
         arcadianMesh.setParent(body);
-        arcadianMesh.position = new Vector3(0, -arcadianHeight/2, 0);
+        arcadianMesh.position = new Vector3(0, -this.arcadiansSize.height/2, 0);
         arcadianMesh.isPickable = false;
 
         const childMeshes = arcadianMesh.getChildMeshes();
@@ -504,31 +542,35 @@ class App {
 
     private moveCharacter(nodeUniqueId: number, destination: Vector3) {
         const characterMesh = this.getRootMesh(nodeUniqueId);
-        const speed = 4.5;
+        destination.y = characterMesh.position.y;
+        const speed = 4;
         let distance = destination.subtract(characterMesh.position);
-
-        const arcadianPhysics = () => {
-            distance = destination.subtract(characterMesh.position);
-            distance.y = 0;
-            if (distance.length() < 0.1) {
-                // TODO: find another way to avoid mini jump at the end of walking
-                characterMesh.physicsImpostor.registerAfterPhysicsStep(()=>{
-                    characterMesh.physicsImpostor.setLinearVelocity(Vector3.Zero())
-                });
-
-                this.setAnimation(characterMesh.uniqueId, ANIMATION_LIST.idle);
-                this._scene.unregisterBeforeRender(arcadianPhysics);
-            }
-            const velocity = distance.normalize().scale(speed);
-            characterMesh.physicsImpostor.setLinearVelocity(velocity);
-            characterMesh.physicsImpostor.setAngularVelocity(new Vector3(0,0,0));
-        }
-
-        this.setAnimation(nodeUniqueId, ANIMATION_LIST.walk);
 
         characterMesh.scaling = new Vector3(-Math.sign(distance.x)*1, 1, 1);
 
-        this._scene.registerBeforeRender(arcadianPhysics);
+        const animationName = "moveAnimation";
+        var animation = new BABYLON.Animation(
+            animationName,
+            "position",
+            this.FPS,
+            BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+            BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+        );
+
+        const totalFrames = this.FPS * distance.length() / speed;
+        var keys = [
+            { frame: 0, value: characterMesh.position },
+            { frame: totalFrames, value: destination }
+        ];
+        animation.setKeys(keys);
+
+        characterMesh.animations.push(animation);
+
+        this._scene.stopAnimation(characterMesh, animationName);
+        this.setAnimation(nodeUniqueId, ANIMATION_LIST.walk);
+        this._scene.beginDirectAnimation(characterMesh, [animation], 0, totalFrames, false, 1, ()=>{
+            this.setAnimation(nodeUniqueId, ANIMATION_LIST.idle);
+        })
     }
 
     private createTerrain() {

@@ -341,13 +341,23 @@ class App {
             if (collidedUniqueIds.includes(collidedMesh.uniqueId)) {
                 return;
             }
-            if (collidedMesh.metadata == "arcadian") {
-                this.updateHpBar(collidedMesh.uniqueId, -weaponToUse.damage);
-                collidedUniqueIds.push(collidedMesh.uniqueId)
+            if (weaponToUse.radiusArea > 0) {
+                const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != attacker.uniqueId);
 
-                const animation = this.getGroupAnimation(collidedMesh.uniqueId, ANIMATION_LIST.hit);
-                animation.start(false);
+                for (let i = 0; i < targets.length; i++) {
+                    const distance = projectile.position.subtract(targets[i].position).length();
+                    
+                    if (distance < weaponToUse.radiusArea) {
+                        this.updateHealth(targets[i].uniqueId, -weaponToUse.damage);
+                        collidedUniqueIds.push(targets[i].uniqueId);
+                    }
+                }
+
+            } else if (collidedMesh.metadata == "arcadian") {
+                this.updateHealth(collidedMesh.uniqueId, -weaponToUse.damage);
+                collidedUniqueIds.push(collidedMesh.uniqueId)
             }
+
             setTimeout(() => {
                 projectile.dispose();
             }, 500);
@@ -452,7 +462,7 @@ class App {
         hpBar.setEnabled(true);
     }
 
-    private updateHpBar(parentUniqueId: number, deltaHp: number): number {
+    private updateHealth(parentUniqueId: number, deltaHp: number): number {
         const parentMesh = this.getRootMesh(parentUniqueId);
         const hpBar = parentMesh.getChildMeshes(true, (node)=>node.name == "hp")[0] as Mesh;
         const hpBarMax = parentMesh.getChildMeshes(true, (node)=>node.name == "hpMax")[0] as Mesh;
@@ -468,6 +478,9 @@ class App {
             hpBar.dispose();
             hpBarMax.dispose();
             BABYLON.Tags.RemoveTagsFrom(parentMesh, "arcadian");
+        } else {
+            const animation = this.getGroupAnimation(parentUniqueId, ANIMATION_LIST.hit);
+            animation.start(false);
         }
         const maxHpBarWidth = 1;
         hpBar.position.x -= (deltaHp / maxHp * maxHpBarWidth) / 2;

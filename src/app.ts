@@ -468,8 +468,8 @@ class App {
         const hpBarMax = parentMesh.getChildMeshes(true, (node)=>node.name == "hpMax")[0] as Mesh;
         const maxHp = Number(hpBarMax.metadata);
         const currentHp = Number(hpBar.metadata);
-        const newHp = Math.max(currentHp + deltaHp, 0);
-        if (newHp == 0) {
+        const updatedHp = Math.max(currentHp + deltaHp, 0);
+        if (updatedHp == 0) {
             this.stopGroupAnimations(parentUniqueId);
             const animation = this.getGroupAnimation(parentUniqueId, ANIMATION_LIST.death);
             animation.start(false);
@@ -484,9 +484,9 @@ class App {
         }
         const maxHpBarWidth = 1;
         hpBar.position.x -= (deltaHp / maxHp * maxHpBarWidth) / 2;
-        hpBar.scaling.x = newHp / maxHp;
-        hpBar.metadata = newHp;
-        return newHp;
+        hpBar.scaling.x = updatedHp / maxHp;
+        hpBar.metadata = updatedHp;
+        return updatedHp;
     }
 
     private async loadArcadian(arcadianId: number, position: Vector3 = Vector3.Zero()) {

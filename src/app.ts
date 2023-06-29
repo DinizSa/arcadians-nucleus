@@ -283,13 +283,11 @@ class App {
             return;
         }
 
-        const deltaPosition = target.position.subtract(attacker.position);
-        const horizontalDirection = -Math.sign(deltaPosition.x); // -1 || 1
-        
+        const horizontalDirection = Math.sign(target.position.x - attacker.position.x)
         const attackPosition = attacker.position.add(
-            new Vector3(-horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
+            new Vector3(horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
         );
-        
+
         const attackDirection = target.position.subtract(attackPosition);
         const distance = attackDirection.length();
         const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
@@ -298,8 +296,8 @@ class App {
         if (!weaponToUse)
             return false;
 
-        if (attacker.scaling.x != horizontalDirection) {
-            attacker.scaling.x = horizontalDirection;
+        if (attacker.scaling.x == horizontalDirection) {
+            attacker.scaling.x = -horizontalDirection;
         }
         
         // attack animation
@@ -381,10 +379,6 @@ class App {
                 this.updateHealth(collidedMesh.uniqueId, -weaponToUse.damage);
                 collidedUniqueIds.push(collidedMesh.uniqueId)
             }
-
-            setTimeout(() => {
-                projectile.dispose();
-            }, 500);
         };
         const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian" && attacker.uniqueId != v.uniqueId).map((v: Mesh)=>v.physicsImpostor);
         projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, onHit);
@@ -394,12 +388,13 @@ class App {
 
             if (weaponToUse.type == 'gun' || weaponToUse.type == 'spell') {
                 let time = distance / weaponToUse.projectileSpeed;
-                const forceX = deltaPosition.x / time;
-                const forceY = target.position.y + deltaPosition.y / time - this.GRAVITY * time * (1/2);
-                const forceZ = deltaPosition.z / time;
+                const forceX = attackDirection.x / time;
+                const forceY = target.position.y + attackDirection.y / time - this.GRAVITY * time * (1/2);
+                const forceZ = attackDirection.z / time;
                 const impulse = new Vector3(forceX, forceY, forceZ).scale(weaponToUse.projectileWeight);
 
                 projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
+                projectile.physicsImpostor.setAngularVelocity(Vector3.One().scale(8))
 
             } else if (weaponToUse.type == "melee") {
                 const direction = BABYLON.Vector3.Normalize(attackDirection);

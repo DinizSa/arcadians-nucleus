@@ -146,6 +146,7 @@ class App {
         this.setupSelectedMark();
         this.setupHpBar()
         this.setupProjectile();
+        this.setupHitEffect();
 
         let counter = 0;
         for (let i = 5; i < this.fieldFimensions.z; i+=10) {
@@ -241,7 +242,7 @@ class App {
 
     private getTexture(pathName: string, invertY?: boolean): BABYLON.Texture {
         let existentTexture = this._scene.getTextureByName(pathName)
-        return existentTexture as BABYLON.Texture || new BABYLON.Texture(pathName, this._scene, true, false, BABYLON.Texture.NEAREST_SAMPLINGMODE);
+        return existentTexture as BABYLON.Texture || new BABYLON.Texture(pathName, this._scene, true, false);
     }
 
     private setupProjectile() {
@@ -249,7 +250,7 @@ class App {
         material.ambientTexture = this.getTexture("combat/fireDiffuse.png");;
         material.emissiveColor = new Color3(1, 0.2, 0);
         material.bumpTexture = this.getTexture("combat/bumpTexture.jpg");
-        material.roughness = 10;
+        material.roughness = 1;
         let projetile = BABYLON.MeshBuilder.CreateSphere("projectile", {diameter: 0.5}, this._scene);
         projetile.material = material;
         projetile.isPickable = false;
@@ -268,16 +269,16 @@ class App {
         particleSystem.minLifeTime = 1;
         particleSystem.maxLifeTime = 2;
 
-        const materialSword = new BABYLON.StandardMaterial("mat", this._scene);
-        materialSword.roughness = 1;
-        materialSword.emissiveColor = new Color3(1, 0.2, 0);
-        let projetileSword = BABYLON.MeshBuilder.CreateBox(
+        
+        // this._scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+
+        let projetileSword = BABYLON.MeshBuilder.CreatePlane(
             "box", {
                 width: 0.2, 
                 height: this.arcadiansSize.height, 
-                depth: 0.5
+                // depth: 0.5
             }, this._scene);
-        projetileSword.material = materialSword;
+        projetileSword.visibility = 0;
         projetileSword.isPickable = false;
         projetileSword.setEnabled(false);
         projetileSword.checkCollisions = true;
@@ -292,12 +293,13 @@ class App {
             return;
         }
 
-        const horizontalDirection = Math.sign(target.position.x - attacker.position.x)
+        const horizontalDirection = Math.sign(target.position.x - attacker.position.x) // -1 || 1
         const attackPosition = attacker.position.add(
             new Vector3(horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
         );
 
-        const attackDirection = target.position.subtract(attackPosition);
+        // scale to compensate unkown bias when aiming the projectile
+        const attackDirection = target.position.subtract(attackPosition).scale(1.15);
         const distance = attackDirection.length();
         const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
 
@@ -347,15 +349,15 @@ class App {
         const onHit = (collider: BABYLON.PhysicsImpostor, collidedAgainst: BABYLON.PhysicsImpostor) => {
             const collidedMesh = collidedAgainst.object as Mesh;
             
+            if (collidedUniqueIds.includes(collidedMesh.uniqueId)) {
+                return;
+            }
+            
             this.stopParticlesSystem(projectile);
 
             setTimeout(() => {
                 projectile.dispose();
             }, 2000);
-
-            if (collidedUniqueIds.includes(collidedMesh.uniqueId)) {
-                return;
-            }
 
             if (weapon.radiusArea > 0) {
                 const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != attacker.uniqueId);
@@ -366,12 +368,16 @@ class App {
                     if (distance < weapon.radiusArea) {
                         this.updateHealth(targets[i].uniqueId, -weapon.damage);
                         collidedUniqueIds.push(targets[i].uniqueId);
+
+                        this.animateHit(targets[i], projectile.position)
                     }
                 }
 
             } else if (collidedMesh.metadata == "arcadian") {
                 this.updateHealth(collidedMesh.uniqueId, -weapon.damage);
-                collidedUniqueIds.push(collidedMesh.uniqueId)
+                collidedUniqueIds.push(collidedMesh.uniqueId);
+
+                this.animateHit(collidedMesh, projectile.position)
             }
         };
         const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian" && attacker.uniqueId != v.uniqueId).map((v: Mesh)=>v.physicsImpostor);
@@ -401,6 +407,23 @@ class App {
                 }, 1000 * lifeTime);
             }
         }, delayProjectile);
+    }
+
+    private animateHit(target: Mesh, projectilePosition: Vector3) {
+        const boundingInfo = target.getBoundingInfo();
+        const hitPosition = target.position.clone();
+        const horizontalDirection = Math.sign(target.position.x - projectilePosition.x)
+        hitPosition.x -= horizontalDirection * boundingInfo.maximum.x;
+        hitPosition.y = projectilePosition.y;
+        hitPosition.z += 0.1;
+
+        const hitStarMeshClone = this._scene.getMeshByName("hitStartMesh").clone("hitStarMeshClone", undefined)
+        hitStarMeshClone.setEnabled(true);
+        hitStarMeshClone.position = hitPosition;
+
+        setTimeout(() => {
+            hitStarMeshClone.dispose(false);
+        }, 200);
     }
 
     private getAttackAnimation(weapon: Weapon): string {
@@ -482,6 +505,17 @@ class App {
         this._hpBar = BABYLON.CreatePlane("hp", {width: 1, height: 0.3})
         this._hpBar.material = materialHp;
         this._hpBar.setEnabled(false);
+    }
+
+    private setupHitEffect() {
+        const hitStarMesh = BABYLON.CreatePlane("hitStartMesh", {width: 1, height: 1}, this._scene);
+        const startMaterial = new BABYLON.StandardMaterial("hitStart", this._scene);
+        startMaterial.emissiveColor = Color3.Red();
+        const text = this.getTexture("combat/hit.png");
+        text.hasAlpha = true;
+        startMaterial.diffuseTexture = text;
+        startMaterial.backFaceCulling = false;
+        hitStarMesh.material = startMaterial;
     }
 
     private createHpBar(parent: Mesh, maxHp: number) {

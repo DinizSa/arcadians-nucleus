@@ -189,7 +189,7 @@ class App {
     }
 
     private setupSelectedMark() {
-        const texture = new BABYLON.Texture("environment/Gem.png", this._scene);
+        const texture = this.getTexture("environment/Gem.png");
         texture.hasAlpha = true;
         texture.uScale = 1;
         texture.vScale = 1;
@@ -231,15 +231,17 @@ class App {
         mark.setEnabled(false);
     }
 
+    private getTexture(pathName: string, invertY?: boolean): BABYLON.Texture {
+        let existentTexture = this._scene.getTextureByName(pathName)
+        return existentTexture as BABYLON.Texture || new BABYLON.Texture(pathName, this._scene, true, false, BABYLON.Texture.NEAREST_SAMPLINGMODE);
+    }
+
     private setupProjectile() {
-
-        const projectileTexture = new BABYLON.Texture("combat/fireDiffuse.png", this._scene);
-        projectileTexture.hasAlpha = true;
-
         const material = new BABYLON.StandardMaterial("mat", this._scene);
-        material.roughness = 1;
-        material.ambientTexture = projectileTexture;
+        material.ambientTexture = this.getTexture("combat/fireDiffuse.png");;
         material.emissiveColor = new Color3(1, 0.2, 0);
+        material.bumpTexture = this.getTexture("combat/bumpTexture.jpg");
+        material.roughness = 10;
         let projetile = BABYLON.MeshBuilder.CreateSphere("projectile", {diameter: 0.5}, this._scene);
         projetile.material = material;
         projetile.isPickable = false;
@@ -247,17 +249,16 @@ class App {
         projetile.checkCollisions = true;
         this._projetile = projetile;
 
-        const particleSystem = new BABYLON.ParticleSystem('particles', 2000, this._scene);
+        const particleSystem = new BABYLON.ParticleSystem('particles', 1000, this._scene);
         particleSystem.emitter = projetile;
         particleSystem.emitRate = 50;
-        particleSystem.particleTexture = new BABYLON.Texture('combat/fireDiffuse.png', this._scene);
+        particleSystem.particleTexture = this.getTexture('combat/fireDiffuse.png');
         particleSystem.minSize = 0.1;
-        particleSystem.maxSize = 0.2;
-        particleSystem.color1 = new BABYLON.Color4(1, 0, 0, 1); // Start color
-        particleSystem.color2 = new BABYLON.Color4(1, 1, 0.2, 0); // End color
+        particleSystem.maxSize = 0.25;
+        particleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 0.5); // Start color
+        particleSystem.color2 = new BABYLON.Color4(1, 1, 0, 0.5); // End color
         particleSystem.minLifeTime = 1;
         particleSystem.maxLifeTime = 2;
-
 
         const materialSword = new BABYLON.StandardMaterial("mat", this._scene);
         materialSword.roughness = 1;
@@ -292,8 +293,8 @@ class App {
         const distance = attackDirection.length();
         const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
 
-        let weaponToUse: Weapon = weapons.find((weapon) => weapon?.range >= distance);
-        if (!weaponToUse)
+        let weapon: Weapon = weapons.find((weapon) => weapon?.range >= distance);
+        if (!weapon)
             return false;
 
         if (attacker.scaling.x == horizontalDirection) {
@@ -301,22 +302,7 @@ class App {
         }
         
         // attack animation
-        let animationName: string;
-        switch (weaponToUse.type) {
-            case "spell":
-                animationName = ANIMATION_LIST.attackWizard;
-                break;
-            case "gun":
-                animationName = ANIMATION_LIST.attackGunner;
-                break;
-            case "melee":
-                const isRightHandWeapon = weaponToUse.slotName == slotsNames.rightHand;
-                animationName = isRightHandWeapon ? ANIMATION_LIST.attackKnight : ANIMATION_LIST.attackAssassin;
-                break;
-            default:
-                animationName = ANIMATION_LIST.attackTech;
-                break;
-        }
+        let animationName = this.getAttackAnimation(weapon);
 
         const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
         animation.start(false);
@@ -324,17 +310,17 @@ class App {
         BABYLON.Tags.AddTagsTo(attacker, "attacking")
         setTimeout(() => {
             BABYLON.Tags.RemoveTagsFrom(attacker, "attacking")
-        }, weaponToUse.reloadTime * 1000);
+        }, weapon.reloadTime * 1000);
 
         // Create projectile
         let projectile: Mesh;
         
         let delayProjectile: number;
-        if (weaponToUse.type == 'gun' || weaponToUse.type == 'spell') {
+        if (weapon.type == 'gun' || weapon.type == 'spell') {
             projectile = this._projetile.clone("projectileClone");
             projectile.position = attackPosition.add(new Vector3(0, 1, 0));
             delayProjectile = 300;
-        } else if (weaponToUse.type == "melee") {
+        } else if (weapon.type == "melee") {
             projectile = this._projetileSword.clone("projectileSwordClone");
             projectile.position = attackPosition.clone();
             delayProjectile = 150;
@@ -343,7 +329,7 @@ class App {
         projectile.physicsImpostor = new BABYLON.PhysicsImpostor(
             projectile, 
             BABYLON.PhysicsImpostor.BoxImpostor, {
-                mass: weaponToUse.projectileWeight, 
+                mass: weapon.projectileWeight, 
                 restitution: 0.1, 
                 friction: 0
             }
@@ -363,20 +349,20 @@ class App {
                 return;
             }
 
-            if (weaponToUse.radiusArea > 0) {
+            if (weapon.radiusArea > 0) {
                 const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != attacker.uniqueId);
 
                 for (let i = 0; i < targets.length; i++) {
                     const distance = projectile.position.subtract(targets[i].position).length();
                     
-                    if (distance < weaponToUse.radiusArea) {
-                        this.updateHealth(targets[i].uniqueId, -weaponToUse.damage);
+                    if (distance < weapon.radiusArea) {
+                        this.updateHealth(targets[i].uniqueId, -weapon.damage);
                         collidedUniqueIds.push(targets[i].uniqueId);
                     }
                 }
 
             } else if (collidedMesh.metadata == "arcadian") {
-                this.updateHealth(collidedMesh.uniqueId, -weaponToUse.damage);
+                this.updateHealth(collidedMesh.uniqueId, -weapon.damage);
                 collidedUniqueIds.push(collidedMesh.uniqueId)
             }
         };
@@ -386,27 +372,41 @@ class App {
         setTimeout(() => {
             projectile.setEnabled(true);
 
-            if (weaponToUse.type == 'gun' || weaponToUse.type == 'spell') {
-                let time = distance / weaponToUse.projectileSpeed;
+            if (weapon.type == 'gun' || weapon.type == 'spell') {
+                let time = distance / weapon.projectileSpeed;
                 const forceX = attackDirection.x / time;
                 const forceY = target.position.y + attackDirection.y / time - this.GRAVITY * time * (1/2);
                 const forceZ = attackDirection.z / time;
-                const impulse = new Vector3(forceX, forceY, forceZ).scale(weaponToUse.projectileWeight);
+                const impulse = new Vector3(forceX, forceY, forceZ).scale(weapon.projectileWeight);
 
                 projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
-                projectile.physicsImpostor.setAngularVelocity(Vector3.One().scale(8))
+                projectile.physicsImpostor.setAngularVelocity(Vector3.One().scale(2))
 
-            } else if (weaponToUse.type == "melee") {
+            } else if (weapon.type == "melee") {
                 const direction = BABYLON.Vector3.Normalize(attackDirection);
-                const impulse = direction.scale(weaponToUse.projectileWeight).scale(weaponToUse.projectileSpeed);
+                const impulse = direction.scale(weapon.projectileWeight).scale(weapon.projectileSpeed);
                 projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
                 
-                const lifeTime = weaponToUse.range / weaponToUse.projectileSpeed;
+                const lifeTime = weapon.range / weapon.projectileSpeed;
                 setTimeout(() => {
                     projectile.dispose();
                 }, 1000 * lifeTime);
             }
         }, delayProjectile);
+    }
+
+    private getAttackAnimation(weapon: Weapon): string {
+        switch (weapon.type) {
+            case "spell":
+                return ANIMATION_LIST.attackWizard;
+            case "gun":
+                return ANIMATION_LIST.attackGunner;
+            case "melee":
+                const isRightHandWeapon = weapon.slotName == slotsNames.rightHand;
+                return isRightHandWeapon ? ANIMATION_LIST.attackKnight : ANIMATION_LIST.attackAssassin;
+            default:
+                return ANIMATION_LIST.attackTech;
+        }
     }
 
     private stopParticlesSystem(mesh: Mesh) {
@@ -417,7 +417,7 @@ class App {
         }
     }
 
-    // Returns the equipped weapons sorted by damage
+    // Returns the equipped weapons ordered by damage
     private getEquippedWeapons(characterUniqueId: number): Weapon[] {
         return [slotsNames.rightHand, slotsNames.leftHand]
             .map((slotName) => ({slotName: slotName, material: this._scene.getMaterialById(this.getItemMaterialId(characterUniqueId, slotName))}))
@@ -562,7 +562,7 @@ class App {
             const itemPath = "parts/" + itemFilename;
             const blankPath = "empty399x399.png";
             const textureImage = await mergeImages([blankPath, {src: itemPath, x: itemSlot.x, y: itemSlot.y}]);
-            let texture = new BABYLON.Texture(textureImage, this._scene, true, false, BABYLON.Texture.NEAREST_SAMPLINGMODE);
+            let texture = this.getTexture(textureImage);
 
             texture.name = itemFilename;
             texture.hasAlpha = true;
@@ -637,7 +637,7 @@ class App {
     }
 
     private createTerrain() {
-        const grassTexture = new BABYLON.Texture("environment/Grass Tile.png", this._scene);
+        const grassTexture = this.getTexture("environment/Grass Tile.png");
         grassTexture.hasAlpha = true;
         grassTexture.vScale = 40;
         grassTexture.uScale = 40;

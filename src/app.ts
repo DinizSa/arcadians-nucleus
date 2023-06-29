@@ -145,13 +145,21 @@ class App {
 
         this.setupSelectedMark();
         this.setupHpBar()
+        this.setupProjectile();
+
+        let counter = 0;
+        for (let i = 5; i < this.fieldFimensions.z; i+=10) {
+            for (let j = 5; j < this.fieldFimensions.x; j+=10) {
+                ++counter;
+                this.loadArcadian(counter, new Vector3(j, 5, i));
+            }
+        }
 
         // run the main render loop
         this._engine.runRenderLoop(() => {
             this._scene.render();
         });
 
-        this.setupProjectile();
     
 
         // Handle pointer clicks
@@ -686,15 +694,6 @@ class App {
         this._scene.gravity = new Vector3(0, this.GRAVITY / this.FPS, 0);
         this._scene.collisionsEnabled = true;
         this._scene.enablePhysics(new Vector3(0, this.GRAVITY, 0), new BABYLON.CannonJSPlugin(true, 10, CANNON));
-        
-
-        let counter = 0;
-        for (let i = 5; i < this.fieldFimensions.z; i+=10) {
-            for (let j = 5; j < this.fieldFimensions.x; j+=10) {
-                ++counter;
-                this.loadArcadian(counter, new Vector3(j, 5, i));
-            }
-        }
     }
 
     private _createCanvas(): HTMLCanvasElement {

@@ -232,15 +232,31 @@ class App {
     }
 
     private setupProjectile() {
+
+        const projectileTexture = new BABYLON.Texture("combat/fireDiffuse.png", this._scene);
+        projectileTexture.hasAlpha = true;
+
         const material = new BABYLON.StandardMaterial("mat", this._scene);
         material.roughness = 1;
+        material.ambientTexture = projectileTexture;
         material.emissiveColor = new Color3(1, 0.2, 0);
-        let projetile = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.5}, this._scene);
+        let projetile = BABYLON.MeshBuilder.CreateSphere("projectile", {diameter: 0.5}, this._scene);
         projetile.material = material;
         projetile.isPickable = false;
         projetile.setEnabled(false);
         projetile.checkCollisions = true;
         this._projetile = projetile;
+
+        const particleSystem = new BABYLON.ParticleSystem('particles', 2000, this._scene);
+        particleSystem.emitter = projetile;
+        particleSystem.emitRate = 50;
+        particleSystem.particleTexture = new BABYLON.Texture('combat/fireDiffuse.png', this._scene);
+        particleSystem.minSize = 0.1;
+        particleSystem.maxSize = 0.2;
+        particleSystem.color1 = new BABYLON.Color4(1, 0, 0, 1); // Start color
+        particleSystem.color2 = new BABYLON.Color4(1, 1, 0.2, 0); // End color
+        particleSystem.minLifeTime = 1;
+        particleSystem.maxLifeTime = 2;
 
 
         const materialSword = new BABYLON.StandardMaterial("mat", this._scene);
@@ -338,9 +354,17 @@ class App {
         let collidedUniqueIds = [];
         const onHit = (collider: BABYLON.PhysicsImpostor, collidedAgainst: BABYLON.PhysicsImpostor) => {
             const collidedMesh = collidedAgainst.object as Mesh;
+            
+            this.stopParticlesSystem(projectile);
+
+            setTimeout(() => {
+                projectile.dispose();
+            }, 2000);
+
             if (collidedUniqueIds.includes(collidedMesh.uniqueId)) {
                 return;
             }
+
             if (weaponToUse.radiusArea > 0) {
                 const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != attacker.uniqueId);
 
@@ -388,6 +412,14 @@ class App {
                 }, 1000 * lifeTime);
             }
         }, delayProjectile);
+    }
+
+    private stopParticlesSystem(mesh: Mesh) {
+        const particleSystems = mesh.getConnectedParticleSystems()
+        for (let i = 0; i < particleSystems.length; i++) {
+            particleSystems[i].disposeOnStop = true;
+            particleSystems[i].stop();
+        }
     }
 
     // Returns the equipped weapons sorted by damage

@@ -102,14 +102,11 @@ class App {
     private _stack: SlotMap[];
     private weaponsList: Weapon[];
 
-    private ground: Mesh;
     private _projetile: Mesh;
     private _projetileSword: Mesh;
     private _selectedMark: Mesh;
-    private _hpBarMax: BABYLON.Mesh
-    private _hpBar: BABYLON.Mesh
 
-    private fieldFimensions = new Vector3(30, 0, 15)
+    private fieldFimensions = new Vector3(300, 0, 100)
     private FPS = 60;
     private GRAVITY = -9.81;
     private arcadiansSize = {
@@ -148,11 +145,15 @@ class App {
         this.setupProjectile();
         this.setupHitEffect();
 
-        let counter = 0;
-        for (let i = 5; i < this.fieldFimensions.z; i+=10) {
-            for (let j = 5; j < this.fieldFimensions.x; j+=10) {
-                ++counter;
-                this.loadArcadian(counter, new Vector3(j, 5, i));
+        const rowsArcadians = 5;
+        const colsArcadians = 2;
+        const distanceArcadians = 10;
+        const startX = this.fieldFimensions.x/2 - (rowsArcadians/2) * distanceArcadians;
+        const startZ = this.fieldFimensions.z/2 - (colsArcadians/2) * distanceArcadians;
+        for (let i = 0; i < rowsArcadians; i++) {
+            for (let j = 0; j < colsArcadians; j++) {
+                const counter = 1 + i * rowsArcadians + j;
+                this.loadArcadian(counter, new Vector3(startX + i * distanceArcadians, 5, startZ + j * distanceArcadians));
             }
         }
 
@@ -198,16 +199,16 @@ class App {
     }
 
     private setupSelectedMark() {
-        const texture = this.getTexture("environment/Gem.png");
+        const texture = this.getTexture("environment/Gem.png", true);
         texture.hasAlpha = true;
         texture.uScale = 1;
         texture.vScale = 1;
-        const material = new BABYLON.StandardMaterial("mat", this._scene);
+        const material = new BABYLON.StandardMaterial("selectedMark", this._scene);
         material.diffuseTexture = texture;
-        material.backFaceCulling = false;
-        let mark = BABYLON.MeshBuilder.CreatePlane("plane", {width: 1, height: 1})
+        let mark = BABYLON.MeshBuilder.CreatePlane("selectedMark", {width: 1, height: 1})
         mark.isPickable = false;
         mark.material = material;
+        mark.rotate(new Vector3(0,1,0), Math.PI);
 
         const waveFrames = [];
         const waveAnim = new BABYLON.Animation(
@@ -236,13 +237,13 @@ class App {
         colorSwitchFrames.push({frame: this.FPS * 2, value: Color3.Purple()})
         colorSwitchAnim.setKeys(colorSwitchFrames);
         mark.animations.push(colorSwitchAnim);
-        this._selectedMark = mark;
         mark.setEnabled(false);
+        this._selectedMark = mark;
     }
 
-    private getTexture(pathName: string, invertY?: boolean): BABYLON.Texture {
+    private getTexture(pathName: string, invertY: boolean = false): BABYLON.Texture {
         let existentTexture = this._scene.getTextureByName(pathName)
-        return existentTexture as BABYLON.Texture || new BABYLON.Texture(pathName, this._scene, true, false);
+        return existentTexture as BABYLON.Texture || new BABYLON.Texture(pathName, this._scene, true, invertY);
     }
 
     private setupProjectile() {
@@ -491,40 +492,40 @@ class App {
         }
     }
 
+    private setupHitEffect() {
+        const hitStarMesh = BABYLON.CreatePlane("hitStartMesh", {width: 1, height: 1}, this._scene);
+        const hitMaterial = new BABYLON.StandardMaterial("hitStart", this._scene);
+        hitMaterial.emissiveColor = Color3.Red();
+        const hitTexture = this.getTexture("combat/hit.png");
+        hitTexture.hasAlpha = true;
+        hitMaterial.diffuseTexture = hitTexture;
+        hitStarMesh.material = hitMaterial;
+        hitStarMesh.rotate(new Vector3(0,1,0), Math.PI);
+    }
+
     private setupHpBar() {
         const materialMaxHp = new BABYLON.StandardMaterial("materialMaxHp", this._scene);
         materialMaxHp.diffuseColor = Color3.Red();
-        materialMaxHp.backFaceCulling = false;
-        this._hpBarMax = BABYLON.CreatePlane("maxHp", {width: 1, height: 0.3})
-        this._hpBarMax.material = materialMaxHp;
-        this._hpBarMax.setEnabled(false);
+        const hpBarMax = BABYLON.CreatePlane("maxHpBar_original", {width: 1, height: 0.3})
+        hpBarMax.material = materialMaxHp;
+        hpBarMax.rotate(new Vector3(0,1,0), Math.PI);
+        hpBarMax.setEnabled(false);
 
         const materialHp = new BABYLON.StandardMaterial("materialHp", this._scene);
         materialHp.diffuseColor = Color3.Blue();
-        materialHp.backFaceCulling = false;
-        this._hpBar = BABYLON.CreatePlane("hp", {width: 1, height: 0.3})
-        this._hpBar.material = materialHp;
-        this._hpBar.setEnabled(false);
-    }
-
-    private setupHitEffect() {
-        const hitStarMesh = BABYLON.CreatePlane("hitStartMesh", {width: 1, height: 1}, this._scene);
-        const startMaterial = new BABYLON.StandardMaterial("hitStart", this._scene);
-        startMaterial.emissiveColor = Color3.Red();
-        const text = this.getTexture("combat/hit.png");
-        text.hasAlpha = true;
-        startMaterial.diffuseTexture = text;
-        startMaterial.backFaceCulling = false;
-        hitStarMesh.material = startMaterial;
+        const hpBar = BABYLON.CreatePlane("hpBar_original", {width: 1, height: 0.3})
+        hpBar.material = materialHp;
+        hpBar.setEnabled(false);
+        hpBar.rotate(new Vector3(0,1,0), Math.PI);
     }
 
     private createHpBar(parent: Mesh, maxHp: number) {
         const boundingInfo = parent.getBoundingInfo();
-        const hpBarMax = this._hpBarMax.clone("hpMax", parent);
+        const hpBarMax = this._scene.getMeshByName("maxHpBar_original").clone("maxHpBar", parent);
         hpBarMax.position.y += boundingInfo.maximum.y + 0.5;
         hpBarMax.metadata = maxHp;
         hpBarMax.setEnabled(true);
-        const hpBar = this._hpBar.clone("hp", parent);
+        const hpBar = this._scene.getMeshByName("hpBar_original").clone("hpBar", parent);
         hpBar.position.y += boundingInfo.maximum.y + 0.5;
         hpBar.position.z += 0.01;
         hpBar.metadata = maxHp;
@@ -533,8 +534,8 @@ class App {
 
     private updateHealth(parentUniqueId: number, deltaHp: number): number {
         const parentMesh = this.getRootMesh(parentUniqueId);
-        const hpBar = parentMesh.getChildMeshes(true, (node)=>node.name == "hp")[0] as Mesh;
-        const hpBarMax = parentMesh.getChildMeshes(true, (node)=>node.name == "hpMax")[0] as Mesh;
+        const hpBar = parentMesh.getChildMeshes(true, (node)=>node.name == "hpBar")[0] as Mesh;
+        const hpBarMax = parentMesh.getChildMeshes(true, (node)=>node.name == "maxHpBar")[0] as Mesh;
         const maxHp = Number(hpBarMax.metadata);
         const currentHp = Number(hpBar.metadata);
         const updatedHp = Math.max(currentHp + deltaHp, 0);
@@ -679,19 +680,39 @@ class App {
     }
 
     private createTerrain() {
-        const grassTexture = this.getTexture("environment/Grass Tile.png");
-        grassTexture.hasAlpha = true;
-        grassTexture.vScale = 40;
-        grassTexture.uScale = 40;
+        // ground
+        const groundTexture = this.getTexture("environment/stoneFloor.png");
+        const groundBumpTexture = this.getTexture("environment/stoneFloorBump.png");
+        groundTexture.hasAlpha = true;
+        const scaleGround = 20;
+        groundTexture.uScale = this.fieldFimensions.x/scaleGround;
+        groundTexture.vScale = this.fieldFimensions.z/scaleGround;
+
+        groundBumpTexture.hasAlpha = true;
+        groundBumpTexture.uScale = this.fieldFimensions.x/scaleGround;
+        groundBumpTexture.vScale = this.fieldFimensions.z/scaleGround;
         
-        const grassMaterial = new BABYLON.StandardMaterial("grassMaterial", this._scene);
-        grassMaterial.ambientTexture = grassTexture;
+        const groundMaterial = new BABYLON.StandardMaterial("groundMaterial", this._scene);
+        groundMaterial.ambientTexture = groundTexture;
+        groundMaterial.bumpTexture = groundBumpTexture;
         
-        this.ground = BABYLON.MeshBuilder.CreateGround("ground", {width: this.fieldFimensions.x, height: this.fieldFimensions.z}, this._scene);
-        this.ground.physicsImpostor = new BABYLON.PhysicsImpostor(this.ground, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 0, restitution: 1});
-        this.ground.position = new Vector3(this.fieldFimensions.x/2, 0, this.fieldFimensions.z/2);
-        this.ground.metadata = "ground";
-        this.ground.material = grassMaterial;
+        const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: this.fieldFimensions.x, height: this.fieldFimensions.z}, this._scene);
+        ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 0, restitution: 0.3});
+        ground.position = new Vector3(this.fieldFimensions.x/2, 0.1, this.fieldFimensions.z/2);
+        ground.metadata = "ground";
+        ground.material = groundMaterial;
+        
+        // background
+        const bgWidth = 1419;
+        const bgHeight = 980;
+        var background = BABYLON.MeshBuilder.CreatePlane("background", {width: bgWidth, height: bgHeight}, this._scene);
+        background.scalingDeterminant = 4;
+        background.position = new Vector3(this.fieldFimensions.x/2, bgHeight/2.5, -bgWidth*3.4)
+        background.isPickable = false;
+        let backgroundMaterial = new BABYLON.StandardMaterial("bgMaterial", this._scene);
+        backgroundMaterial.diffuseTexture = this.getTexture("bgMountain.jpg", true);
+        background.material = backgroundMaterial;
+        background.rotate(new Vector3(0,1,0), Math.PI);
     }
 
     private getRootMesh(nodeUniqueId: number): Mesh {
@@ -721,9 +742,21 @@ class App {
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(this.fieldFimensions.x, this.fieldFimensions.x, this.fieldFimensions.z), this._scene);
         // var light1 = new BABYLON.DirectionalLight("DirectionalLight", new BABYLON.Vector3(0, -1, -1), this._scene);
         light1.intensity = 2;
-        let camera = new FreeCamera("camera1", new Vector3(this.fieldFimensions.x/2, 10, this.fieldFimensions.z+10), this._scene);
-        camera.setTarget(new Vector3(this.fieldFimensions.x/2, 0, this.fieldFimensions.z*1/4))
+        const cameraY = 6;
+        let camera = new FreeCamera("camera1", new Vector3(this.fieldFimensions.x/2, cameraY, this.fieldFimensions.z-15), this._scene);
+        camera.minZ = 1;
+        camera.setTarget(new Vector3(this.fieldFimensions.x/2, 0, this.fieldFimensions.z * 1/4))
         camera.attachControl(this._canvas, true);
+        camera.inputs.removeMouse();
+
+        // Keeps the camera position within bounds
+        this._scene.registerBeforeRender(()=>{
+            const marginX = this.fieldFimensions.z/2;
+            const marginZ = 40;
+            camera.position.x = Math.min(Math.max(camera.position.x, marginX), this.fieldFimensions.x - marginX);
+            camera.position.y = cameraY;
+            camera.position.z = Math.min(Math.max(camera.position.z, marginZ), this.fieldFimensions.z);
+        })
 
         this._scene.gravity = new Vector3(0, this.GRAVITY / this.FPS, 0);
         this._scene.collisionsEnabled = true;

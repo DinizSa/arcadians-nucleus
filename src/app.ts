@@ -705,8 +705,10 @@ class App {
         // background
         const bgWidth = 1419;
         const bgHeight = 980;
+        console.log("window.innerWidth", window.innerWidth)
         var background = BABYLON.MeshBuilder.CreatePlane("background", {width: bgWidth, height: bgHeight}, this._scene);
-        background.scalingDeterminant = 4;
+        console.log("scale", Math.round(window.innerWidth / 300))
+        background.scalingDeterminant = Math.round(window.innerWidth / 300);
         background.position = new Vector3(this.fieldFimensions.x/2, bgHeight/2.5, -bgWidth*3.4)
         background.isPickable = false;
         let backgroundMaterial = new BABYLON.StandardMaterial("bgMaterial", this._scene);

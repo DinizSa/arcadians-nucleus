@@ -360,26 +360,24 @@ class App {
                 projectile.dispose();
             }, 2000);
 
+            const hitMeshes = [];
             if (weapon.radiusArea > 0) {
                 const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != attacker.uniqueId);
 
                 for (let i = 0; i < targets.length; i++) {
                     const distance = projectile.position.subtract(targets[i].position).length();
-                    
                     if (distance < weapon.radiusArea) {
-                        this.updateHealth(targets[i].uniqueId, -weapon.damage);
-                        collidedUniqueIds.push(targets[i].uniqueId);
-
-                        this.animateHit(targets[i], projectile.position)
+                        hitMeshes.push(targets[i])
                     }
                 }
-
             } else if (collidedMesh.metadata == "arcadian") {
-                this.updateHealth(collidedMesh.uniqueId, -weapon.damage);
-                collidedUniqueIds.push(collidedMesh.uniqueId);
-
-                this.animateHit(collidedMesh, projectile.position)
+                hitMeshes.push(collidedMesh)
             }
+            for (const hitMesh of hitMeshes) {
+                this.updateHealth(hitMesh.uniqueId, -weapon.damage);
+                collidedUniqueIds.push(hitMesh.uniqueId);
+            }
+            this.animateExplosion(collidedMesh, projectile.position, weapon.radiusArea)
         };
         const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian" && attacker.uniqueId != v.uniqueId).map((v: Mesh)=>v.physicsImpostor);
         projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, onHit);
@@ -410,7 +408,7 @@ class App {
         }, delayProjectile);
     }
 
-    private animateHit(target: Mesh, projectilePosition: Vector3) {
+    private animateExplosion(target: Mesh, projectilePosition: Vector3, radius: number) {
         const boundingInfo = target.getBoundingInfo();
         const hitPosition = target.position.clone();
         const horizontalDirection = Math.sign(target.position.x - projectilePosition.x)
@@ -418,13 +416,20 @@ class App {
         hitPosition.y = projectilePosition.y;
         hitPosition.z += 0.1;
 
-        const hitStarMeshClone = this._scene.getMeshByName("hitStartMesh").clone("hitStarMeshClone", undefined)
-        hitStarMeshClone.setEnabled(true);
-        hitStarMeshClone.position = hitPosition;
+        const hitStarMesh = this._scene.getMeshByName("hitStarMesh_original").clone("hitStarMesh", undefined)
+        hitStarMesh.setEnabled(true);
+        hitStarMesh.position = hitPosition;
+        hitStarMesh.scalingDeterminant = radius;
+
+        const lifespanMS = 200;
+        setTimeout(() => {
+            hitStarMesh.rotate(new Vector3(0,0,1), Math.PI/10);
+            hitStarMesh.scalingDeterminant += 0.5;
+        }, lifespanMS/2);
 
         setTimeout(() => {
-            hitStarMeshClone.dispose(false);
-        }, 200);
+            hitStarMesh.dispose(false);
+        }, lifespanMS); 
     }
 
     private getAttackAnimation(weapon: Weapon): string {
@@ -493,7 +498,7 @@ class App {
     }
 
     private setupHitEffect() {
-        const hitStarMesh = BABYLON.CreatePlane("hitStartMesh", {width: 1, height: 1}, this._scene);
+        const hitStarMesh = BABYLON.CreatePlane("hitStarMesh_original", {width: 1, height: 1}, this._scene);
         const hitMaterial = new BABYLON.StandardMaterial("hitStart", this._scene);
         hitMaterial.emissiveColor = Color3.Red();
         const hitTexture = this.getTexture("combat/hit.png");
@@ -501,6 +506,7 @@ class App {
         hitMaterial.diffuseTexture = hitTexture;
         hitStarMesh.material = hitMaterial;
         hitStarMesh.rotate(new Vector3(0,1,0), Math.PI);
+        hitStarMesh.setEnabled(false);
     }
 
     private setupHpBar() {
@@ -705,9 +711,7 @@ class App {
         // background
         const bgWidth = 1419;
         const bgHeight = 980;
-        console.log("window.innerWidth", window.innerWidth)
         var background = BABYLON.MeshBuilder.CreatePlane("background", {width: bgWidth, height: bgHeight}, this._scene);
-        console.log("scale", Math.round(window.innerWidth / 300))
         background.scalingDeterminant = Math.round(window.innerWidth / 300);
         background.position = new Vector3(this.fieldFimensions.x/2, bgHeight/2.5, -bgWidth*3.4)
         background.isPickable = false;

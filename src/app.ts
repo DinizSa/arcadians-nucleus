@@ -36,7 +36,8 @@ interface Weapon {
     image: string;
     name: string;
     rarity: 'common' | 'uncommon' | 'rare' | 'legenday' | 'epic';
-    damage: number;
+    physicalDamage: number;
+    magicDamage: number;
     range: number;
     weight: number,
     reloadTime: number;
@@ -45,8 +46,9 @@ interface Weapon {
     projectileWeight: number;
     accuracyRadius: number;
     radiusArea: number;
-    specialAbility: 'freeze' | 'none';
-    damageType: 'magic' | 'physical';
+    frostDuration: number;
+    burnDuration: number;
+    burnTotalDamage: number;	
     slotName?: string;
 };
 
@@ -134,7 +136,7 @@ class App {
 
     private async _main(): Promise<void> {
 
-        this.loadFilesToMemory();
+        await this.loadFilesToMemory();
 
         this.createScene();
 
@@ -270,9 +272,6 @@ class App {
         particleSystem.minLifeTime = 1;
         particleSystem.maxLifeTime = 2;
 
-        
-        // this._scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
-
         let projetileSword = BABYLON.MeshBuilder.CreatePlane(
             "box", {
                 width: 0.2, 
@@ -290,7 +289,7 @@ class App {
         const attacker = this.getRootMesh(attackerUniqueId);
 
         const tags = BABYLON.Tags.GetTags(attacker) || [];
-        if (tags.includes("attacking")) {
+        if (tags.includes("attacking") || tags.includes("frost")) {
             return;
         }
 
@@ -305,19 +304,17 @@ class App {
         const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
 
         let weapon: Weapon = weapons.find((weapon) => weapon?.range >= distance);
-        if (!weapon)
+        if (!weapon){
             return false;
-
+        }
         if (attacker.scaling.x == horizontalDirection) {
             attacker.scaling.x = -horizontalDirection;
         }
         
         // attack animation
         let animationName = this.getAttackAnimation(weapon);
-
         const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
         animation.start(false);
-
         BABYLON.Tags.AddTagsTo(attacker, "attacking")
         setTimeout(() => {
             BABYLON.Tags.RemoveTagsFrom(attacker, "attacking")
@@ -325,7 +322,6 @@ class App {
 
         // Create projectile
         let projectile: Mesh;
-        
         let delayProjectile: number;
         if (weapon.type == 'gun' || weapon.type == 'spell') {
             projectile = this._projetile.clone("projectileClone");
@@ -356,11 +352,9 @@ class App {
             
             this.stopParticlesSystem(projectile);
 
-            setTimeout(() => {
-                projectile.dispose();
-            }, 2000);
+            projectile.dispose();
 
-            const hitMeshes = [];
+            const hitMeshes: Mesh[] = [];
             if (weapon.radiusArea > 0) {
                 const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != attacker.uniqueId);
 
@@ -374,8 +368,66 @@ class App {
                 hitMeshes.push(collidedMesh)
             }
             for (const hitMesh of hitMeshes) {
-                this.updateHealth(hitMesh.uniqueId, -weapon.damage);
+
+                const damage = weapon.magicDamage + weapon.physicalDamage;
+                const updatedHp = this.registerHit(hitMesh.uniqueId, damage);
                 collidedUniqueIds.push(hitMesh.uniqueId);
+
+                if (updatedHp <= 0) {
+                    return;
+                }
+                    
+                if (weapon.frostDuration > 0) {
+                    const particleSystem = new BABYLON.ParticleSystem('frostEffect', 300, this._scene);
+                    particleSystem.emitter = hitMesh.position;
+                    particleSystem.emitRate = 30;
+                    particleSystem.minSize = 0.2;
+                    particleSystem.maxSize = 0.4;
+                    particleSystem.minLifeTime = 1;
+                    particleSystem.maxLifeTime = 2;
+                    particleSystem.color1 = new BABYLON.Color4(0, 0, 1, 0.5); // Start color
+                    particleSystem.color2 = new BABYLON.Color4(1, 1, 1, 0.5); // End color
+                    particleSystem.particleTexture = this.getTexture('combat/ice.jpg');
+                    particleSystem.start()
+
+                    BABYLON.Tags.AddTagsTo(hitMesh, "frost");
+
+                    this.stopGroupAnimations(hitMesh.uniqueId);
+                    setTimeout(() => {
+                        const tags = BABYLON.Tags.GetTags(hitMesh) || [];
+                        if (!tags.includes("dead")) {
+                            this.getGroupAnimation(hitMesh.uniqueId, ANIMATION_LIST.idle).start(true);
+                        }
+                        
+                        BABYLON.Tags.RemoveTagsFrom(hitMesh, "frost");
+                        particleSystem.stop();
+                    }, weapon.frostDuration * 1000);
+                }
+
+                if (weapon.burnTotalDamage > 0) {
+                    const particleSystem = new BABYLON.ParticleSystem('burnEffect', 300, this._scene);
+                    particleSystem.emitter = hitMesh.position;
+                    particleSystem.emitRate = 30;
+                    particleSystem.minSize = 0.2;
+                    particleSystem.maxSize = 0.4;
+                    particleSystem.minLifeTime = 1;
+                    particleSystem.maxLifeTime = 2;
+                    particleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 0.5); // Start color
+                    particleSystem.color2 = new BABYLON.Color4(1, 1, 0, 0.5); // End color
+                    particleSystem.particleTexture = this.getTexture('combat/fireDiffuse.png');
+                    particleSystem.start()
+
+                    let numberTicks = weapon.burnDuration * (1000 / 100);
+                    const burnPerTick = weapon.burnTotalDamage / numberTicks;
+                    const burnInterval = setInterval(()=>{
+                        const newHp = this.registerHit(hitMesh.uniqueId, burnPerTick, false);
+                        if (numberTicks === 0 || newHp === 0) {
+                            particleSystem.stop();
+                            clearInterval(burnInterval)
+                        }
+                        numberTicks--;
+                    }, 100)
+                }
             }
             this.animateExplosion(collidedMesh, projectile.position, weapon.radiusArea)
         };
@@ -464,7 +516,7 @@ class App {
                 weapon.slotName = resp.slotName
                 return weapon;
             })
-            .sort((a, b)=> b.damage - a.damage)
+            .sort((a, b)=> (b.magicDamage + b.physicalDamage) - (a.magicDamage + a.physicalDamage))
     }
 
     // Returns true if the a shot ocurred, false otherwise
@@ -538,28 +590,35 @@ class App {
         hpBar.setEnabled(true);
     }
 
-    private updateHealth(parentUniqueId: number, deltaHp: number): number {
-        const parentMesh = this.getRootMesh(parentUniqueId);
+    private getHp(characterMesh: Mesh) {
+        const hpBar = characterMesh.getChildMeshes(true, (node)=>node.name == "hpBar")[0] as Mesh;
+        const currentHp = Number(hpBar.metadata);
+        return currentHp;
+    }
+
+    private registerHit(hitMeshUniqueId: number, damage: number, animateHit: boolean = true): number {
+        const parentMesh = this.getRootMesh(hitMeshUniqueId);
         const hpBar = parentMesh.getChildMeshes(true, (node)=>node.name == "hpBar")[0] as Mesh;
         const hpBarMax = parentMesh.getChildMeshes(true, (node)=>node.name == "maxHpBar")[0] as Mesh;
         const maxHp = Number(hpBarMax.metadata);
         const currentHp = Number(hpBar.metadata);
-        const updatedHp = Math.max(currentHp + deltaHp, 0);
+        const updatedHp = Math.max(currentHp - damage, 0);
         if (updatedHp == 0) {
-            this.stopGroupAnimations(parentUniqueId);
-            const animation = this.getGroupAnimation(parentUniqueId, ANIMATION_LIST.death);
+            this.stopGroupAnimations(hitMeshUniqueId);
+            const animation = this.getGroupAnimation(hitMeshUniqueId, ANIMATION_LIST.death);
             animation.start(false);
             parentMesh.physicsImpostor.dispose();
             parentMesh.isPickable = false;
             hpBar.dispose();
             hpBarMax.dispose();
+            BABYLON.Tags.AddTagsTo(parentMesh, "dead");
             BABYLON.Tags.RemoveTagsFrom(parentMesh, "arcadian");
-        } else {
-            const animation = this.getGroupAnimation(parentUniqueId, ANIMATION_LIST.hit);
+        } else if (animateHit) {
+            const animation = this.getGroupAnimation(hitMeshUniqueId, ANIMATION_LIST.hit);
             animation.start(false);
         }
         const maxHpBarWidth = 1;
-        hpBar.position.x -= (deltaHp / maxHp * maxHpBarWidth) / 2;
+        hpBar.position.x += (damage / maxHp * maxHpBarWidth) / 2;
         hpBar.scaling.x = updatedHp / maxHp;
         hpBar.metadata = updatedHp;
         return updatedHp;
@@ -569,7 +628,6 @@ class App {
         
         const metadataUrl = "https://arcadians.prod.outplay.games/v2/arcadians/" + arcadianId;
         const metadata = await fetch(metadataUrl).then((result)=>result.json())
-
         const attributes: MetadataSlot[] = metadata.attributes;
 
         // body to detect interactions
@@ -649,6 +707,11 @@ class App {
 
     private moveCharacter(nodeUniqueId: number, destination: Vector3) {
         const characterMesh = this.getRootMesh(nodeUniqueId);
+        
+        const tags = BABYLON.Tags.GetTags(characterMesh) || [];
+        if (tags.includes("frost")) {
+            return;
+        }
         destination.y = characterMesh.position.y;
         const speed = 4;
         let distance = destination.subtract(characterMesh.position);
@@ -680,8 +743,8 @@ class App {
 
         this._scene.beginDirectAnimation(characterMesh, [animation], 0, totalFrames, false, 1, () => {
             this.stopGroupAnimations(nodeUniqueId);
-            const groupAnimation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.idle);
-            groupAnimation.start(true);
+            const animation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.idle);
+            animation.start(true);
         })
     }
 
@@ -690,7 +753,7 @@ class App {
         const groundTexture = this.getTexture("environment/stoneFloor.png");
         const groundBumpTexture = this.getTexture("environment/stoneFloorBump.png");
         groundTexture.hasAlpha = true;
-        const scaleGround = 20;
+        const scaleGround = 10;
         groundTexture.uScale = this.fieldFimensions.x/scaleGround;
         groundTexture.vScale = this.fieldFimensions.z/scaleGround;
 

@@ -62,7 +62,7 @@
         "rarity": "Rare",
         "name": "Explosive Rain",
         "physicalDamage": "40",
-        "magicDamage": "",
+        "magicDamage": "0",
         "range": "10",
         "weight": "5",
         "reloadTime": "4",
@@ -71,7 +71,7 @@
         "projectileSpeed": "4",
         "projectileWeight": "1",
         "radiusArea": "3",
-        "frostDuration": "2",
+        "frostDuration": "0",
         "burnDuration": "2",
         "burnTotalDamage": "10"
     },

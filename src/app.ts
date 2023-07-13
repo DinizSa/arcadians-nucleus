@@ -111,6 +111,7 @@ class App {
     private fieldFimensions = new Vector3(300, 0, 100)
     private FPS = 60;
     private GRAVITY = -9.81;
+    private MAX_SOUND_DISTANCE = 50;
     private arcadiansSize = {
         width: 1.2,
         height: 2.7
@@ -369,28 +370,30 @@ class App {
             }
             for (const hitMesh of hitMeshes) {
 
-                const damage = weapon.magicDamage + weapon.physicalDamage;
-                const updatedHp = this.registerHit(hitMesh.uniqueId, damage);
+                const effectiveDamage = this.getEffectiveDamage(weapon.magicDamage, weapon.physicalDamage, hitMesh);
+                const updatedHp = this.registerHit(hitMesh.uniqueId, effectiveDamage);
                 collidedUniqueIds.push(hitMesh.uniqueId);
 
                 if (updatedHp <= 0) {
                     return;
                 }
-                    
+
                 if (weapon.frostDuration > 0) {
                     const particleSystem = new BABYLON.ParticleSystem('frostEffect', 300, this._scene);
-                    particleSystem.emitter = hitMesh.position;
+                    particleSystem.emitter = hitMesh;
                     particleSystem.emitRate = 30;
                     particleSystem.minSize = 0.2;
                     particleSystem.maxSize = 0.4;
                     particleSystem.minLifeTime = 1;
                     particleSystem.maxLifeTime = 2;
-                    particleSystem.color1 = new BABYLON.Color4(0, 0, 1, 0.5); // Start color
-                    particleSystem.color2 = new BABYLON.Color4(1, 1, 1, 0.5); // End color
+                    particleSystem.color1 = new BABYLON.Color4(0, 0, 1, 0.5);
+                    particleSystem.color2 = new BABYLON.Color4(1, 1, 1, 0.5);
                     particleSystem.particleTexture = this.getTexture('combat/ice.jpg');
-                    particleSystem.start()
+                    particleSystem.start();
 
                     BABYLON.Tags.AddTagsTo(hitMesh, "frost");
+
+                    new BABYLON.Sound("freeze", "sounds/freeze.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position)/2, maxDistance: this.MAX_SOUND_DISTANCE})
 
                     this.stopGroupAnimations(hitMesh.uniqueId);
                     setTimeout(() => {
@@ -406,16 +409,18 @@ class App {
 
                 if (weapon.burnTotalDamage > 0) {
                     const particleSystem = new BABYLON.ParticleSystem('burnEffect', 300, this._scene);
-                    particleSystem.emitter = hitMesh.position;
+                    particleSystem.emitter = hitMesh;
                     particleSystem.emitRate = 30;
                     particleSystem.minSize = 0.2;
                     particleSystem.maxSize = 0.4;
                     particleSystem.minLifeTime = 1;
                     particleSystem.maxLifeTime = 2;
-                    particleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 0.5); // Start color
-                    particleSystem.color2 = new BABYLON.Color4(1, 1, 0, 0.5); // End color
+                    particleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 0.5);
+                    particleSystem.color2 = new BABYLON.Color4(1, 1, 0, 0.5);
                     particleSystem.particleTexture = this.getTexture('combat/fireDiffuse.png');
                     particleSystem.start()
+
+                    new BABYLON.Sound("burn", "sounds/burn.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position)/2, maxDistance: this.MAX_SOUND_DISTANCE})
 
                     let numberTicks = weapon.burnDuration * (1000 / 100);
                     const burnPerTick = weapon.burnTotalDamage / numberTicks;
@@ -429,7 +434,7 @@ class App {
                     }, 100)
                 }
             }
-            this.animateExplosion(collidedMesh, projectile.position, weapon.radiusArea)
+            this.animateExplosion(collidedMesh, projectile.position, weapon.radiusArea);
         };
         const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian" && attacker.uniqueId != v.uniqueId).map((v: Mesh)=>v.physicsImpostor);
         projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, onHit);
@@ -447,6 +452,9 @@ class App {
                 projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
                 projectile.physicsImpostor.setAngularVelocity(Vector3.One().scale(2))
 
+                
+                new BABYLON.Sound("fireGrenade", "sounds/Fire Grenade.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position), maxDistance: this.MAX_SOUND_DISTANCE})
+
             } else if (weapon.type == "melee") {
                 const direction = BABYLON.Vector3.Normalize(attackDirection);
                 const impulse = direction.scale(weapon.projectileWeight).scale(weapon.projectileSpeed);
@@ -456,8 +464,18 @@ class App {
                 setTimeout(() => {
                     projectile.dispose();
                 }, 1000 * lifeTime);
+
+                new BABYLON.Sound("sword", "sounds/Sword.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position), maxDistance: this.MAX_SOUND_DISTANCE})
             }
         }, delayProjectile);
+    }
+
+    private getEffectiveDamage(magicDamage: number, physicalDamage: number, hitMesh: Mesh) {
+        // TODO: get armor and magic resist from all the wereables
+        const magicResist = 20; // percentage of magic damage ignored
+        const armor = 10; // percentage or physical damage ignored
+        const damage = (magicDamage * (1 - magicResist/100)) + (physicalDamage * (1 - armor/100));
+        return damage;
     }
 
     private animateExplosion(target: Mesh, projectilePosition: Vector3, radius: number) {
@@ -473,15 +491,27 @@ class App {
         hitStarMesh.position = hitPosition;
         hitStarMesh.scalingDeterminant = radius;
 
-        const lifespanMS = 200;
-        setTimeout(() => {
-            hitStarMesh.rotate(new Vector3(0,0,1), Math.PI/10);
-            hitStarMesh.scalingDeterminant += 0.5;
-        }, lifespanMS/2);
-
-        setTimeout(() => {
-            hitStarMesh.dispose(false);
-        }, lifespanMS); 
+        // explosion animation
+        const animationFrames = [];
+        const animation = new BABYLON.Animation(
+            "waveVertical", 
+            "scalingDeterminant", 
+            this.FPS, 
+            BABYLON.Animation.ANIMATIONTYPE_FLOAT, 
+            BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+        )
+        const durationSeconds = 0.4;
+        const totalFrames = this.FPS * durationSeconds;
+        animationFrames.push({frame: 0, value: 0})
+        animationFrames.push({frame: Math.round(totalFrames * (45/100)), value: 0.8 * radius})
+        animationFrames.push({frame: Math.round(totalFrames * (50/100)), value: 1 * radius})
+        animationFrames.push({frame: Math.round(totalFrames * (55/100)), value: 0.8 * radius})
+        animationFrames.push({frame: Math.round(totalFrames), value: 0})
+        animation.setKeys(animationFrames);
+        hitStarMesh.animations.push(animation);
+        this._scene.beginAnimation(hitStarMesh, 0, totalFrames, false, 1, ()=>{
+            hitStarMesh.dispose();
+        });
     }
 
     private getAttackAnimation(weapon: Weapon): string {
@@ -553,9 +583,11 @@ class App {
         const hitStarMesh = BABYLON.CreatePlane("hitStarMesh_original", {width: 1, height: 1}, this._scene);
         const hitMaterial = new BABYLON.StandardMaterial("hitStart", this._scene);
         hitMaterial.emissiveColor = Color3.Red();
-        const hitTexture = this.getTexture("combat/hit.png");
+        const hitTexture = this.getTexture("combat/explosionEffect.png");
         hitTexture.hasAlpha = true;
         hitMaterial.diffuseTexture = hitTexture;
+        hitMaterial.emissiveColor = new Color3(0,0,1);
+        // hitMaterial.emissiveTexture = hitTexture;
         hitStarMesh.material = hitMaterial;
         hitStarMesh.rotate(new Vector3(0,1,0), Math.PI);
         hitStarMesh.setEnabled(false);
@@ -613,15 +645,25 @@ class App {
             hpBarMax.dispose();
             BABYLON.Tags.AddTagsTo(parentMesh, "dead");
             BABYLON.Tags.RemoveTagsFrom(parentMesh, "arcadian");
+
+            new BABYLON.Sound("hit", "sounds/die.mp3", this._scene, null, {autoplay: true, volume: this.getVolume(parentMesh.position), maxDistance: this.MAX_SOUND_DISTANCE})
         } else if (animateHit) {
             const animation = this.getGroupAnimation(hitMeshUniqueId, ANIMATION_LIST.hit);
             animation.start(false);
+
+            const hitSounds = ["hit1.mp3", "hit4.mp3", "hit5.mp3"];
+            const randomHitSound = hitSounds[Math.floor(Math.random()*(hitSounds.length-1))]
+            new BABYLON.Sound("die", "sounds/"+randomHitSound, this._scene, null, {autoplay: true, volume: this.getVolume(parentMesh.position), maxDistance: this.MAX_SOUND_DISTANCE})
         }
         const maxHpBarWidth = 1;
         hpBar.position.x += (damage / maxHp * maxHpBarWidth) / 2;
         hpBar.scaling.x = updatedHp / maxHp;
         hpBar.metadata = updatedHp;
         return updatedHp;
+    }
+
+    private getVolume(sourcePosition: Vector3) {
+        return 1 - this._scene.cameras[0].position.subtract(sourcePosition).length()/this.MAX_SOUND_DISTANCE
     }
 
     private async loadArcadian(arcadianId: number, position: Vector3 = Vector3.Zero()) {
@@ -776,7 +818,7 @@ class App {
         const bgHeight = 980;
         var background = BABYLON.MeshBuilder.CreatePlane("background", {width: bgWidth, height: bgHeight}, this._scene);
         background.scalingDeterminant = Math.round(window.innerWidth / 300);
-        background.position = new Vector3(this.fieldFimensions.x/2, bgHeight/2.5, -bgWidth*3.4)
+        background.position = new Vector3(this.fieldFimensions.x/2, bgHeight/2.5, -bgWidth*2.5)
         background.isPickable = false;
         let backgroundMaterial = new BABYLON.StandardMaterial("bgMaterial", this._scene);
         backgroundMaterial.diffuseTexture = this.getTexture("bgMountain.jpg", true);

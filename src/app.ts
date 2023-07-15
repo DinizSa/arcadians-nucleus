@@ -258,27 +258,27 @@ class App {
         return existentTexture as BABYLON.Texture || new BABYLON.Texture(pathName, this._scene, true, invertY);
     }
 
-    private getWeaponPojectileColor(weapon: Weapon): Color3 {
+    private getPojectileColor(weapon: Weapon): BABYLON.Color4 {
         if (weapon.projectileColor != undefined) {
             let projectileColor = weapon.projectileColor.split(',').map((v)=>Number(v));
-            return new Color3(projectileColor[0], projectileColor[1], projectileColor[2])
+            return new BABYLON.Color4(projectileColor[0], projectileColor[1], projectileColor[2], projectileColor[3])
         }
-        return new Color3(1, 0.2, 0);
+        return new BABYLON.Color4(1, 0.2, 0, 0.8);
     }
 
     private getGunProjectile(weapon: Weapon): Mesh {
-        const projectileColor = this.getWeaponPojectileColor(weapon);
+        const projectileColor = this.getPojectileColor(weapon);
         const projectile = this._projetile.clone("gunProjectileClone");
         const material = new BABYLON.StandardMaterial("gunProjectile", this._scene);
         material.ambientTexture = this.getTexture("combat/cloud.jpg");
-        material.diffuseColor = projectileColor;
+        material.diffuseColor = new Color3(projectileColor.r, projectileColor.g, projectileColor.b);
         projectile.material = material;
 
         const particleSystems = projectile.getConnectedParticleSystems()
         if (particleSystems?.length) {
             const particleSystem = particleSystems[0];
-            particleSystem.color1 = new BABYLON.Color4(projectileColor.r, projectileColor.g, projectileColor.b, 1);
-            particleSystem.color2 = new BABYLON.Color4(projectileColor.r, projectileColor.g, projectileColor.b, 1);
+            particleSystem.color1 = projectileColor;
+            particleSystem.color2 = projectileColor;
         }
         return projectile;
     }
@@ -503,7 +503,7 @@ class App {
                     projectile.dispose();
                 }, 1000 * lifeTime);
 
-                this.animateMeleeSlash(attacker, projectile.position, this.getWeaponPojectileColor(weapon));
+                this.animateMeleeSlash(attacker, projectile.position, this.getPojectileColor(weapon));
 
                 new BABYLON.Sound("sword", "sounds/Sword.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position), maxDistance: this.MAX_SOUND_DISTANCE})
             }
@@ -682,7 +682,7 @@ class App {
         return this._scene.spriteManagers.find((sp)=>sp.name == name)
     }
 
-    private animateMeleeSlash(attacker: Mesh, attackStartPosition: Vector3, color: BABYLON.Color3 = undefined) {
+    private animateMeleeSlash(attacker: Mesh, attackStartPosition: Vector3, color: BABYLON.Color4 = undefined) {
         const horizontalDirection = Math.sign(attacker.position.x - attackStartPosition.x)
         const boundingInfo = attacker.getBoundingInfo();
 
@@ -693,7 +693,7 @@ class App {
         sprite.position = attackStartPosition.add(new Vector3(-horizontalDirection*boundingInfo.maximum.x*2,0,0.1));
         sprite.disposeWhenFinishedAnimating = true;
         if (color) {
-            sprite.color = new BABYLON.Color4(color.r, color.g, color.b, 1);
+            sprite.color = color;
         }
         sprite.playAnimation(0, 5, false, 50);
     }

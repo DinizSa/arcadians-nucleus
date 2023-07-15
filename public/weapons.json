@@ -69,7 +69,7 @@
         "spellAmount": "10",
         "spellRange": "11",
         "spellMaxTargets": "2",
-        "projectileColor": "0,1,0"
+        "projectileColor": "0,1,0,1"
     },
     {
         "id": "509",
@@ -93,7 +93,7 @@
         "spellAmount": "",
         "spellRange": "",
         "spellMaxTargets": "",
-        "projectileColor": "0,1,0"
+        "projectileColor": "0,1,0, 0.5"
     },
     {
         "id": "217",

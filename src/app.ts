@@ -359,6 +359,7 @@ class App {
 
     // x lifesteal
     // chain lightening
+    // shield: block next attack
     // x fix hp bar also inverting on direction change
     // replace projectile particle for air asset
     // add projectiles assets 
@@ -423,11 +424,11 @@ class App {
                         hitMeshes.push(enemies[i])
                     }
                 }
+                if (weapon.type == "gun") {
+                    this.animateExplosion(projectile.position, weapon.radiusArea);
+                }
             } else {
                 hitMeshes.push(collidedMesh)
-            }
-            if (weapon.type == "gun") {
-                this.animateExplosion(collidedMesh, projectile.position, weapon.radiusArea);
             }
             // Filter so only in the alive characters are applied effects like frost, fire, etc.
             const meshesToApplyEffects: Mesh[] = [];
@@ -485,6 +486,8 @@ class App {
                 setTimeout(() => {
                     projectile.dispose();
                 }, 1000 * lifeTime);
+
+                this.animateMeleeSlash(attacker, projectile.position);
 
                 new BABYLON.Sound("sword", "sounds/Sword.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position), maxDistance: this.MAX_SOUND_DISTANCE})
             }
@@ -654,40 +657,42 @@ class App {
         return damage;
     }
 
-    private animateExplosion(target: Mesh, projectilePosition: Vector3, radius: number) {
-        const boundingInfo = target.getBoundingInfo();
-        const hitPosition = target.position.clone();
-        const horizontalDirection = Math.sign(target.position.x - projectilePosition.x)
-        hitPosition.x -= horizontalDirection * boundingInfo.maximum.x;
-        hitPosition.y = projectilePosition.y;
-        hitPosition.z += 0.1;
+    private setupSpriteManagers() {
+        new BABYLON.SpriteManager("explosion", "spritesheets/explosion.png", 15, 192, this._scene);
+        new BABYLON.SpriteManager("swordSlash", "spritesheets/swordSlash.png", 6, 400, this._scene);
 
-        const hitStarMesh = this._scene.getMeshByName("hitStarMesh_original").clone("hitStarMesh", undefined)
-        hitStarMesh.setEnabled(true);
-        hitStarMesh.position = hitPosition;
-        hitStarMesh.scalingDeterminant = radius;
+    }
 
-        // explosion animation
-        const animationFrames = [];
-        const animation = new BABYLON.Animation(
-            "waveVertical", 
-            "scalingDeterminant", 
-            this.FPS, 
-            BABYLON.Animation.ANIMATIONTYPE_FLOAT, 
-            BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
-        )
-        const durationSeconds = 0.4;
-        const totalFrames = this.FPS * durationSeconds;
-        animationFrames.push({frame: 0, value: 0})
-        animationFrames.push({frame: Math.round(totalFrames * (45/100)), value: 0.8 * radius})
-        animationFrames.push({frame: Math.round(totalFrames * (50/100)), value: 1 * radius})
-        animationFrames.push({frame: Math.round(totalFrames * (55/100)), value: 0.8 * radius})
-        animationFrames.push({frame: Math.round(totalFrames), value: 0})
-        animation.setKeys(animationFrames);
-        hitStarMesh.animations.push(animation);
-        this._scene.beginAnimation(hitStarMesh, 0, totalFrames, false, 1, ()=>{
-            hitStarMesh.dispose();
-        });
+    private getSpriteManager(name: string): BABYLON.ISpriteManager {
+        return this._scene.spriteManagers.find((sp)=>sp.name == name)[0]
+    }
+
+    private animateMeleeSlash(attacker: Mesh, attackStartPosition: Vector3, color: BABYLON.Color4 = undefined) {
+        const horizontalDirection = Math.sign(attacker.position.x - attackStartPosition.x)
+        const boundingInfo = attacker.getBoundingInfo();
+
+        const spriteManager = this.getSpriteManager("swordSlash")
+        const sprite = new BABYLON.Sprite("sprite", spriteManager);
+        sprite.invertU = horizontalDirection == 1 ? false : true;
+        sprite.size = boundingInfo.maximum.y * 3;
+        sprite.position = attackStartPosition.add(new Vector3(-horizontalDirection*boundingInfo.maximum.x*2,0,0.1));
+        sprite.disposeWhenFinishedAnimating = true;
+        if (color) {
+            sprite.color = color;
+        }
+        sprite.playAnimation(0, 5, false, 50);
+    }
+
+    private animateExplosion(position: Vector3, radius: number, color: BABYLON.Color4 = undefined) {
+        const spriteManager = this.getSpriteManager("explosion")
+        const sprite = new BABYLON.Sprite("sprite", spriteManager);
+        sprite.size = radius*1.5; // value to compensate image transparent borders
+        sprite.position = position.add(new Vector3(0,0,0.1));
+        sprite.disposeWhenFinishedAnimating = true;
+        if (color) {
+            sprite.color = color;
+        }
+        sprite.playAnimation(0, 5, false, 50);
     }
 
     private getAttackAnimation(weapon: Weapon): string {

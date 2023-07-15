@@ -357,9 +357,9 @@ class App {
                 // sprite.disposeWhenFinishedAnimating = true;
                 // sprite.playAnimation(0, 5, false, 70);
 
-    // lifesteal
+    // x lifesteal
     // chain lightening
-    // fix hp bar also inverting on direction change
+    // x fix hp bar also inverting on direction change
     // replace projectile particle for air asset
     // add projectiles assets 
 
@@ -371,13 +371,11 @@ class App {
             return false;
         }
 
-        const horizontalDirection = Math.sign(target.position.x - attacker.position.x) // -1 | 1
+        const horizontalDirection = Math.sign(target.position.x - attacker.position.x)
         const projectileStartPosition = attacker.position.add(
             new Vector3(horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
         );
-        if (attacker.scaling.x == horizontalDirection) {
-            attacker.scaling.x = -horizontalDirection;
-        }
+        this.faceDirection(attacker, target.position);
         
         // attack animation
         let animationName = this.getAttackAnimation(weapon);
@@ -965,35 +963,36 @@ class App {
         const attributes: MetadataSlot[] = metadata.attributes;
 
         // body to detect interactions
-        let body = BABYLON.MeshBuilder.CreateCylinder("body", {diameter: this.arcadiansSize.width, height: this.arcadiansSize.height});
+        let root = BABYLON.MeshBuilder.CreateCylinder("root", {diameter: this.arcadiansSize.width, height: this.arcadiansSize.height});
         // TODO: set magic resist and armor based on the items equipped
         const characterMetadata: CharacterMetadata = {
             magicResist: 10,
             armor: 5,
         }
-        body.metadata = JSON.stringify(characterMetadata);
-        body.name = "arcadian_" + arcadianId;
-        BABYLON.Tags.AddTagsTo(body, "arcadian");
-        BABYLON.Tags.AddTagsTo(body, ["black", "white"][Math.floor(Math.random()*2)]);
-        body.visibility = 0;
-        body.position = position;
-        body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.3, friction: 0.3});
-        body.physicsImpostor.physicsBody.angularDamping = 1;
-        body.checkCollisions = true;
-        const nodeUniqueId = body.uniqueId;
+        root.metadata = JSON.stringify(characterMetadata);
+        root.name = "arcadian_" + arcadianId;
+        BABYLON.Tags.AddTagsTo(root, "arcadian");
+        BABYLON.Tags.AddTagsTo(root, ["black", "white"][Math.floor(Math.random()*2)]);
+        root.visibility = 0;
+        root.position = position;
+        root.physicsImpostor = new BABYLON.PhysicsImpostor(root, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.3, friction: 0.3});
+        root.physicsImpostor.physicsBody.angularDamping = 1;
+        root.checkCollisions = true;
+        const nodeUniqueId = root.uniqueId;
         const {meshes, animationGroups} = await SceneLoader.ImportMeshAsync(null, "ArcadianAvatar", ".gltf", this._scene);
-        const arcadianMesh = meshes[0];
+        const body = meshes[0];
         animationGroups[0].stop();
-        arcadianMesh.setParent(body);
-        arcadianMesh.position = new Vector3(0, -this.arcadiansSize.height/2, 0);
-        arcadianMesh.isPickable = false;
+        body.setParent(root);
+        body.name = "body";
+        body.position = new Vector3(0, -this.arcadiansSize.height/2, 0);
+        body.isPickable = false;
 
-        const childMeshes = arcadianMesh.getChildMeshes();
+        const childMeshes = body.getChildMeshes();
         for (const childMesh of childMeshes) {
             childMesh.isPickable = false;
         }
         for (const group of animationGroups) {
-            group.name = body.uniqueId + this.SEPARATOR + group.name
+            group.name = root.uniqueId + this.SEPARATOR + group.name
         }
 
         for (const att of attributes) {
@@ -1029,10 +1028,10 @@ class App {
 
         // Set hp bars
         const maxHp = 100;
-        this.createHpBar(body, maxHp);
+        this.createHpBar(root, maxHp);
 
-        body.actionManager = new BABYLON.ActionManager(this._scene);
-        body.actionManager.registerAction(
+        root.actionManager = new BABYLON.ActionManager(this._scene);
+        root.actionManager.registerAction(
             new BABYLON.ExecuteCodeAction(
                 {
                     trigger: BABYLON.ActionManager.OnPickDownTrigger,
@@ -1045,6 +1044,14 @@ class App {
         animation.start(true);
     }
 
+    private faceDirection(character: Mesh, pointToLook: Vector3) {
+        const horizontalDirection = Math.sign(pointToLook.x - character.position.x) // -1 | 1
+        const characterMesh = character.getChildMeshes(true, (node)=>node.name == "body")[0]
+        if (characterMesh.scaling.x == horizontalDirection) {
+            characterMesh.scaling.x = -horizontalDirection;
+        }
+    }
+
     private moveCharacter(nodeUniqueId: number, destination: Vector3) {
         const characterMesh = this.getRootMesh(nodeUniqueId);
         
@@ -1053,10 +1060,11 @@ class App {
             return;
         }
         destination.y = characterMesh.position.y;
+        // TODO: speed should come from equippments
         const speed = 4;
         let distance = destination.subtract(characterMesh.position);
 
-        characterMesh.scaling = new Vector3(-Math.sign(distance.x)*1, 1, 1);
+        this.faceDirection(characterMesh, destination);
 
         const animationName = "moveAnimation";
         var animation = new BABYLON.Animation(

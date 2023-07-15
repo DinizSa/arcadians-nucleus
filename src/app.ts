@@ -48,7 +48,8 @@ interface Weapon {
     radiusArea: number;
     frostDuration: number;
     burnDuration: number;
-    burnTotalDamage: number;	
+    burnTotalDamage: number;
+    lifesteal: number;
     specialSpellType: 'heal' | 'convert' | 'increaseArmor' | 'increaseMagicResist';
     spellAmount: number;
     spellRange: number;
@@ -356,6 +357,12 @@ class App {
                 // sprite.disposeWhenFinishedAnimating = true;
                 // sprite.playAnimation(0, 5, false, 70);
 
+    // lifesteal
+    // chain lightening
+    // fix hp bar also inverting on direction change
+    // replace projectile particle for air asset
+    // add projectiles assets 
+
     private shootWeapon(attacker: Mesh, weapon: Weapon): boolean {
         const target = this.getNearestVisibleTarget(attacker);
         const attackDirection = target.position.subtract(attacker.position).scale(1.15); // TODO: factor to compensate unkown bias
@@ -419,20 +426,19 @@ class App {
                     }
                 }
             } else {
-                // const tags = BABYLON.Tags.GetTags(collidedMesh) || [];
-                // if (tags.includes("arcadian")) {
-                    hitMeshes.push(collidedMesh)
-                // }
+                hitMeshes.push(collidedMesh)
             }
             if (weapon.type == "gun") {
                 this.animateExplosion(collidedMesh, projectile.position, weapon.radiusArea);
             }
             // Filter so only in the alive characters are applied effects like frost, fire, etc.
             const meshesToApplyEffects: Mesh[] = [];
+            let damageInflictedTotal = 0;
             for (const hitMesh of hitMeshes) {
-                const effectiveDamage = this.getEffectiveDamage(weapon.magicDamage, weapon.physicalDamage, hitMesh);
-                const updatedHp = this.updateHp(hitMesh, -effectiveDamage);
                 collidedUniqueIds.push(hitMesh.uniqueId);
+                const effectiveDamage = this.getEffectiveDamage(weapon.magicDamage, weapon.physicalDamage, hitMesh);
+                damageInflictedTotal += effectiveDamage;
+                const updatedHp = this.updateHp(hitMesh, -effectiveDamage);
                 if (updatedHp > 0) {
                     meshesToApplyEffects.push(hitMesh);
                 }
@@ -444,7 +450,11 @@ class App {
                 this.applyFrostEffect(meshesToApplyEffects, weapon.frostDuration, attacker.position);
             }
             if (weapon.burnTotalDamage > 0) {
-                this.applyBurnEffect(meshesToApplyEffects, weapon.burnDuration, weapon.burnTotalDamage, attacker.position)
+                damageInflictedTotal += this.applyBurnEffect(meshesToApplyEffects, weapon.burnDuration, weapon.burnTotalDamage, attacker.position)
+            }
+            if (weapon.lifesteal > 0) {
+                const lifestealAmount = damageInflictedTotal*(weapon.lifesteal/100);
+                this.applyHealEffect([attacker], lifestealAmount);
             }
         };
 
@@ -472,7 +482,7 @@ class App {
                 const direction = BABYLON.Vector3.Normalize(attackDirection);
                 const impulse = direction.scale(weapon.projectileWeight).scale(weapon.projectileSpeed);
                 projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
-                
+
                 const lifeTime = weapon.range / weapon.projectileSpeed;
                 setTimeout(() => {
                     projectile.dispose();
@@ -543,14 +553,16 @@ class App {
         particleSystem.dispose(false);
     }
 
-    private applyHealEffect(targets: Mesh[], amountToHeal: number, soundOrigin: Vector3) {
+    private applyHealEffect(targets: Mesh[], amountToHeal: number, soundOrigin: Vector3 = null) {
         for (const target of targets) {
             this.updateHp(target, amountToHeal, false);
         }
-        new BABYLON.Sound("heal", "sounds/heal.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+        if (soundOrigin) {
+            new BABYLON.Sound("heal", "sounds/heal.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+        }
     }
 
-    private applyBurnEffect(targets: Mesh[], durationSeconds: number, totalDamage: number, soundOrigin: Vector3) {
+    private applyBurnEffect(targets: Mesh[], durationSeconds: number, totalDamage: number, soundOrigin: Vector3): number {
         const particleSystem = new BABYLON.ParticleSystem('burnEffect', 300, this._scene);
         particleSystem.emitRate = 50;
         particleSystem.minSize = 0.2;
@@ -570,10 +582,12 @@ class App {
 
         new BABYLON.Sound("burn", "sounds/burn.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
 
+        let effectiveDamageTotal = 0;
         for (const target of targets) {
             let numberTicks = durationSeconds * (1000 / 100);
             // burn damage is considered physical
             const effectiveDamage = this.getEffectiveDamage(totalDamage, 0, target);
+            effectiveDamageTotal += effectiveDamage;
             const burnPerTick = effectiveDamage / numberTicks;
 
             const particleSystemClone = particleSystem.clone("particleSystemClone", target)
@@ -589,6 +603,7 @@ class App {
             }, 100)
         }
         particleSystem.dispose(false);
+        return effectiveDamageTotal;
     }
 
     private applyFrostEffect(targets: Mesh[], durationSeconds: number, soundOrigin: Vector3) {

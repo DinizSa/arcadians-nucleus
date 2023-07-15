@@ -371,35 +371,28 @@ class App {
         return true;
     }
 
-    // SpriteManager
-                // const spriteManager = new BABYLON.SpriteManager("sm", "spritesheets/hearth.png", 5, 512, this._scene);
-                // var sprite = new BABYLON.Sprite("sprite", spriteManager);
-                // sprite.size = 1;
-                // sprite.position = attacker.position.add(new Vector3(0,0,0.1));
-                // sprite.disposeWhenFinishedAnimating = true;
-                // sprite.playAnimation(0, 5, false, 70);
-
     // x lifesteal
     // x add animations for sword slash & explosion
     // chain lightening
     // shield: block next attack
     // x fix hp bar also inverting on direction change
-    // replace projectile particle for air asset
-    // add projectiles assets 
+    // x replace projectile particle for air asset
+    // x add projectiles assets 
+    // x fix projectile direction
 
     private shootWeapon(attacker: Mesh, weapon: Weapon): boolean {
         const target = this.getNearestVisibleTarget(attacker);
-        const attackDirection = target.position.subtract(attacker.position).scale(1.15); // TODO: factor to compensate unkown bias
-        const distance = attackDirection.length();
-        if (weapon.range < distance) {
-            return false;
-        }
-
         const horizontalDirection = Math.sign(target.position.x - attacker.position.x)
         const projectileStartPosition = attacker.position.add(
             new Vector3(horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
         );
         this.faceDirection(attacker, target.position);
+        const attackDirection = target.position.subtract(projectileStartPosition).scale(1.15); // TODO: factor to compensate unkown bias
+        const distance = attackDirection.length();
+        if (weapon.range < distance) {
+            return false;
+        }
+
         
         // attack animation
         let animationName = this.getAttackAnimation(weapon);

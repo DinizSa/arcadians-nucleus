@@ -156,7 +156,6 @@ class App {
         this.setupSelectedMark();
         this.setupHpBar()
         this.setupProjectile();
-        this.setupHitEffect();
         this.setupSpriteManagers();
 
         const rowsArcadians = 5;
@@ -260,11 +259,9 @@ class App {
 
     private setupProjectile() {
         const material = new BABYLON.StandardMaterial("mat", this._scene);
-        material.ambientTexture = this.getTexture("combat/fireDiffuse.png");;
-        material.emissiveColor = new Color3(1, 0.2, 0);
-        material.bumpTexture = this.getTexture("combat/bumpTexture.jpg");
+        material.ambientTexture = this.getTexture("combat/fireDiffuse.png");
         material.roughness = 1;
-        let projetile = BABYLON.MeshBuilder.CreateSphere("projectile", {diameter: 0.5}, this._scene);
+        let projetile = BABYLON.MeshBuilder.CreateSphere("projectile", {diameter: 0.3}, this._scene);
         projetile.material = material;
         projetile.isPickable = false;
         projetile.setEnabled(false);
@@ -273,10 +270,10 @@ class App {
 
         const particleSystem = new BABYLON.ParticleSystem('particles', 1000, this._scene);
         particleSystem.emitter = projetile;
-        particleSystem.emitRate = 50;
-        particleSystem.particleTexture = this.getTexture('combat/fireDiffuse.png');
+        particleSystem.emitRate = 30;
+        particleSystem.particleTexture = this.getTexture('combat/fireCircle.png');
         particleSystem.minSize = 0.1;
-        particleSystem.maxSize = 0.25;
+        particleSystem.maxSize = 0.1;
         particleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 0.5); // Start color
         particleSystem.color2 = new BABYLON.Color4(1, 1, 0, 0.5); // End color
         particleSystem.minLifeTime = 1;
@@ -750,7 +747,7 @@ class App {
                 continue;
             }
             targets.push(target);
-            if (targets.length > weapon.spellMaxTargets) {
+            if (targets.length >= weapon.spellMaxTargets) {
                 break;
             }
         }
@@ -793,18 +790,6 @@ class App {
         }
     }
 
-    private setupHitEffect() {
-        const hitStarMesh = BABYLON.CreatePlane("hitStarMesh_original", {width: 1, height: 1}, this._scene);
-        const hitMaterial = new BABYLON.StandardMaterial("hitStart", this._scene);
-        hitMaterial.emissiveColor = Color3.Red();
-        const hitTexture = this.getTexture("combat/explosionEffect.png");
-        hitTexture.hasAlpha = true;
-        hitMaterial.diffuseTexture = hitTexture;
-        hitStarMesh.material = hitMaterial;
-        hitStarMesh.rotate(new Vector3(0,1,0), Math.PI);
-        hitStarMesh.setEnabled(false);
-    }
-
     private setupHpBar() {
         const materialMaxHp = new BABYLON.StandardMaterial("materialMaxHp", this._scene);
         materialMaxHp.diffuseColor = Color3.Red();
@@ -843,7 +828,7 @@ class App {
     }
 
     private updateMagicResist(targets: Mesh[], deltaArmor: number, soundOrigin: Vector3) {
-        new BABYLON.Sound("increaseMagicResist", "sounds/enchant.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+        new BABYLON.Sound("increaseMagicResist", "sounds/spellGeneric.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
 
         for (const target of targets) {
             const meta: CharacterMetadata = JSON.parse(target.metadata)
@@ -853,12 +838,12 @@ class App {
             const particleSystem = new BABYLON.ParticleSystem('increaseMagicResist', 300, this._scene);
             particleSystem.particleTexture = this.getTexture('combat/shield.png', true);
             particleSystem.emitter = target;
-            particleSystem.emitRate = 30;
-            particleSystem.minSize = 0.2;
-            particleSystem.maxSize = 0.4;
+            particleSystem.emitRate = 10;
+            particleSystem.minSize = 0.5;
+            particleSystem.maxSize = 0.5;
             particleSystem.minLifeTime = 1;
             particleSystem.maxLifeTime = 2;
-            const color = new BABYLON.Color4(0.8,0.8,0, 1);
+            const color = new BABYLON.Color4(62/255, 175/255, 118/255, 1);
             particleSystem.color1 = color;
             particleSystem.color2 = color;
             particleSystem.start();
@@ -923,7 +908,7 @@ class App {
             const animation = this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.hit);
             animation.start(false);
 
-            const hitSounds = ["hit1.mp3", "hit4.mp3", "hit5.mp3"];
+            const hitSounds = ["hit1.mp3", "hit5.mp3"];
             const randomHitSound = hitSounds[Math.floor(Math.random()*(hitSounds.length-1))]
             new BABYLON.Sound("die", "sounds/"+randomHitSound, this._scene, null, {autoplay: true, volume: this.getVolume(target.position), maxDistance: this.MAX_SOUND_DISTANCE})
         } else if (deltaHp > 0) {
@@ -1012,7 +997,7 @@ class App {
 
             const itemFilename = itemSlot.src.split("/")[1];
             const itemPath = "parts/" + itemFilename;
-            const blankPath = "empty399x399.png";
+            const blankPath = "utils/empty399x399.png";
             const textureImage = await mergeImages([blankPath, {src: itemPath, x: itemSlot.x, y: itemSlot.y}]);
             let texture = this.getTexture(textureImage);
 
@@ -1133,7 +1118,7 @@ class App {
         background.position = new Vector3(this.fieldFimensions.x/2, bgHeight/2.5, -bgWidth*2.5)
         background.isPickable = false;
         let backgroundMaterial = new BABYLON.StandardMaterial("bgMaterial", this._scene);
-        backgroundMaterial.diffuseTexture = this.getTexture("bgMountain.jpg", true);
+        backgroundMaterial.diffuseTexture = this.getTexture("environment/bgMountain.jpg", true);
         background.material = backgroundMaterial;
         background.rotate(new Vector3(0,1,0), Math.PI);
     }

@@ -55,7 +55,7 @@
         "range": "11",
         "weight": "1",
         "reloadTime": "1",
-        "type": "melee",
+        "type": "spell",
         "projectileSpeed": "50",
         "projectileWeight": "5",
         "radiusArea": "0",
@@ -63,10 +63,10 @@
         "burnDuration": "0",
         "burnTotalDamage": "0",
         "lifesteal": "",
-        "specialSpellType": "",
-        "spellAmount": "",
-        "spellRange": "",
-        "spellMaxTargets": ""
+        "specialSpellType": "increaseMagicResist",
+        "spellAmount": "10",
+        "spellRange": "12",
+        "spellMaxTargets": "2"
     },
     {
         "id": "509",

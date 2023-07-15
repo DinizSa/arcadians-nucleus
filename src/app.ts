@@ -49,8 +49,17 @@ interface Weapon {
     frostDuration: number;
     burnDuration: number;
     burnTotalDamage: number;	
+    specialSpellType: 'heal' | 'convert' | 'increaseArmor' | 'increaseMagicResist';
+    spellAmount: number;
+    spellRange: number;
+    spellMaxTargets: number;
     slotName?: string;
 };
+
+interface CharacterMetadata {
+    armor: number; // percentage or physical damage ignored
+    magicResist: number; // percentage of magic damage ignored
+}
 
 const slotsNames = {
     eyes: "Eyes",
@@ -165,8 +174,6 @@ class App {
             this._scene.render();
         });
 
-    
-
         // Handle pointer clicks
         this._scene.onPointerDown = (event: BABYLON.IPointerEvent, pickInfo: BABYLON.PickingInfo) => {
             if (event.button == 0 && pickInfo.hit) {
@@ -174,9 +181,12 @@ class App {
                     this.moveCharacter(this.selectedCharacterId, pickInfo.pickedPoint);
                     this.selectedCharacterId = 0;
                     this._selectedMark.setEnabled(false);
-                } else if (pickInfo.pickedMesh.metadata == "arcadian") {
-                    this.selectedCharacterId = pickInfo.pickedMesh.uniqueId;
-                    this.startSelectedMarkAnim(this.selectedCharacterId);
+                } else {
+                    const tags = BABYLON.Tags.GetTags(pickInfo.pickedMesh) || [];
+                    if (tags.includes("arcadian")) {
+                        this.selectedCharacterId = pickInfo.pickedMesh.uniqueId;
+                        this.startSelectedMarkAnim(this.selectedCharacterId);
+                    }
                 }
             }
         }
@@ -184,10 +194,7 @@ class App {
         window.addEventListener("keydown", (ev) => {
             if (ev.keyCode === 32) {
                 if (this.selectedCharacterId) {
-                    const target = this.getNearestAttackTarget(this.selectedCharacterId);
-                    if (target) {
-                        this.attackTarget(this.selectedCharacterId, target);
-                    }
+                    this.useWeapon(this.selectedCharacterId);
                 }
             }
         });
@@ -286,28 +293,81 @@ class App {
         this._projetileSword = projetileSword;
     }
 
-    private attackTarget(attackerUniqueId: number, target: Mesh) {
-        const attacker = this.getRootMesh(attackerUniqueId);
+    private getTags(mesh: Mesh) : string[] {
+        return BABYLON.Tags.GetTags(mesh) || [];
+    }
 
-        const tags = BABYLON.Tags.GetTags(attacker) || [];
-        if (tags.includes("attacking") || tags.includes("frost")) {
-            return;
+    private getFaction(character: Mesh): string {
+        const tags = this.getTags(character);
+        const factions = ["black", "white"];
+        for (const faction of factions) {
+            if (tags.includes(faction)) {
+                return faction
+            }
         }
+    }
 
-        const horizontalDirection = Math.sign(target.position.x - attacker.position.x) // -1 || 1
-        const attackPosition = attacker.position.add(
-            new Vector3(horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
-        );
+    private getEnemyFaction(faction: string): string {
+        return ["black", "white"].find((v)=>v!=faction)
+    }
 
-        // scale to compensate unkown bias when aiming the projectile
-        const attackDirection = target.position.subtract(attackPosition).scale(1.15);
-        const distance = attackDirection.length();
-        const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
+    private castSpell(attacker: Mesh, weapon: Weapon): boolean {
+        let targets: Mesh[] = this.getSpellTargets(attacker, weapon);
 
-        let weapon: Weapon = weapons.find((weapon) => weapon?.range >= distance);
-        if (!weapon){
+        if (targets.length == 0) {
             return false;
         }
+
+        if (weapon.frostDuration > 0) {
+            this.applyFrostEffect(targets, weapon.frostDuration, attacker.position);
+        }
+
+        if (weapon.burnTotalDamage > 0) {
+            this.applyBurnEffect(targets, weapon.burnDuration, weapon.burnTotalDamage, attacker.position)
+        }
+
+        if (weapon.specialSpellType == "heal") {
+            this.applyHealEffect(targets, weapon.spellAmount, attacker.position)
+        }
+
+        if (weapon.specialSpellType == "increaseArmor") {
+            this.updateArmor(targets, weapon.spellAmount, attacker.position)
+        }
+
+        if (weapon.specialSpellType == "increaseMagicResist") {
+            this.updateMagicResist(targets, weapon.spellAmount, attacker.position)
+        }
+
+        if (weapon.specialSpellType == "convert") {
+            this.convertTarget(targets, weapon.spellAmount, attacker.position);
+        }
+
+        let animationName = this.getAttackAnimation(weapon);
+        const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
+        animation.start(false);
+        return true;
+    }
+
+    // SpriteManager
+                // const spriteManager = new BABYLON.SpriteManager("sm", "spritesheets/hearth.png", 5, 512, this._scene);
+                // var sprite = new BABYLON.Sprite("sprite", spriteManager);
+                // sprite.size = 1;
+                // sprite.position = attacker.position.add(new Vector3(0,0,0.1));
+                // sprite.disposeWhenFinishedAnimating = true;
+                // sprite.playAnimation(0, 5, false, 70);
+
+    private shootWeapon(attacker: Mesh, weapon: Weapon): boolean {
+        const target = this.getNearestVisibleTarget(attacker);
+        const attackDirection = target.position.subtract(attacker.position).scale(1.15); // TODO: factor to compensate unkown bias
+        const distance = attackDirection.length();
+        if (weapon.range < distance) {
+            return false;
+        }
+
+        const horizontalDirection = Math.sign(target.position.x - attacker.position.x) // -1 | 1
+        const projectileStartPosition = attacker.position.add(
+            new Vector3(horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
+        );
         if (attacker.scaling.x == horizontalDirection) {
             attacker.scaling.x = -horizontalDirection;
         }
@@ -316,21 +376,17 @@ class App {
         let animationName = this.getAttackAnimation(weapon);
         const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
         animation.start(false);
-        BABYLON.Tags.AddTagsTo(attacker, "attacking")
-        setTimeout(() => {
-            BABYLON.Tags.RemoveTagsFrom(attacker, "attacking")
-        }, weapon.reloadTime * 1000);
 
         // Create projectile
         let projectile: Mesh;
         let delayProjectile: number;
-        if (weapon.type == 'gun' || weapon.type == 'spell') {
+        if (weapon.type == 'gun') {
             projectile = this._projetile.clone("projectileClone");
-            projectile.position = attackPosition.add(new Vector3(0, 1, 0));
+            projectile.position = projectileStartPosition.add(new Vector3(0, 1, 0));
             delayProjectile = 300;
         } else if (weapon.type == "melee") {
             projectile = this._projetileSword.clone("projectileSwordClone");
-            projectile.position = attackPosition.clone();
+            projectile.position = projectileStartPosition.clone();
             delayProjectile = 150;
         }
         
@@ -352,97 +408,54 @@ class App {
             }
             
             this.stopParticlesSystem(projectile);
-
             projectile.dispose();
 
             const hitMeshes: Mesh[] = [];
             if (weapon.radiusArea > 0) {
-                const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != attacker.uniqueId);
-
-                for (let i = 0; i < targets.length; i++) {
-                    const distance = projectile.position.subtract(targets[i].position).length();
+                for (let i = 0; i < enemies.length; i++) {
+                    const distance = projectile.position.subtract(enemies[i].position).length();
                     if (distance < weapon.radiusArea) {
-                        hitMeshes.push(targets[i])
+                        hitMeshes.push(enemies[i])
                     }
                 }
-            } else if (collidedMesh.metadata == "arcadian") {
-                hitMeshes.push(collidedMesh)
+            } else {
+                // const tags = BABYLON.Tags.GetTags(collidedMesh) || [];
+                // if (tags.includes("arcadian")) {
+                    hitMeshes.push(collidedMesh)
+                // }
             }
+            if (weapon.type == "gun") {
+                this.animateExplosion(collidedMesh, projectile.position, weapon.radiusArea);
+            }
+            // Filter so only in the alive characters are applied effects like frost, fire, etc.
+            const meshesToApplyEffects: Mesh[] = [];
             for (const hitMesh of hitMeshes) {
-
                 const effectiveDamage = this.getEffectiveDamage(weapon.magicDamage, weapon.physicalDamage, hitMesh);
-                const updatedHp = this.registerHit(hitMesh.uniqueId, effectiveDamage);
+                const updatedHp = this.updateHp(hitMesh, -effectiveDamage);
                 collidedUniqueIds.push(hitMesh.uniqueId);
-
-                if (updatedHp <= 0) {
-                    return;
-                }
-
-                if (weapon.frostDuration > 0) {
-                    const particleSystem = new BABYLON.ParticleSystem('frostEffect', 300, this._scene);
-                    particleSystem.emitter = hitMesh;
-                    particleSystem.emitRate = 30;
-                    particleSystem.minSize = 0.2;
-                    particleSystem.maxSize = 0.4;
-                    particleSystem.minLifeTime = 1;
-                    particleSystem.maxLifeTime = 2;
-                    particleSystem.color1 = new BABYLON.Color4(0, 0, 1, 0.5);
-                    particleSystem.color2 = new BABYLON.Color4(1, 1, 1, 0.5);
-                    particleSystem.particleTexture = this.getTexture('combat/ice.jpg');
-                    particleSystem.start();
-
-                    BABYLON.Tags.AddTagsTo(hitMesh, "frost");
-
-                    new BABYLON.Sound("freeze", "sounds/freeze.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position)/2, maxDistance: this.MAX_SOUND_DISTANCE})
-
-                    this.stopGroupAnimations(hitMesh.uniqueId);
-                    setTimeout(() => {
-                        const tags = BABYLON.Tags.GetTags(hitMesh) || [];
-                        if (!tags.includes("dead")) {
-                            this.getGroupAnimation(hitMesh.uniqueId, ANIMATION_LIST.idle).start(true);
-                        }
-                        
-                        BABYLON.Tags.RemoveTagsFrom(hitMesh, "frost");
-                        particleSystem.stop();
-                    }, weapon.frostDuration * 1000);
-                }
-
-                if (weapon.burnTotalDamage > 0) {
-                    const particleSystem = new BABYLON.ParticleSystem('burnEffect', 300, this._scene);
-                    particleSystem.emitter = hitMesh;
-                    particleSystem.emitRate = 30;
-                    particleSystem.minSize = 0.2;
-                    particleSystem.maxSize = 0.4;
-                    particleSystem.minLifeTime = 1;
-                    particleSystem.maxLifeTime = 2;
-                    particleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 0.5);
-                    particleSystem.color2 = new BABYLON.Color4(1, 1, 0, 0.5);
-                    particleSystem.particleTexture = this.getTexture('combat/fireDiffuse.png');
-                    particleSystem.start()
-
-                    new BABYLON.Sound("burn", "sounds/burn.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position)/2, maxDistance: this.MAX_SOUND_DISTANCE})
-
-                    let numberTicks = weapon.burnDuration * (1000 / 100);
-                    const burnPerTick = weapon.burnTotalDamage / numberTicks;
-                    const burnInterval = setInterval(()=>{
-                        const newHp = this.registerHit(hitMesh.uniqueId, burnPerTick, false);
-                        if (numberTicks === 0 || newHp === 0) {
-                            particleSystem.stop();
-                            clearInterval(burnInterval)
-                        }
-                        numberTicks--;
-                    }, 100)
+                if (updatedHp > 0) {
+                    meshesToApplyEffects.push(hitMesh);
                 }
             }
-            this.animateExplosion(collidedMesh, projectile.position, weapon.radiusArea);
+            if (meshesToApplyEffects.length == 0) {
+                return
+            }
+            if (weapon.frostDuration > 0) {
+                this.applyFrostEffect(meshesToApplyEffects, weapon.frostDuration, attacker.position);
+            }
+            if (weapon.burnTotalDamage > 0) {
+                this.applyBurnEffect(meshesToApplyEffects, weapon.burnDuration, weapon.burnTotalDamage, attacker.position)
+            }
         };
-        const physicsImpostors = this._scene.rootNodes.filter((v)=>v.metadata == "arcadian" && attacker.uniqueId != v.uniqueId).map((v: Mesh)=>v.physicsImpostor);
+
+        const enemies = this.getEnemies(attacker);
+        const physicsImpostors = enemies.map((v: Mesh)=>v.physicsImpostor);
         projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, onHit);
 
         setTimeout(() => {
             projectile.setEnabled(true);
 
-            if (weapon.type == 'gun' || weapon.type == 'spell') {
+            if (weapon.type == 'gun') {
                 let time = distance / weapon.projectileSpeed;
                 const forceX = attackDirection.x / time;
                 const forceY = target.position.y + attackDirection.y / time - this.GRAVITY * time * (1/2);
@@ -468,12 +481,162 @@ class App {
                 new BABYLON.Sound("sword", "sounds/Sword.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position), maxDistance: this.MAX_SOUND_DISTANCE})
             }
         }, delayProjectile);
+        
+        return true;
     }
 
-    private getEffectiveDamage(magicDamage: number, physicalDamage: number, hitMesh: Mesh) {
-        // TODO: get armor and magic resist from all the wereables
-        const magicResist = 20; // percentage of magic damage ignored
-        const armor = 10; // percentage or physical damage ignored
+    private useWeapon(attackerUniqueId: number) {
+
+        const attacker = this.getRootMesh(attackerUniqueId);
+        const tags = BABYLON.Tags.GetTags(attacker) || [];
+        if (tags.includes("attacking") || tags.includes("frost")) {
+            return;
+        }
+
+        const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
+        for (let i = 0; i < weapons.length; i++) {
+            const weapon = weapons[i];
+            let attacked = false;
+            if (weapon.type == "spell") {
+                attacked = this.castSpell(attacker, weapon);
+            } else if (weapon.type == 'gun' || weapon.type == "melee") {
+                attacked = this.shootWeapon(attacker, weapon);
+            }
+            if (!attacked) {
+                continue;
+            }
+            BABYLON.Tags.AddTagsTo(attacker, "attacking")
+            setTimeout(() => {
+                BABYLON.Tags.RemoveTagsFrom(attacker, "attacking")
+            }, weapon.reloadTime * 1000);
+        }
+    }
+
+    private convertTarget(targets: Mesh[], durationSeconds: number, soundOrigin: Vector3) {
+        new BABYLON.Sound("convert", "sounds/curse.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+
+        const particleSystem = new BABYLON.ParticleSystem('convertEffect', 300, this._scene);
+        particleSystem.particleTexture = this.getTexture('combat/mindControl.png', true);
+        particleSystem.emitRate = 5;
+        particleSystem.minSize = 0.5;
+        particleSystem.maxSize = 0.8;
+        particleSystem.minLifeTime = 1;
+        particleSystem.maxLifeTime = 2;
+        particleSystem.disposeOnStop = true;
+
+        for (const target of targets) {
+            const particleSystemClone = particleSystem.clone("convertEffectClone", target)
+            particleSystemClone.start();
+            
+            const faction = this.getFaction(target);
+            const enemyFaction = this.getEnemyFaction(faction);
+            BABYLON.Tags.RemoveTagsFrom(target, faction);
+            BABYLON.Tags.AddTagsTo(target, enemyFaction);
+    
+            setTimeout(() => {
+                BABYLON.Tags.RemoveTagsFrom(target, enemyFaction);
+                BABYLON.Tags.AddTagsTo(target, faction);
+
+                particleSystemClone.stop();
+            }, durationSeconds*1000);
+        }
+        particleSystem.dispose(false);
+    }
+
+    private applyHealEffect(targets: Mesh[], amountToHeal: number, soundOrigin: Vector3) {
+        for (const target of targets) {
+            this.updateHp(target, amountToHeal, false);
+        }
+        new BABYLON.Sound("heal", "sounds/heal.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+    }
+
+    private applyBurnEffect(targets: Mesh[], durationSeconds: number, totalDamage: number, soundOrigin: Vector3) {
+        const particleSystem = new BABYLON.ParticleSystem('burnEffect', 300, this._scene);
+        particleSystem.emitRate = 50;
+        particleSystem.minSize = 0.2;
+        particleSystem.maxSize = 0.6;
+        particleSystem.minLifeTime = 1;
+        particleSystem.maxLifeTime = 2;
+        
+        particleSystem.isAnimationSheetEnabled = true;
+        particleSystem.particleTexture = this.getTexture('combat/fire1_64.png');
+        particleSystem.spriteCellHeight = 64;
+        particleSystem.spriteCellWidth = 64;
+        particleSystem.startSpriteCellID = 0;
+        particleSystem.endSpriteCellID = 59;
+        particleSystem.spriteCellChangeSpeed = 4;
+        particleSystem.spriteRandomStartCell = true;
+        particleSystem.disposeOnStop = true;
+
+        new BABYLON.Sound("burn", "sounds/burn.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+
+        for (const target of targets) {
+            let numberTicks = durationSeconds * (1000 / 100);
+            // burn damage is considered physical
+            const effectiveDamage = this.getEffectiveDamage(totalDamage, 0, target);
+            const burnPerTick = effectiveDamage / numberTicks;
+
+            const particleSystemClone = particleSystem.clone("particleSystemClone", target)
+            particleSystemClone.start();
+
+            const burnInterval = setInterval(()=>{
+                const newHp = this.updateHp(target, -burnPerTick, false);
+                if (numberTicks === 0 || newHp === 0) {
+                    particleSystemClone.stop();
+                    clearInterval(burnInterval)
+                }
+                numberTicks--;
+            }, 100)
+        }
+        particleSystem.dispose(false);
+    }
+
+    private applyFrostEffect(targets: Mesh[], durationSeconds: number, soundOrigin: Vector3) {
+        const particleSystem = new BABYLON.ParticleSystem('frostEffect', 300, this._scene);
+        particleSystem.emitRate = 30;
+        particleSystem.minSize = 0.2;
+        particleSystem.maxSize = 0.4;
+        particleSystem.minLifeTime = 1;
+        particleSystem.maxLifeTime = 2;
+        particleSystem.color1 = new BABYLON.Color4(0, 0, 1, 0.5);
+        particleSystem.color2 = new BABYLON.Color4(1, 1, 1, 0.5);
+
+        particleSystem.isAnimationSheetEnabled = true;
+        particleSystem.particleTexture = this.getTexture('spritesheets/frost.png');
+        particleSystem.spriteCellHeight = 184.4;
+        particleSystem.spriteCellWidth = 187.4;
+        particleSystem.startSpriteCellID = 0;
+        particleSystem.endSpriteCellID = 5 * 7 -1;
+        particleSystem.spriteCellChangeSpeed = 4;
+        particleSystem.spriteRandomStartCell = true;
+        particleSystem.disposeOnStop = true;
+
+        new BABYLON.Sound("freeze", "sounds/freeze.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+
+        for (const target of targets) {
+            const particleSystemClone = particleSystem.clone("particleSystemClone", target)
+            particleSystemClone.start();
+    
+            BABYLON.Tags.AddTagsTo(target, "frost");
+    
+            this.stopGroupAnimations(target.uniqueId);
+            setTimeout(() => {
+                const tags = BABYLON.Tags.GetTags(target) || [];
+                if (!tags.includes("dead")) {
+                    this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.idle).start(true);
+                }
+                
+                BABYLON.Tags.RemoveTagsFrom(target, "frost");
+                particleSystemClone.stop();
+            }, durationSeconds * 1000);
+        }
+        particleSystem.dispose(false);
+    }
+
+    private getEffectiveDamage(magicDamage: number, physicalDamage: number, target: Mesh) {
+        const metadata: CharacterMetadata = JSON.parse(target.metadata)
+        const magicResist = metadata.magicResist; 
+        const armor = metadata.armor;
         const damage = (magicDamage * (1 - magicResist/100)) + (physicalDamage * (1 - armor/100));
         return damage;
     }
@@ -548,32 +711,64 @@ class App {
             })
             .sort((a, b)=> (b.magicDamage + b.physicalDamage) - (a.magicDamage + a.physicalDamage))
     }
+    
+    private getSpellTargets(attacker: Mesh, weapon: Weapon): Mesh[] {
+        const isDefensiveSpell = ["heal", "increaseArmor", "increaseMagicResist"].includes(weapon.specialSpellType);
+        const possibleTargets = isDefensiveSpell ? this.getAllies(attacker) : this.getEnemies(attacker);
+        if (!possibleTargets || possibleTargets.length == 0) {
+            return;
+        }
+        possibleTargets.sort((a, b)=>a.position.subtract(attacker.position).length() - b.position.subtract(attacker.position).length())
 
-    // Returns true if the a shot ocurred, false otherwise
-    private getNearestAttackTarget(characterUniqueId: number): Mesh {
-        const characterMesh = this.getRootMesh(characterUniqueId);
-        
-        const targets = this._scene.getMeshesByTags("arcadian").filter((v)=>v.uniqueId != characterMesh.uniqueId);
+        const targets: Mesh[] = [];
+        for (let i = 0; i < possibleTargets.length; i++) {
+            const target = possibleTargets[i];
+            const deltaPosition = target.position.subtract(attacker.position);
+            if (deltaPosition.length() > (weapon.spellRange)) {
+                continue;
+            }
+            if (weapon.specialSpellType == "heal" && this.getHpPercentage(target) == 100) {
+                continue;
+            }
+            targets.push(target);
+            if (targets.length > weapon.spellMaxTargets) {
+                break;
+            }
+        }
+        return targets;
+    }
+
+    private getAllies(character: Mesh) {
+        const allyFaction = this.getFaction(character);
+        return this._scene.getMeshesByTags(`${allyFaction} && !dead`);
+    }
+
+    private getEnemies(attacker: Mesh) {
+        const enemyFaction = this.getEnemyFaction(this.getFaction(attacker));
+        return this._scene.getMeshesByTags(`${enemyFaction} && !dead`);
+    }
+
+    private getNearestVisibleTarget(attacker: Mesh): Mesh {
+        const targets = this.getEnemies(attacker);
         if (!targets || targets.length == 0) {
             return;
         }
-        targets.sort((a, b)=>a.position.subtract(characterMesh.position).length() - b.position.subtract(characterMesh.position).length())
+        targets.sort((a, b)=>a.position.subtract(attacker.position).length() - b.position.subtract(attacker.position).length())
 
         for (let i = 0; i < targets.length; i++) {
             const target = targets[i];
-            const deltaPosition = target.position.subtract(characterMesh.position);
+            const deltaPosition = target.position.subtract(attacker.position);
 
-            const origin = characterMesh.position;
+            const origin = attacker.position;
             const ray = new BABYLON.Ray(origin, deltaPosition);
             
             // let rayHelper = new BABYLON.RayHelper(ray);		
             // rayHelper.show(this._scene);
-            characterMesh.isPickable = false;
+            attacker.isPickable = false;
             const hit = this._scene.pickWithRay(ray);
-            characterMesh.isPickable = true;
+            attacker.isPickable = true;
 
-            const tags = BABYLON.Tags.GetTags(hit.pickedMesh) || [];
-            if (tags.includes("arcadian")) {
+            if (targets.some((t)=>t.uniqueId == hit.pickedMesh?.uniqueId)) {
                 return hit.pickedMesh as Mesh;
             }
         }
@@ -586,8 +781,6 @@ class App {
         const hitTexture = this.getTexture("combat/explosionEffect.png");
         hitTexture.hasAlpha = true;
         hitMaterial.diffuseTexture = hitTexture;
-        hitMaterial.emissiveColor = new Color3(0,0,1);
-        // hitMaterial.emissiveTexture = hitTexture;
         hitStarMesh.material = hitMaterial;
         hitStarMesh.rotate(new Vector3(0,1,0), Math.PI);
         hitStarMesh.setEnabled(false);
@@ -622,41 +815,125 @@ class App {
         hpBar.setEnabled(true);
     }
 
-    private getHp(characterMesh: Mesh) {
+    private getHpPercentage(characterMesh: Mesh) {
         const hpBar = characterMesh.getChildMeshes(true, (node)=>node.name == "hpBar")[0] as Mesh;
         const currentHp = Number(hpBar.metadata);
-        return currentHp;
+        const hpBarMax = characterMesh.getChildMeshes(true, (node)=>node.name == "maxHpBar")[0] as Mesh;
+        const maxHp = Number(hpBarMax.metadata);
+        return 100 * currentHp / maxHp;
     }
 
-    private registerHit(hitMeshUniqueId: number, damage: number, animateHit: boolean = true): number {
-        const parentMesh = this.getRootMesh(hitMeshUniqueId);
-        const hpBar = parentMesh.getChildMeshes(true, (node)=>node.name == "hpBar")[0] as Mesh;
-        const hpBarMax = parentMesh.getChildMeshes(true, (node)=>node.name == "maxHpBar")[0] as Mesh;
+    private updateMagicResist(targets: Mesh[], deltaArmor: number, soundOrigin: Vector3) {
+        new BABYLON.Sound("increaseMagicResist", "sounds/enchant.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+
+        for (const target of targets) {
+            const meta: CharacterMetadata = JSON.parse(target.metadata)
+            meta.magicResist += deltaArmor;
+            target.metadata = JSON.stringify(meta);
+    
+            const particleSystem = new BABYLON.ParticleSystem('increaseMagicResist', 300, this._scene);
+            particleSystem.particleTexture = this.getTexture('combat/shield.png', true);
+            particleSystem.emitter = target;
+            particleSystem.emitRate = 30;
+            particleSystem.minSize = 0.2;
+            particleSystem.maxSize = 0.4;
+            particleSystem.minLifeTime = 1;
+            particleSystem.maxLifeTime = 2;
+            const color = new BABYLON.Color4(0.8,0.8,0, 1);
+            particleSystem.color1 = color;
+            particleSystem.color2 = color;
+            particleSystem.start();
+    
+            setTimeout(() => {
+                particleSystem.stop();
+            }, 1000);
+        }
+    }
+
+    private updateArmor(targets: Mesh[], deltaArmor: number, soundOrigin: Vector3) {
+        new BABYLON.Sound("increaseArmor", "sounds/enchant2.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+
+        for (const target of targets) {
+            const meta: CharacterMetadata = JSON.parse(target.metadata)
+            meta.armor += deltaArmor;
+            target.metadata = JSON.stringify(meta);
+    
+            const particleSystem = new BABYLON.ParticleSystem('increaseArmor', 300, this._scene);
+            particleSystem.particleTexture = this.getTexture('combat/shield.png', true);
+            particleSystem.emitter = target;
+            particleSystem.emitRate = 30;
+            particleSystem.minSize = 0.2;
+            particleSystem.maxSize = 0.4;
+            particleSystem.minLifeTime = 1;
+            particleSystem.maxLifeTime = 2;
+            const color = new BABYLON.Color4(0,0.5,1, 1);
+            particleSystem.color1 = color;
+            particleSystem.color2 = color;
+            particleSystem.start();
+    
+            setTimeout(() => {
+                particleSystem.stop();
+            }, 1000);
+        }
+    }
+
+    private updateHp(target: Mesh, deltaHp: number, animateHit: boolean = true): number {
+        if (this.getTags(target).includes("dead")) {
+            return 0;
+        }
+        const hpBar = target.getChildMeshes(true, (node)=>node.name == "hpBar")[0] as Mesh;
+        const hpBarMax = target.getChildMeshes(true, (node)=>node.name == "maxHpBar")[0] as Mesh;
         const maxHp = Number(hpBarMax.metadata);
         const currentHp = Number(hpBar.metadata);
-        const updatedHp = Math.max(currentHp - damage, 0);
+        const updatedHp = Math.max(Math.min(currentHp + deltaHp, maxHp), 0);
+        deltaHp = updatedHp - currentHp;
         if (updatedHp == 0) {
-            this.stopGroupAnimations(hitMeshUniqueId);
-            const animation = this.getGroupAnimation(hitMeshUniqueId, ANIMATION_LIST.death);
+            this.stopGroupAnimations(target.uniqueId);
+            const animation = this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.death);
             animation.start(false);
-            parentMesh.physicsImpostor.dispose();
-            parentMesh.isPickable = false;
+            target.physicsImpostor.dispose();
+            target.isPickable = false;
             hpBar.dispose();
             hpBarMax.dispose();
-            BABYLON.Tags.AddTagsTo(parentMesh, "dead");
-            BABYLON.Tags.RemoveTagsFrom(parentMesh, "arcadian");
+            
+            BABYLON.Tags.AddTagsTo(target, "dead");
+            BABYLON.Tags.RemoveTagsFrom(target, "arcadian");
 
-            new BABYLON.Sound("hit", "sounds/die.mp3", this._scene, null, {autoplay: true, volume: this.getVolume(parentMesh.position), maxDistance: this.MAX_SOUND_DISTANCE})
-        } else if (animateHit) {
-            const animation = this.getGroupAnimation(hitMeshUniqueId, ANIMATION_LIST.hit);
+            new BABYLON.Sound("hit", "sounds/die.mp3", this._scene, null, {autoplay: true, volume: this.getVolume(target.position), maxDistance: this.MAX_SOUND_DISTANCE})
+        } else if (deltaHp < 0 && animateHit) {
+            const animation = this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.hit);
             animation.start(false);
 
             const hitSounds = ["hit1.mp3", "hit4.mp3", "hit5.mp3"];
             const randomHitSound = hitSounds[Math.floor(Math.random()*(hitSounds.length-1))]
-            new BABYLON.Sound("die", "sounds/"+randomHitSound, this._scene, null, {autoplay: true, volume: this.getVolume(parentMesh.position), maxDistance: this.MAX_SOUND_DISTANCE})
+            new BABYLON.Sound("die", "sounds/"+randomHitSound, this._scene, null, {autoplay: true, volume: this.getVolume(target.position), maxDistance: this.MAX_SOUND_DISTANCE})
+        } else if (deltaHp > 0) {
+
+            const particleSystem = new BABYLON.ParticleSystem('healEffect', 300, this._scene);
+            particleSystem.emitter = target;
+            particleSystem.emitRate = 30;
+            particleSystem.minSize = 0.2;
+            particleSystem.maxSize = 0.4;
+            particleSystem.minLifeTime = 1;
+            particleSystem.maxLifeTime = 2;
+
+            particleSystem.isAnimationSheetEnabled = true;
+            particleSystem.particleTexture = this.getTexture('spritesheets/hearth.png');
+            particleSystem.spriteCellHeight = 512;
+            particleSystem.spriteCellWidth = 512;
+            particleSystem.startSpriteCellID = 0;
+            particleSystem.endSpriteCellID = 5*1 - 1;
+            particleSystem.spriteCellChangeSpeed = 4;
+            particleSystem.spriteRandomStartCell = true;
+            particleSystem.color1 = new BABYLON.Color4(0,1,0,1);
+            particleSystem.color2 = new BABYLON.Color4(0,1,0,1);
+            particleSystem.start();
+            setTimeout(() => {
+                particleSystem.stop();
+            }, 1000);
         }
         const maxHpBarWidth = 1;
-        hpBar.position.x += (damage / maxHp * maxHpBarWidth) / 2;
+        hpBar.position.x -= (deltaHp / maxHp * maxHpBarWidth) / 2;
         hpBar.scaling.x = updatedHp / maxHp;
         hpBar.metadata = updatedHp;
         return updatedHp;
@@ -674,9 +951,15 @@ class App {
 
         // body to detect interactions
         let body = BABYLON.MeshBuilder.CreateCylinder("body", {diameter: this.arcadiansSize.width, height: this.arcadiansSize.height});
-        body.metadata = "arcadian";
+        // TODO: set magic resist and armor based on the items equipped
+        const characterMetadata: CharacterMetadata = {
+            magicResist: 10,
+            armor: 5,
+        }
+        body.metadata = JSON.stringify(characterMetadata);
         body.name = "arcadian_" + arcadianId;
         BABYLON.Tags.AddTagsTo(body, "arcadian");
+        BABYLON.Tags.AddTagsTo(body, ["black", "white"][Math.floor(Math.random()*2)]);
         body.visibility = 0;
         body.position = position;
         body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.3, friction: 0.3});

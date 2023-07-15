@@ -157,6 +157,7 @@ class App {
         this.setupHpBar()
         this.setupProjectile();
         this.setupHitEffect();
+        this.setupSpriteManagers();
 
         const rowsArcadians = 5;
         const colsArcadians = 2;
@@ -358,6 +359,7 @@ class App {
                 // sprite.playAnimation(0, 5, false, 70);
 
     // x lifesteal
+    // x add animations for sword slash & explosion
     // chain lightening
     // shield: block next attack
     // x fix hp bar also inverting on direction change
@@ -660,11 +662,10 @@ class App {
     private setupSpriteManagers() {
         new BABYLON.SpriteManager("explosion", "spritesheets/explosion.png", 15, 192, this._scene);
         new BABYLON.SpriteManager("swordSlash", "spritesheets/swordSlash.png", 6, 400, this._scene);
-
     }
 
     private getSpriteManager(name: string): BABYLON.ISpriteManager {
-        return this._scene.spriteManagers.find((sp)=>sp.name == name)[0]
+        return this._scene.spriteManagers.find((sp)=>sp.name == name)
     }
 
     private animateMeleeSlash(attacker: Mesh, attackStartPosition: Vector3, color: BABYLON.Color4 = undefined) {

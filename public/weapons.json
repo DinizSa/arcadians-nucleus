@@ -20,7 +20,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "259",
@@ -43,7 +44,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "306",
@@ -55,18 +57,19 @@
         "range": "11",
         "weight": "1",
         "reloadTime": "1",
-        "type": "spell",
+        "type": "melee",
         "projectileSpeed": "50",
-        "projectileWeight": "5",
+        "projectileWeight": "1",
         "radiusArea": "0",
         "frostDuration": "0",
         "burnDuration": "0",
         "burnTotalDamage": "0",
         "lifesteal": "",
-        "specialSpellType": "increaseMagicResist",
+        "specialSpellType": "",
         "spellAmount": "10",
-        "spellRange": "12",
-        "spellMaxTargets": "2"
+        "spellRange": "11",
+        "spellMaxTargets": "2",
+        "projectileColor": "0,1,0"
     },
     {
         "id": "509",
@@ -89,7 +92,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": "0,1,0"
     },
     {
         "id": "217",
@@ -112,7 +116,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "218",
@@ -135,7 +140,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "219",
@@ -158,7 +164,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "220",
@@ -181,7 +188,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "221",
@@ -204,7 +212,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "222",
@@ -227,7 +236,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "223",
@@ -250,7 +260,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "224",
@@ -273,7 +284,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "225",
@@ -296,7 +308,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "226",
@@ -319,7 +332,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "227",
@@ -342,7 +356,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "228",
@@ -365,7 +380,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "229",
@@ -388,7 +404,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "230",
@@ -411,7 +428,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "231",
@@ -434,7 +452,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "232",
@@ -457,7 +476,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "233",
@@ -480,7 +500,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "234",
@@ -503,7 +524,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "235",
@@ -526,7 +548,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "236",
@@ -549,7 +572,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "237",
@@ -572,7 +596,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "238",
@@ -595,7 +620,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "239",
@@ -618,7 +644,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "240",
@@ -641,7 +668,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "241",
@@ -664,7 +692,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "242",
@@ -687,7 +716,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "243",
@@ -710,7 +740,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "244",
@@ -733,7 +764,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "245",
@@ -756,7 +788,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "246",
@@ -779,7 +812,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "247",
@@ -802,7 +836,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "248",
@@ -825,7 +860,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "249",
@@ -848,7 +884,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "250",
@@ -871,7 +908,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "251",
@@ -894,7 +932,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "252",
@@ -917,7 +956,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "253",
@@ -940,7 +980,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "254",
@@ -963,7 +1004,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "255",
@@ -986,7 +1028,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "256",
@@ -1009,7 +1052,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "257",
@@ -1032,7 +1076,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "258",
@@ -1055,7 +1100,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "260",
@@ -1078,7 +1124,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "261",
@@ -1101,7 +1148,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "262",
@@ -1124,7 +1172,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "263",
@@ -1147,7 +1196,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "264",
@@ -1170,7 +1220,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "265",
@@ -1193,7 +1244,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "266",
@@ -1216,7 +1268,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "267",
@@ -1239,7 +1292,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "268",
@@ -1262,7 +1316,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "270",
@@ -1285,7 +1340,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "271",
@@ -1308,7 +1364,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "272",
@@ -1331,7 +1388,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "273",
@@ -1354,7 +1412,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "274",
@@ -1377,7 +1436,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "275",
@@ -1400,7 +1460,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "276",
@@ -1423,7 +1484,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "277",
@@ -1446,7 +1508,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "278",
@@ -1469,7 +1532,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "279",
@@ -1492,7 +1556,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "280",
@@ -1515,7 +1580,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "281",
@@ -1538,7 +1604,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "282",
@@ -1561,7 +1628,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "283",
@@ -1584,7 +1652,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "284",
@@ -1607,7 +1676,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "285",
@@ -1630,7 +1700,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "286",
@@ -1653,7 +1724,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "287",
@@ -1676,7 +1748,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "288",
@@ -1699,7 +1772,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "289",
@@ -1722,7 +1796,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "290",
@@ -1745,7 +1820,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "291",
@@ -1768,7 +1844,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "292",
@@ -1791,7 +1868,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "293",
@@ -1814,7 +1892,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "294",
@@ -1837,7 +1916,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "295",
@@ -1860,7 +1940,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "296",
@@ -1883,7 +1964,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "297",
@@ -1906,7 +1988,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "298",
@@ -1929,7 +2012,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "299",
@@ -1952,7 +2036,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "300",
@@ -1975,7 +2060,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "301",
@@ -1998,7 +2084,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "302",
@@ -2021,7 +2108,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "303",
@@ -2044,7 +2132,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "304",
@@ -2067,7 +2156,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "305",
@@ -2090,7 +2180,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "307",
@@ -2113,7 +2204,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "308",
@@ -2136,7 +2228,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "309",
@@ -2159,7 +2252,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "310",
@@ -2182,7 +2276,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "311",
@@ -2205,7 +2300,8 @@
         "specialSpellType": "",
         "spellAmount": "",
         "spellRange": "",
-        "spellMaxTargets": ""
+        "spellMaxTargets": "",
+        "projectileColor": ""
     },
     {
         "id": "312",

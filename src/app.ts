@@ -44,6 +44,7 @@ interface Weapon {
     type: 'spell' | 'melee' | 'gun';
     projectileSpeed: number;
     projectileWeight: number;
+    projectileColor: string;
     accuracyRadius: number;
     radiusArea: number;
     frostDuration: number;
@@ -257,9 +258,34 @@ class App {
         return existentTexture as BABYLON.Texture || new BABYLON.Texture(pathName, this._scene, true, invertY);
     }
 
+    private getWeaponPojectileColor(weapon: Weapon): Color3 {
+        if (weapon.projectileColor != undefined) {
+            let projectileColor = weapon.projectileColor.split(',').map((v)=>Number(v));
+            return new Color3(projectileColor[0], projectileColor[1], projectileColor[2])
+        }
+        return new Color3(1, 0.2, 0);
+    }
+
+    private getGunProjectile(weapon: Weapon): Mesh {
+        const projectileColor = this.getWeaponPojectileColor(weapon);
+        const projectile = this._projetile.clone("gunProjectileClone");
+        const material = new BABYLON.StandardMaterial("gunProjectile", this._scene);
+        material.ambientTexture = this.getTexture("combat/cloud.jpg");
+        material.diffuseColor = projectileColor;
+        projectile.material = material;
+
+        const particleSystems = projectile.getConnectedParticleSystems()
+        if (particleSystems?.length) {
+            const particleSystem = particleSystems[0];
+            particleSystem.color1 = new BABYLON.Color4(projectileColor.r, projectileColor.g, projectileColor.b, 1);
+            particleSystem.color2 = new BABYLON.Color4(projectileColor.r, projectileColor.g, projectileColor.b, 1);
+        }
+        return projectile;
+    }
+
     private setupProjectile() {
-        const material = new BABYLON.StandardMaterial("mat", this._scene);
-        material.ambientTexture = this.getTexture("combat/fireDiffuse.png");
+        const material = new BABYLON.StandardMaterial("gunProjectile", this._scene);
+        material.ambientTexture = this.getTexture("combat/cloud.jpg");
         material.roughness = 1;
         let projetile = BABYLON.MeshBuilder.CreateSphere("projectile", {diameter: 0.3}, this._scene);
         projetile.material = material;
@@ -271,11 +297,9 @@ class App {
         const particleSystem = new BABYLON.ParticleSystem('particles', 1000, this._scene);
         particleSystem.emitter = projetile;
         particleSystem.emitRate = 30;
-        particleSystem.particleTexture = this.getTexture('combat/fireCircle.png');
+        particleSystem.particleTexture = this.getTexture('combat/outlineCircle.png');
         particleSystem.minSize = 0.1;
         particleSystem.maxSize = 0.1;
-        particleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 0.5); // Start color
-        particleSystem.color2 = new BABYLON.Color4(1, 1, 0, 0.5); // End color
         particleSystem.minLifeTime = 1;
         particleSystem.maxLifeTime = 2;
 
@@ -386,7 +410,7 @@ class App {
         let projectile: Mesh;
         let delayProjectile: number;
         if (weapon.type == 'gun') {
-            projectile = this._projetile.clone("projectileClone");
+            projectile = this.getGunProjectile(weapon);
             projectile.position = projectileStartPosition.add(new Vector3(0, 1, 0));
             delayProjectile = 300;
         } else if (weapon.type == "melee") {
@@ -486,7 +510,7 @@ class App {
                     projectile.dispose();
                 }, 1000 * lifeTime);
 
-                this.animateMeleeSlash(attacker, projectile.position);
+                this.animateMeleeSlash(attacker, projectile.position, this.getWeaponPojectileColor(weapon));
 
                 new BABYLON.Sound("sword", "sounds/Sword.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position), maxDistance: this.MAX_SOUND_DISTANCE})
             }
@@ -665,7 +689,7 @@ class App {
         return this._scene.spriteManagers.find((sp)=>sp.name == name)
     }
 
-    private animateMeleeSlash(attacker: Mesh, attackStartPosition: Vector3, color: BABYLON.Color4 = undefined) {
+    private animateMeleeSlash(attacker: Mesh, attackStartPosition: Vector3, color: BABYLON.Color3 = undefined) {
         const horizontalDirection = Math.sign(attacker.position.x - attackStartPosition.x)
         const boundingInfo = attacker.getBoundingInfo();
 
@@ -676,7 +700,7 @@ class App {
         sprite.position = attackStartPosition.add(new Vector3(-horizontalDirection*boundingInfo.maximum.x*2,0,0.1));
         sprite.disposeWhenFinishedAnimating = true;
         if (color) {
-            sprite.color = color;
+            sprite.color = new BABYLON.Color4(color.r, color.g, color.b, 1);
         }
         sprite.playAnimation(0, 5, false, 50);
     }
@@ -1208,7 +1232,11 @@ class App {
         for (let key in obj) {
             const parsed = parseFloat(obj[key]);
             const numericKey = isNaN(parsed) ? obj[key] : parsed;
-            convertedObj[key] = numericKey;
+            if (key == "projectileColor") {
+                convertedObj[key] = obj[key];
+            } else {
+                convertedObj[key] = numericKey;
+            }
         }
         return convertedObj;
       }

@@ -51,7 +51,7 @@ interface Weapon {
     burnDuration: number;
     burnTotalDamage: number;
     lifesteal: number;
-    specialSpellType: 'heal' | 'convert' | 'increaseArmor' | 'increaseMagicResist';
+    specialSpellType: 'heal' | 'convert' | 'increaseArmor' | 'increaseMagicResist' | 'shield';
     spellAmount: number;
     spellRange: number;
     spellMaxTargets: number;
@@ -127,6 +127,7 @@ class App {
         width: 1.2,
         height: 2.7
     }
+    private defaultProjectileColor = new BABYLON.Color4(1, 0.2, 0, 0.8);
 
     constructor() {
         this._canvas = this._createCanvas()
@@ -263,11 +264,10 @@ class App {
             let projectileColor = weapon.projectileColor.split(',').map((v)=>Number(v));
             return new BABYLON.Color4(projectileColor[0], projectileColor[1], projectileColor[2], projectileColor[3])
         }
-        return new BABYLON.Color4(1, 0.2, 0, 0.8);
     }
 
     private getGunProjectile(weapon: Weapon): Mesh {
-        const projectileColor = this.getPojectileColor(weapon);
+        const projectileColor = this.getPojectileColor(weapon) || this.defaultProjectileColor;
         const projectile = this._projetile.clone("gunProjectileClone");
         const material = new BABYLON.StandardMaterial("gunProjectile", this._scene);
         material.ambientTexture = this.getTexture("combat/cloud.jpg");
@@ -357,6 +357,10 @@ class App {
             this.updateArmor(targets, weapon.spellAmount, attacker.position)
         }
 
+        if (weapon.specialSpellType == "shield") {
+            this.createShield(targets, weapon.spellAmount, attacker.position)
+        }
+
         if (weapon.specialSpellType == "increaseMagicResist") {
             this.updateMagicResist(targets, weapon.spellAmount, attacker.position)
         }
@@ -374,10 +378,9 @@ class App {
     // x lifesteal
     // x add animations for sword slash & explosion
     // chain lightening
-    // shield: block next attack
+    // x shield: block next attack
     // x fix hp bar also inverting on direction change
-    // x replace projectile particle for air asset
-    // x add projectiles assets 
+    // x allow projectiles color customization 
     // x fix projectile direction
 
     private shootWeapon(attacker: Mesh, weapon: Weapon): boolean {
@@ -392,7 +395,6 @@ class App {
         if (weapon.range < distance) {
             return false;
         }
-
         
         // attack animation
         let animationName = this.getAttackAnimation(weapon);
@@ -451,6 +453,10 @@ class App {
             let damageInflictedTotal = 0;
             for (const hitMesh of hitMeshes) {
                 collidedUniqueIds.push(hitMesh.uniqueId);
+                if (this.getTags(hitMesh).includes("shield")) {
+                    this.disableShield(target);
+                    continue;
+                }
                 const effectiveDamage = this.getEffectiveDamage(weapon.magicDamage, weapon.physicalDamage, hitMesh);
                 damageInflictedTotal += effectiveDamage;
                 const updatedHp = this.updateHp(hitMesh, -effectiveDamage);
@@ -746,7 +752,7 @@ class App {
     }
     
     private getSpellTargets(attacker: Mesh, weapon: Weapon): Mesh[] {
-        const isDefensiveSpell = ["heal", "increaseArmor", "increaseMagicResist"].includes(weapon.specialSpellType);
+        const isDefensiveSpell = ["heal", "increaseArmor", "increaseMagicResist", "spell"].includes(weapon.specialSpellType);
         const possibleTargets = isDefensiveSpell ? this.getAllies(attacker) : this.getEnemies(attacker);
         if (!possibleTargets || possibleTargets.length == 0) {
             return;
@@ -868,6 +874,66 @@ class App {
             setTimeout(() => {
                 particleSystem.stop();
             }, 1000);
+        }
+    }
+
+    private createShield(targets: Mesh[], duration: number, soundOrigin: Vector3) {
+        new BABYLON.Sound("increaseArmor", "sounds/magicShield.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+        const multiplierU = 1.4;
+        const multiplierV = 1.2;
+        const shield = BABYLON.MeshBuilder.CreateDisc("shield", {radius: (this.arcadiansSize.height/2)*multiplierV})
+        const material = new BABYLON.StandardMaterial("shieldOriginal", this._scene);
+        let text = this.getTexture("combat/shieldSphere.png", true);
+        text.hasAlpha = true;
+        material.diffuseTexture = text;
+
+        shield.material = material;
+        shield.isPickable = false;
+        shield.rotate(new Vector3(0,1,0), Math.PI);
+        shield.setEnabled(false);
+
+        var animation = new BABYLON.Animation(
+            "visibilityWave",
+            "visibility",
+            this.FPS,
+            BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+            BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+        );
+
+        const totalFrames = this.FPS*duration;
+        const minValue = 0
+        const maxValue = 0.4
+        var keys = [
+            { frame: 0, value: minValue },
+            { frame: Math.floor(totalFrames/2), value: maxValue },
+            { frame: totalFrames-1, value: minValue }
+        ];
+        animation.setKeys(keys);
+        
+        const easingFunc = new BABYLON.CircleEase();
+        easingFunc.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT)
+        animation.setEasingFunction(easingFunc);
+
+        for (const target of targets) {
+            const shieldClone = shield.clone("shield", target, false, true);
+            shieldClone.position.y += (this.arcadiansSize.height * multiplierV - this.arcadiansSize.height) / 2;
+            shieldClone.position.z += (this.arcadiansSize.width * multiplierU - this.arcadiansSize.width) / 2 + 0.1;
+            shieldClone.setEnabled(true);
+            BABYLON.Tags.AddTagsTo(target, "shield");
+
+            this._scene.beginDirectAnimation(shieldClone, [animation], 0, totalFrames, true)
+
+            setTimeout(()=>{
+                this.disableShield(target);
+            }, duration * 1000)
+        }
+    }
+
+    private disableShield(target: Mesh) {
+        BABYLON.Tags.RemoveTagsFrom(target, "shield");
+        const shieldArray = target.getChildMeshes(true, (node)=>node.name == "shield");
+        if (shieldArray.length > 0) {
+            shieldArray[0].dispose();
         }
     }
 

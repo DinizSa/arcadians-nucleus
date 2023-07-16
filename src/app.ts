@@ -50,6 +50,9 @@ interface Weapon {
     frostDuration: number;
     burnDuration: number;
     burnTotalDamage: number;
+    shockRadiusArea: number;
+    shockDamage: number;
+    shockTargets: number;
     lifesteal: number;
     specialSpellType: 'heal' | 'convert' | 'increaseArmor' | 'increaseMagicResist' | 'shield';
     spellAmount: number;
@@ -442,7 +445,7 @@ class App {
                         hitMeshes.push(enemies[i])
                     }
                 }
-                if (weapon.type == "gun") {
+                if (weapon.type == "gun" && (weapon.physicalDamage > 0 || weapon.magicDamage > 0)) {
                     this.animateExplosion(projectile.position, weapon.radiusArea);
                 }
             } else {
@@ -472,6 +475,9 @@ class App {
             }
             if (weapon.burnTotalDamage > 0) {
                 damageInflictedTotal += this.applyBurnEffect(meshesToApplyEffects, weapon.burnDuration, weapon.burnTotalDamage, attacker.position)
+            }
+            if (weapon.shockDamage > 0) {
+                damageInflictedTotal += this.applyShockEffect(meshesToApplyEffects, weapon.shockTargets, weapon.shockDamage, attacker.position, undefined, true)
             }
             if (weapon.lifesteal > 0) {
                 const lifestealAmount = damageInflictedTotal*(weapon.lifesteal/100);
@@ -585,6 +591,44 @@ class App {
         }
     }
 
+    private applyShockEffect(targets: Mesh[], maxTargets: number, damage: number, attackerPosition: Vector3, color: BABYLON.Color4 = undefined, shockFromAttacker: boolean = false): number {
+        new BABYLON.Sound("eletricShock", "sounds/eletricShock.mp3", this._scene, null, {autoplay: true, volume: this.getVolume(attackerPosition), maxDistance: this.MAX_SOUND_DISTANCE})
+
+        let effectiveDamageTotal = 0;
+        let previousPosition: Vector3;
+        if (shockFromAttacker) {
+            previousPosition = attackerPosition;
+        }
+        for (let i = 0; i < targets.length; i++) {
+            if (i >= maxTargets) {
+                break;
+            }
+            const target = targets[i];
+            const effectiveDamage = this.getEffectiveDamage(damage, 0, target);
+            this.updateHp(target, -effectiveDamage, true);
+            effectiveDamageTotal += effectiveDamage;
+            const spriteManager = this.getSpriteManager("shockBean")
+            
+            if (previousPosition) {
+                const sprite = new BABYLON.Sprite("sprite", spriteManager);
+                const distance = target.position.x - previousPosition.x;
+                if (distance < 0.1) {
+                    continue;
+                }
+
+                sprite.width = distance;
+                sprite.position = target.position.add(previousPosition).scaleInPlace(1/2); 
+                sprite.disposeWhenFinishedAnimating = true;
+                if (color) {
+                    sprite.color = color;
+                }
+                sprite.playAnimation(0, 3, false, 50);
+            }
+            previousPosition = target.position;
+        }
+        return effectiveDamageTotal;
+    }
+
     private applyBurnEffect(targets: Mesh[], durationSeconds: number, totalDamage: number, soundOrigin: Vector3): number {
         const particleSystem = new BABYLON.ParticleSystem('burnEffect', 300, this._scene);
         particleSystem.emitRate = 50;
@@ -682,6 +726,7 @@ class App {
     private setupSpriteManagers() {
         new BABYLON.SpriteManager("explosion", "spritesheets/explosion.png", 15, 192, this._scene);
         new BABYLON.SpriteManager("swordSlash", "spritesheets/swordSlash.png", 6, 400, this._scene);
+        new BABYLON.SpriteManager("shockBean", "spritesheets/shockBean.png", 4, 64, this._scene);
     }
 
     private getSpriteManager(name: string): BABYLON.ISpriteManager {
@@ -784,7 +829,9 @@ class App {
 
     private getEnemies(attacker: Mesh) {
         const enemyFaction = this.getEnemyFaction(this.getFaction(attacker));
-        return this._scene.getMeshesByTags(`${enemyFaction} && !dead`);
+        const enemies = this._scene.getMeshesByTags(`${enemyFaction} && !dead`);
+        enemies.sort((a, b)=>a.position.subtract(attacker.position).length() - b.position.subtract(attacker.position).length())
+        return enemies;
     }
 
     private getNearestVisibleTarget(attacker: Mesh): Mesh {

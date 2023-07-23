@@ -7,6 +7,8 @@ import mergeImages from 'merge-images';
 import { Engine, Scene, Vector3, Mesh, HemisphericLight, Color3, FreeCamera, SceneLoader } from "@babylonjs/core";
 import * as CANNON from "cannon";
 
+// bug: when the target moves, the attacker continues moving to the target initial position
+
 interface MetadataSlot {
     // item_contract_address: string,
     item_id: number,
@@ -74,6 +76,7 @@ interface HandEquippment {
 
 interface CharacterData {
     faction: 'white' | 'black';
+    subFaction: 'arcadian' | 'orcBerserc' | 'orcShaman' | 'orcWarrior' | "vikingAxe" | "vikingSword" | "vikingSpear";
     uniqueId: number;
     armor: number; // percentage or physical damage ignored
     magicResist: number; // percentage of magic damage ignored
@@ -111,7 +114,7 @@ const ANIMATION_LIST = {
     talk: "m.talk",
     talkPositive: "m.talkpositive",
     talkNegative: "m.talknegative",
-    hit: "m.hit",
+    hurt: "m.hit",
     stun: "m.stun",
     death: "m.death",
     win: "m.win",
@@ -126,22 +129,120 @@ const ANIMATION_LIST = {
     attackWizard: "m.atkWiz",
 }
 
-
-interface animationMap {
+interface AnimationMap {
     start: number;
     end: number;
 }
-const orcAnimationMap: {[key: string]: animationMap} = {
-    idle: {start: 0, end: 4},
-    walk: {start: 9, end: 15},
-    run: {start: 18, end: 23},
-    attackSpecial: {start: 27, end: 31},
-    attackLeftHand: {start: 36, end: 39},
-    attackRightHand: {start: 45, end: 49},
-    attackStabbed: {start: 54, end: 55},
-    jump: {start: 63, end: 67},
-    hurt: {start: 72, end: 73},
-    death: {start: 81, end: 84},
+interface AnimationStartStop {[key: string]: AnimationMap};
+
+interface CharacterSetup {
+    category: 'orcBerserc' | 'orcShaman' | 'orcWarrior' | 'vikingAxe' | 'vikingSword' | 'vikingSpear';
+    leftHandEquippment: string;
+    rightHandEquippment: string;
+    animations: AnimationStartStop
+}
+const orcBerserkData: CharacterSetup = {
+    category: 'orcBerserc',
+    leftHandEquippment: "Reaperblade",
+    rightHandEquippment: "Valorous Blade",
+    animations: {
+        idle: {start: 0, end: 4},
+        walk: {start: 9, end: 15},
+        run: {start: 18, end: 23},
+        attackLeftHand: {start: 36, end: 39},
+        attackRightHand: {start: 45, end: 49},
+        jump: {start: 63, end: 67},
+        hurt: {start: 72, end: 73},
+        death: {start: 81, end: 84}
+    }
+}
+
+const orcShamanData: CharacterSetup = {
+    category: 'orcShaman',
+    leftHandEquippment: "Constellation Scribe",
+    rightHandEquippment: "Royal Wand of Power",
+    animations: {
+        idle: {start: 0, end: 4},
+        walk: {start: 9, end: 15},
+        run: {start: 18, end: 23},
+        attackRightHand: {start: 45, end: 52},
+        attackLeftHand: {start: 54, end: 59},
+        jump: {start: 63, end: 68},
+        hurt: {start: 72, end: 73},
+        death: {start: 81, end: 85},
+    }
+}
+const orcWarriorData: CharacterSetup = {
+    category: 'orcWarrior',
+    leftHandEquippment: "Axe of Strings",
+    rightHandEquippment: "Common Axe",
+    animations: {
+        idle: {start: 0, end: 4},
+        walk: {start: 9, end: 15},
+        run: {start: 18, end: 23},
+        attackRightHand: {start: 36, end: 39},
+        attackLeftHand: {start: 45, end: 48},
+        jump: {start: 63, end: 70},
+        hurt: {start: 72, end: 73},
+        death: {start: 81, end: 84},
+    }
+}
+const vikingAxeData: CharacterSetup = {
+    category: 'vikingAxe',
+    leftHandEquippment: "Ichika's Doomblade",
+    rightHandEquippment: "Iron Fist",
+    animations: {
+        idle: {start: 0, end: 5},
+        walk: {start: 9, end: 16},
+        run: {start: 18, end: 23},
+        attackRightHand: {start: 27, end: 30},
+        // attackRightHand: {start: 36, end: 39},
+        attackLeftHand: {start: 45, end: 48},
+        jump: {start: 63, end: 70},
+        hurt: {start: 72, end: 73},
+        death: {start: 81, end: 84},
+    }
+}
+
+const vikingSwordData: CharacterSetup = {
+    category: 'vikingSword',
+    leftHandEquippment: "Neuromantic Saber",
+    rightHandEquippment: "Kite Shield",
+    animations: {
+        idle: {start: 0, end: 4},
+        walk: {start: 9, end: 16},
+        run: {start: 18, end: 23},
+        attackRightHand: {start: 45, end: 48},
+        attackLeftHand: {start: 27, end: 30},
+        jump: {start: 63, end: 69},
+        hurt: {start: 72, end: 74},
+        death: {start: 81, end: 84},
+    }
+}
+
+const vikingSpearData: CharacterSetup = {
+    category: 'vikingSpear',
+    leftHandEquippment: "Squire's Lance",
+    rightHandEquippment: "Shining Barrier",
+    animations: {
+        idle: {start: 0, end: 4},
+        walk: {start: 9, end: 16},
+        run: {start: 18, end: 23},
+        attackLeftHand: {start: 36, end: 39},
+        attackRightHand: {start: 54, end: 56},
+        jump: {start: 63, end: 70},
+        hurt: {start: 72, end: 73},
+        death: {start: 81, end: 84},
+    }
+}
+
+const charactersSetup: {[key: string]: CharacterSetup} = {
+    orcBerserc: orcBerserkData,
+    orcShaman: orcShamanData,
+    orcWarrior: orcWarriorData,
+    vikingAxe: vikingAxeData,
+    vikingSword: vikingSwordData,
+    vikingSpear: vikingSpearData,
 }
 
 class App {
@@ -208,13 +309,19 @@ class App {
         const rowsArcadians = 1;
         const colsArcadians = 8;
         const distanceArcadians = 4;
-        const startX = this.fieldFimensions.x/2 - (rowsArcadians/2) * distanceArcadians;
+        const startX = this.fieldFimensions.x/2 - (rowsArcadians/2) * distanceArcadians + 10;
         const startZ = this.fieldFimensions.z/2 - (colsArcadians/2) * distanceArcadians;
-        this.createOrc()
+
+        this.createSpriteCharacter('orcBerserc', this.fieldFimensions.x/2 - 8, this.fieldFimensions.z/2 - 10)
+        this.createSpriteCharacter('orcShaman', this.fieldFimensions.x/2 - 9, this.fieldFimensions.z/2 - 6)
+        this.createSpriteCharacter('orcWarrior', this.fieldFimensions.x/2 - 10, this.fieldFimensions.z/2 - 2)
+        this.createSpriteCharacter('vikingAxe', this.fieldFimensions.x/2 - 11, this.fieldFimensions.z/2 + 2)
+        this.createSpriteCharacter('vikingSword', this.fieldFimensions.x/2 - 12, this.fieldFimensions.z/2 + 6)
+        this.createSpriteCharacter('vikingSpear', this.fieldFimensions.x/2 - 13, this.fieldFimensions.z/2 + 10)
         for (let i = 0; i < rowsArcadians; i++) {
             for (let j = 0; j < colsArcadians; j++) {
                 const counter = 1 + i * rowsArcadians + j;
-                this.loadArcadian(counter, new Vector3(startX + i * distanceArcadians, this.arcadiansSize.height/2+0.1, startZ + j * distanceArcadians));
+                this.loadArcadian(counter, new Vector3(startX + i * distanceArcadians + counter, this.arcadiansSize.height/2+0.1, startZ + j * distanceArcadians));
             }
         }
 
@@ -246,21 +353,17 @@ class App {
                 }
             } else if (ev.keyCode === 88) {
                 if (this.selectedCharacterId) {
-                    this.attackSingleHand(
+                    this.moveAndAttack(
                         this.selectedCharacterId, 
                         this.charactersTracker[this.selectedCharacterId].leftHand
                     );
                 }
             } else if (ev.keyCode === 90) {
                 if (this.selectedCharacterId) {
-                    this.attackSingleHand(
+                    this.moveAndAttack(
                         this.selectedCharacterId, 
                         this.charactersTracker[this.selectedCharacterId].rightHand
                     );
-                }
-            } else if (ev.keyCode === 67) {
-                if (this.selectedCharacterId) {
-                    this.moveToAttackRange(this.selectedCharacterId, true)
                 }
             }
         });
@@ -385,12 +488,12 @@ class App {
         return BABYLON.Tags.GetTags(mesh) || [];
     }
 
-    private getFaction(character: Mesh): string {
+    private getFaction(character: Mesh): "black" | "white" {
         return this.charactersTracker[character.uniqueId]?.faction;
     }
 
-    private getEnemyFaction(faction: string): string {
-        return ["black", "white"].find((v)=>v!=faction)
+    private getEnemyFaction(faction: string): "black" | "white" {
+        return ["black", "white"].find((v)=>v!=faction) as "black" | "white"
     }
 
     private handleHit(attacker: Mesh, weapon: Weapon, allies: Mesh[], enemies: Mesh[]): boolean {
@@ -603,7 +706,7 @@ class App {
             attacked = this.projectileAttack(attacker, handEquippment.weapon, allies, enemies);
         } else {
             if (handEquippment.weapon.range > 0) {
-                enemies = enemies.filter((enemy)=>attacker.position.subtract(enemy.position).length() <= handEquippment.weapon.range)
+                enemies = enemies.filter((enemy)=> attacker.position.subtract(enemy.position).length() <= handEquippment.weapon.range)
                 allies = allies.filter((ally)=>ally.position.subtract(attacker.position).length() <= handEquippment.weapon.range)
             }
             attacked = this.handleHit(attacker, handEquippment.weapon, allies, enemies);
@@ -611,14 +714,9 @@ class App {
 
         // attack animation
         if (attacked) {
-            if (this.charactersTracker[attacker.uniqueId].faction === "white") {
-                let animationName = this.getAttackAnimation(handEquippment.weapon);
-                const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
-                animation.start(false);
-            } else {
-                const animation = handEquippment.slotName == slotsNames.leftHand ? "attackLeftHand" : "attackRightHand"
-                this.animateOrc(attacker.uniqueId, animation, false)
-            }
+            const animation = handEquippment.slotName == slotsNames.leftHand ? "attackLeftHand" : "attackRightHand"
+
+            this.animateCharacter(attacker.uniqueId, animation, false);
 
             const availableAt = Date.now() + handEquippment.weapon.reloadTime * 1000;
             if (handEquippment.slotName === slotsNames.rightHand) {
@@ -650,12 +748,10 @@ class App {
             
             const faction = this.getFaction(target);
             const enemyFaction = this.getEnemyFaction(faction);
-            BABYLON.Tags.RemoveTagsFrom(target, faction);
-            BABYLON.Tags.AddTagsTo(target, enemyFaction);
+            this.charactersTracker[target.uniqueId].faction = enemyFaction;
     
             setTimeout(() => {
-                BABYLON.Tags.RemoveTagsFrom(target, enemyFaction);
-                BABYLON.Tags.AddTagsTo(target, faction);
+                this.charactersTracker[target.uniqueId].faction = faction;
 
                 particleSystemClone.stop();
             }, durationSeconds*1000);
@@ -708,9 +804,9 @@ class App {
                 sprite.width = distance;
                 sprite.position = target.position.add(previousPosition).scaleInPlace(1/2); 
                 sprite.disposeWhenFinishedAnimating = true;
-                if (color) {
-                    sprite.color = color;
-                }
+                // if (color) {
+                    // sprite.color = color;
+                // }
                 sprite.playAnimation(0, 3, false, 50);
             }
             previousPosition = target.position;
@@ -798,21 +894,14 @@ class App {
                 this.charactersTracker[target.uniqueId].rightHand.availableAt += durationSeconds * 1000;
             }
 
-            if (this.charactersTracker[target.uniqueId].faction === "white") {
-                this.stopGroupAnimations(target.uniqueId);
-            } else {
-                this.charactersTracker[target.uniqueId].sprite.stopAnimation()
-            }
+            this.stopAnimations(target.uniqueId);
+            
             setTimeout(() => {
                 this.charactersTracker[target.uniqueId].frozenCounter--;
                 particleSystemClone.stop();
 
                 if (this.charactersTracker[target.uniqueId].isAlive && this.charactersTracker[target.uniqueId].frozenCounter === 0) {
-                    if (this.charactersTracker[target.uniqueId].faction === "white") {
-                        this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.idle).start(true);
-                    } else {
-                        this.animateOrc(target.uniqueId, "idle", true)
-                    }
+                    this.animateCharacter(target.uniqueId, "idle", true)
                 }
             }, durationSeconds * 1000);
 
@@ -831,13 +920,18 @@ class App {
     }
 
     private setupSpriteManagers() {
-        new BABYLON.SpriteManager("explosion", "spritesheets/explosion.png", 15, 192, this._scene);
-        new BABYLON.SpriteManager("swordSlash", "spritesheets/swordSlash.png", 6, 400, this._scene);
-        new BABYLON.SpriteManager("shockBean", "spritesheets/shockBean.png", 4, 64, this._scene);
+        const capacity = 100;
+        new BABYLON.SpriteManager("explosion", "spritesheets/explosion.png", capacity, 192, this._scene);
+        new BABYLON.SpriteManager("swordSlash", "spritesheets/swordSlash.png", capacity, 400, this._scene);
+        new BABYLON.SpriteManager("shockBean", "spritesheets/shockBean.png", capacity, 64, this._scene);
         
-        new BABYLON.SpriteManager("orcBersec", "spritesheets/orcBerserc.png", 90, 96, this._scene);
-        new BABYLON.SpriteManager("orcShaman", "spritesheets/orcShaman.png", 90, 96, this._scene);
-        new BABYLON.SpriteManager("orcWarrior", "spritesheets/orcWarrior.png", 90, 96, this._scene);
+        new BABYLON.SpriteManager("orcBerserc", "spritesheets/orcBerserc.png", capacity, 96, this._scene);
+        new BABYLON.SpriteManager("orcShaman", "spritesheets/orcShaman.png", capacity, 96, this._scene);
+        new BABYLON.SpriteManager("orcWarrior", "spritesheets/orcWarrior.png", capacity, 96, this._scene);
+        
+        new BABYLON.SpriteManager("vikingAxe", "spritesheets/vikingAxe.png", capacity, 96, this._scene);
+        new BABYLON.SpriteManager("vikingSword", "spritesheets/vikingSword.png", capacity, 96, this._scene);
+        new BABYLON.SpriteManager("vikingSpear", "spritesheets/vikingSpear.png", capacity, 96, this._scene);
     }
 
     private getSpriteManager(name: string): BABYLON.ISpriteManager {
@@ -870,20 +964,6 @@ class App {
             sprite.color = color;
         }
         sprite.playAnimation(0, 5, false, 50);
-    }
-
-    private getAttackAnimation(weapon: Weapon): string {
-        switch (weapon.type) {
-            case "spell":
-                return ANIMATION_LIST.attackWizard;
-            case "gun":
-                return ANIMATION_LIST.attackGunner;
-            case "melee":
-                const isRightHandWeapon = weapon.slotName ===slotsNames.rightHand;
-                return isRightHandWeapon ? ANIMATION_LIST.attackKnight : ANIMATION_LIST.attackAssassin;
-            default:
-                return ANIMATION_LIST.attackTech;
-        }
     }
 
     private stopParticlesSystem(mesh: Mesh) {
@@ -988,7 +1068,7 @@ class App {
             "visibility",
             this.FPS,
             BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-            BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+            BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
         );
 
         const totalFrames = this.FPS*duration;
@@ -996,14 +1076,16 @@ class App {
         const maxValue = 0.4
         var keys = [
             { frame: 0, value: minValue },
+            { frame: Math.floor(totalFrames*(1/10)), value: maxValue },
             { frame: Math.floor(totalFrames/2), value: maxValue },
+            { frame: Math.floor(totalFrames*(9/10)), value: maxValue },
             { frame: totalFrames-1, value: minValue }
         ];
         animation.setKeys(keys);
         
-        const easingFunc = new BABYLON.CircleEase();
-        easingFunc.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT)
-        animation.setEasingFunction(easingFunc);
+        // const easingFunc = new BABYLON.CircleEase();
+        // easingFunc.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT)
+        // animation.setEasingFunction(easingFunc);
 
         let shieldCounter = 0;
         for (const target of targets) {
@@ -1030,7 +1112,6 @@ class App {
         this.charactersTracker[target.uniqueId].shieldCounter--;
         const shieldArray = target.getChildMeshes(true, (node)=>node.name === "shield");
         shieldArray[0].dispose();
-        return true;
         return true;
     }
 
@@ -1065,9 +1146,7 @@ class App {
             particleSystem.start();
     
             setTimeout(() => {
-                const meta: CharacterData = JSON.parse(target.metadata)
-                meta.magicResist -= deltaMR;
-                meta.magicResist = Math.max(meta.magicResist-deltaMR, 0);
+                this.charactersTracker[target.uniqueId].magicResist = Math.max(this.charactersTracker[target.uniqueId].magicResist - deltaMR, 0);
                 particleSystem.stop();
             }, duration * 1000);
 
@@ -1131,29 +1210,21 @@ class App {
         deltaHp = updatedHp - currentHp;
         this.charactersTracker[target.uniqueId].currentHp = updatedHp;
         if (updatedHp === 0) {
-            if (character.faction === "white") {
-                this.stopGroupAnimations(target.uniqueId);
-                const animation = this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.death);
-                animation.start(false);
-            } else if (character.faction === "black") {
-                this.animateOrc(target.uniqueId, "death", false);
-            }
+            this.animateCharacter(target.uniqueId, "death", false, true)
+
             target.physicsImpostor.dispose();
             target.isPickable = false;
             hpBar?.dispose();
             hpBarMax?.dispose();
+            this.charactersTracker[target.uniqueId].isAlive = false;
             
             BABYLON.Tags.AddTagsTo(target, "dead");
             BABYLON.Tags.RemoveTagsFrom(target, "arcadian");
 
             new BABYLON.Sound("hit", "sounds/die.mp3", this._scene, null, {autoplay: true, volume: this.getVolume(target.position), maxDistance: this.MAX_SOUND_DISTANCE})
         } else if (deltaHp < 0 && animateHit) {
-            if (character.faction === "white") {
-                const animation = this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.hit);
-                animation.start(false);
-            } else if (character.faction === "black") {
-                this.animateOrc(target.uniqueId, "hurt", false);
-            }
+
+            this.animateCharacter(target.uniqueId, "hurt", false)
 
             const hitSounds = ["hit1.mp3", "hit5.mp3"];
             const randomHitSound = hitSounds[Math.floor(Math.random()*(hitSounds.length-1))]
@@ -1193,13 +1264,14 @@ class App {
         return 1 - this._scene.cameras[0].position.subtract(sourcePosition).length()/this.MAX_SOUND_DISTANCE
     }
 
-    private createOrc() {
-        const spriteManager = this.getSpriteManager("orcBersec")
+    private createSpriteCharacter(orcName: 'orcBerserc' | 'orcShaman' | 'orcWarrior' | 'vikingAxe' | 'vikingSword' | 'vikingSpear', positionX: number, positionZ: number) {
+        const orcData = charactersSetup[orcName];
+        const spriteManager = this.getSpriteManager(orcName)
             
-        const sprite = new BABYLON.Sprite("sprite", spriteManager);
+        const sprite = new BABYLON.Sprite(orcName, spriteManager);
 
         const size = 4;
-        const position = new Vector3(this.fieldFimensions.x/2 - 20, size*(1/2) + 0.1, this.fieldFimensions.z/2);
+        const position = new Vector3(positionX, size*(1/2) + 0.1, positionZ);
         sprite.size = size;
         sprite.position = position.clone()
         sprite.invertU = true;
@@ -1225,6 +1297,7 @@ class App {
         const characterData: CharacterData = {
             uniqueId: body.uniqueId,
             faction: "black",
+            subFaction: orcName,
             magicResist: 5,
             armor: 5,
             movementSpeed: 4,
@@ -1235,45 +1308,92 @@ class App {
             shieldCounter: 0,
             sprite: sprite,
             rightHand: {
-                weapon: this.getWeapon("Valorous Blade"),
+                weapon: this.getWeapon(orcData.rightHandEquippment),
                 availableAt: 0, 
                 slotName: slotsNames.rightHand,
             },
             leftHand: {
-                weapon: this.getWeapon("Valorous Blade"),
+                weapon: this.getWeapon(orcData.leftHandEquippment),
                 availableAt: 0, 
                 slotName: slotsNames.leftHand,
             }
         }
         this.charactersTracker[body.uniqueId] = characterData;
-        this.animateOrc(body.uniqueId, 'idle', true)
-
-        // setTimeout(() => {
-        //     this.moveToAttackRange(body.uniqueId, true)
-        // }, 2000);
+        this.animateSpriteCharacter(body.uniqueId, 'idle', true);
     }
 
-    private animateOrc(
-        uniqueId: number, 
-        animation: 'idle' | 'walk' | 'run' | 'attackSpecial' | 'attackLeftHand' | 'attackRightHand' | 'attackStabbed' |'jump' | 'hurt' | 'death', 
+    private animateCharacter(
+        characterId: number,
+        animation: 'idle' | 'walk' | 'attackLeftHand' | 'attackRightHand' | 'hurt' | 'death', 
+        loop: boolean,
+        stopGroupAnimations: boolean = false
+    ) {
+        if (this.charactersTracker[characterId].subFaction === "arcadian") {
+            if (stopGroupAnimations) {
+                this.stopGroupAnimations(characterId);
+            }
+            this.animateArcadian(characterId, animation, loop);
+        } else {
+            this.animateSpriteCharacter(characterId, animation, loop);
+        }
+    }
+
+    private animateArcadian(
+        uniqueId: number,
+        animation: 'idle' | 'walk' | 'attackLeftHand' | 'attackRightHand' | 'hurt' | 'death', 
+        loop: boolean
+    ) {
+        let animationName: string;
+        const isAttackAnimation = ['attackLeftHand', 'attackRightHand'].includes(animation);
+        if (isAttackAnimation) {
+            const character = this.charactersTracker[uniqueId];
+            const weapon = animation === 'attackRightHand' ? character.rightHand.weapon : character.leftHand.weapon;
+            switch (weapon.type) {
+                case "spell":
+                    animationName = ANIMATION_LIST.attackWizard;
+                    break;
+                case "gun":
+                    animationName = ANIMATION_LIST.attackGunner;
+                    break;
+                case "melee":
+                    const isRightHandWeapon = weapon.slotName ===slotsNames.rightHand;
+                    animationName = isRightHandWeapon ? ANIMATION_LIST.attackKnight : ANIMATION_LIST.attackAssassin;
+                    break;
+                default:
+                    animationName = ANIMATION_LIST.attackTech;
+                    break;
+            }
+            
+        } else {
+            animationName = ANIMATION_LIST[animation]
+        }
+        const groupAnimation = this.getGroupAnimation(uniqueId, animationName);
+        groupAnimation.start(loop);
+    }
+
+    private animateSpriteCharacter(
+        uniqueId: number,
+        animation: 'idle' | 'walk' | 'run' | 'attackLeftHand' | 'attackRightHand' |'jump' | 'hurt' | 'death', 
         loop: boolean
     ) {
         const onAnimationEnd = ()=>{
             if (!loop && animation != 'death') {
-                this.animateOrc(uniqueId, 'idle', true)
+                this.animateSpriteCharacter(uniqueId, 'idle', true)
             }
         }
+
+        let animationMap = charactersSetup[this.charactersTracker[uniqueId].subFaction].animations;
+        
         this.charactersTracker[uniqueId].sprite.playAnimation(
-            orcAnimationMap[animation].start, 
-            orcAnimationMap[animation].end, 
-            loop, 
+            animationMap[animation].start,
+            animationMap[animation].end,
+            loop,
             100,
             onAnimationEnd
         );
     }
 
     private async loadArcadian(arcadianId: number, position: Vector3 = Vector3.Zero()) {
-        
         const metadataUrl = "https://arcadians.prod.outplay.games/v2/arcadians/" + arcadianId;
         const metadata = await fetch(metadataUrl).then((result)=>result.json())
         const attributes: MetadataSlot[] = metadata.attributes;
@@ -1287,6 +1407,7 @@ class App {
         const characterData: CharacterData = {
             uniqueId: root.uniqueId,
             faction: "white",
+            subFaction: "arcadian",
             magicResist: 5,
             armor: 5,
             movementSpeed: 4,
@@ -1369,7 +1490,7 @@ class App {
                     characterData.currentHp += maxHp;
                 }
             } else {
-                material.metadata = att.value || "";
+                // material.metadata = att.value || "";
             }
         }
         // Set hp bars
@@ -1387,11 +1508,6 @@ class App {
 
         const animation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.idle);
         animation.start(true);
-
-
-        // setTimeout(() => {
-        //     this.moveToAttackRange(root.uniqueId, true)
-        // }, 5000);
     }
 
     private getRarityMultiplier(rarity: ItemRarity["rarity"]) {
@@ -1402,7 +1518,9 @@ class App {
 
     private faceDirection(character: Mesh, pointToLook: Vector3) {
         const horizontalDirection = Math.sign(pointToLook.x - character.position.x) // -1 | 1
-        if (this.charactersTracker[character.uniqueId].faction === "white") {
+        if (horizontalDirection == 0) return;
+
+        if (this.charactersTracker[character.uniqueId].subFaction === "arcadian") {
             const characterMesh = character.getChildMeshes(true, (node)=>node.name ==="body")[0]
             if (characterMesh.scaling.x === horizontalDirection) {
                 characterMesh.scaling.x = -horizontalDirection;
@@ -1412,7 +1530,10 @@ class App {
         }
     }
 
-    private moveToAttackRange(characterId: number, attack: boolean) {
+    private moveAndAttack(characterId: number, handEquippment: HandEquippment) {
+        if (!handEquippment || !handEquippment.weapon) {
+            return;
+        } 
         const attacker = this._scene.getMeshByUniqueId(characterId) as Mesh;
         const enemies = this.getEnemies(attacker);
         const nearestEnemy = this.getNearestVisibleTarget(
@@ -1426,26 +1547,24 @@ class App {
 
         const delta = nearestEnemy.position.subtract(attacker.position);
         const distance = delta.length();
-        const characterData = this.charactersTracker[characterId];
-        const maxRange =  Math.max(characterData.rightHand?.weapon?.range || 0, characterData.leftHand?.weapon?.range || 0);
-        if (maxRange === 0) {
+        const range = handEquippment.weapon.range;
+        if (range === 0) {
             return;
         }
 
         let destination: Vector3;
-        if (maxRange && distance > maxRange) {
-            delta.normalize().scaleInPlace(distance - maxRange);
+        if (range && distance > range) {
+            delta.normalize().scaleInPlace((distance+1) - range);
             destination = attacker.position.add(delta);
         } else {
             destination = attacker.position.clone();
         }
 
         let onArrival: ()=>void;
-        if (attack) {
-            onArrival = ()=>{
-                this.attackBothHands(attacker.uniqueId)
-            }
+        onArrival = ()=>{
+            this.attackSingleHand(attacker.uniqueId, handEquippment)
         }
+        this.faceDirection(attacker, nearestEnemy.position);
         this.moveCharacter(attacker.uniqueId, destination, onArrival)
     }
 
@@ -1481,22 +1600,11 @@ class App {
 
         this._scene.stopAnimation(character, animationName);
 
-        if (this.charactersTracker[character.uniqueId].faction === "white") {
-            const groupAnimation = this.getGroupAnimation(characterId, ANIMATION_LIST.walk);
-            groupAnimation.start(true);
-        } else {
-            this.animateOrc(character.uniqueId, "walk", true);
-        }
+        this.animateCharacter(characterId, 'walk', true)
 
         this._scene.beginDirectAnimation(character, [animation], 0, totalFrames, false, 1, () => {
 
-            if (this.charactersTracker[character.uniqueId].faction === "white") {
-                this.stopGroupAnimations(characterId);
-                const animation = this.getGroupAnimation(characterId, ANIMATION_LIST.idle);
-                animation.start(true);
-            } else {
-                this.animateOrc(character.uniqueId, "idle", true);
-            }
+            this.animateCharacter(characterId, 'idle', true, true);
             onArrival();
         })
     }
@@ -1540,6 +1648,15 @@ class App {
     private getRootMesh(nodeUniqueId: number): Mesh {
         return this._scene.rootNodes.find((v)=>v.uniqueId ===nodeUniqueId) as Mesh;
     }
+
+    private stopAnimations(characterId: number) {
+        if (this.charactersTracker[characterId].subFaction === "arcadian") {
+            this.stopGroupAnimations(characterId);
+        } else {
+            this.charactersTracker[characterId].sprite.stopAnimation()
+        }
+    }
+
     private stopGroupAnimations(uniqueId: number) {
         const activeAnimations = this._scene.animationGroups.filter((v)=>v.isPlaying && v.name.split(this.SEPARATOR)[0] ===uniqueId.toString());
         activeAnimations.forEach((v)=>v.stop())

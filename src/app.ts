@@ -231,8 +231,7 @@ class App {
                     this.selectedCharacterId = 0;
                     this._selectedMark.setEnabled(false);
                 } else {
-                    const tags = this.getTags(pickInfo.pickedMesh as Mesh);
-                    if (tags.includes("arcadian")) {
+                    if (this.charactersTracker[pickInfo.pickedMesh.uniqueId]) {
                         this.selectedCharacterId = pickInfo.pickedMesh.uniqueId;
                         this.startSelectedMarkAnim(this.selectedCharacterId);
                     }
@@ -1214,6 +1213,7 @@ class App {
         body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 50, restitution: 0.3, friction: 0.3}, this._scene);
         body.physicsImpostor.physicsBody.angularDamping = 1;
         body.checkCollisions = true;
+        body.isPickable = true;
         const deltaPosition = body.position.subtract(sprite.position);
         this._scene.registerBeforeRender(()=>{
             sprite.position = body.position.subtract(deltaPosition)

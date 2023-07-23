@@ -31,39 +31,61 @@ interface SlotMap {
     layer: ItemMap[]
 }
 
+interface ItemRarity {
+    name: string;
+    rarity: 'Common' | 'Uncommon' | 'Rare' | 'Legendary' | 'Epic';
+}
 interface Weapon {
     id: number;
     image: string;
     name: string;
-    rarity: 'common' | 'uncommon' | 'rare' | 'legenday' | 'epic';
+    rarity: 'common' | 'uncommon' | 'rare' | 'legendary' | 'epic';
     physicalDamage: number;
     magicDamage: number;
     range: number;
     weight: number,
     reloadTime: number;
     type: 'spell' | 'melee' | 'gun';
+    hasProjectile: boolean;
     projectileSpeed: number;
     projectileWeight: number;
-    projectileColor: string;
-    accuracyRadius: number;
     radiusArea: number;
+    maxTargetsOffense: number;
+    maxTargetsDefense: number;
     frostDuration: number;
     burnDuration: number;
     burnTotalDamage: number;
-    shockRadiusArea: number;
     shockDamage: number;
-    shockTargets: number;
     lifesteal: number;
-    specialSpellType: 'heal' | 'convert' | 'increaseArmor' | 'increaseMagicResist' | 'shield';
-    spellAmount: number;
-    spellRange: number;
-    spellMaxTargets: number;
+    healAmount: number;
+    conversionSeconds: number;
+    deltaArmor: number;
+    deltaMagicResist: number;
+    shieldSeconds: number;
+    projectileColor: string;
     slotName?: string;
 };
 
-interface CharacterMetadata {
+interface HandEquippment {
+    weapon: Weapon;
+    availableAt: number; // Epoch seconds at which the weapon can shoot again
+    slotName: string;
+}
+
+interface CharacterData {
+    faction: 'white' | 'black';
+    uniqueId: number;
     armor: number; // percentage or physical damage ignored
     magicResist: number; // percentage of magic damage ignored
+    movementSpeed: number;
+    maxHp: number;
+    isAlive: boolean;
+    frozenCounter: number;
+    shieldCounter: number;
+    currentHp: number;
+    rightHand?: HandEquippment; 
+    leftHand?: HandEquippment;
+    sprite?: BABYLON.Sprite;
 }
 
 const slotsNames = {
@@ -104,6 +126,24 @@ const ANIMATION_LIST = {
     attackWizard: "m.atkWiz",
 }
 
+
+interface animationMap {
+    start: number;
+    end: number;
+}
+const orcAnimationMap: {[key: string]: animationMap} = {
+    idle: {start: 0, end: 4},
+    walk: {start: 9, end: 15},
+    run: {start: 18, end: 23},
+    attackSpecial: {start: 27, end: 31},
+    attackLeftHand: {start: 36, end: 39},
+    attackRightHand: {start: 45, end: 49},
+    attackStabbed: {start: 54, end: 55},
+    jump: {start: 63, end: 67},
+    hurt: {start: 72, end: 73},
+    death: {start: 81, end: 84},
+}
+
 class App {
     // General Entire Application
     private _scene: Scene;
@@ -117,6 +157,7 @@ class App {
 
     private _stack: SlotMap[];
     private weaponsList: Weapon[];
+    private itemsRarity: ItemRarity[];
 
     private _projetile: Mesh;
     private _projetileSword: Mesh;
@@ -131,6 +172,7 @@ class App {
         height: 2.7
     }
     private defaultProjectileColor = new BABYLON.Color4(1, 0.2, 0, 0.8);
+    private charactersTracker: {[key: number]: CharacterData} = {};
 
     constructor() {
         this._canvas = this._createCanvas()
@@ -163,15 +205,16 @@ class App {
         this.setupProjectile();
         this.setupSpriteManagers();
 
-        const rowsArcadians = 5;
-        const colsArcadians = 2;
-        const distanceArcadians = 10;
+        const rowsArcadians = 1;
+        const colsArcadians = 8;
+        const distanceArcadians = 4;
         const startX = this.fieldFimensions.x/2 - (rowsArcadians/2) * distanceArcadians;
         const startZ = this.fieldFimensions.z/2 - (colsArcadians/2) * distanceArcadians;
+        this.createOrc()
         for (let i = 0; i < rowsArcadians; i++) {
             for (let j = 0; j < colsArcadians; j++) {
                 const counter = 1 + i * rowsArcadians + j;
-                this.loadArcadian(counter, new Vector3(startX + i * distanceArcadians, 5, startZ + j * distanceArcadians));
+                this.loadArcadian(counter, new Vector3(startX + i * distanceArcadians, this.arcadiansSize.height/2+0.1, startZ + j * distanceArcadians));
             }
         }
 
@@ -182,13 +225,13 @@ class App {
 
         // Handle pointer clicks
         this._scene.onPointerDown = (event: BABYLON.IPointerEvent, pickInfo: BABYLON.PickingInfo) => {
-            if (event.button == 0 && pickInfo.hit) {
-                if (this.selectedCharacterId && pickInfo.hit && pickInfo.pickedMesh.metadata == "ground") {
+            if (event.button ===0 && pickInfo.hit) {
+                if (this.selectedCharacterId && pickInfo.hit && pickInfo.pickedMesh.metadata === "ground") {
                     this.moveCharacter(this.selectedCharacterId, pickInfo.pickedPoint);
                     this.selectedCharacterId = 0;
                     this._selectedMark.setEnabled(false);
                 } else {
-                    const tags = BABYLON.Tags.GetTags(pickInfo.pickedMesh) || [];
+                    const tags = this.getTags(pickInfo.pickedMesh as Mesh);
                     if (tags.includes("arcadian")) {
                         this.selectedCharacterId = pickInfo.pickedMesh.uniqueId;
                         this.startSelectedMarkAnim(this.selectedCharacterId);
@@ -200,17 +243,37 @@ class App {
         window.addEventListener("keydown", (ev) => {
             if (ev.keyCode === 32) {
                 if (this.selectedCharacterId) {
-                    this.useWeapon(this.selectedCharacterId);
+                    this.attackBothHands(this.selectedCharacterId);
+                }
+            } else if (ev.keyCode === 88) {
+                if (this.selectedCharacterId) {
+                    this.attackSingleHand(
+                        this.selectedCharacterId, 
+                        this.charactersTracker[this.selectedCharacterId].leftHand
+                    );
+                }
+            } else if (ev.keyCode === 90) {
+                if (this.selectedCharacterId) {
+                    this.attackSingleHand(
+                        this.selectedCharacterId, 
+                        this.charactersTracker[this.selectedCharacterId].rightHand
+                    );
+                }
+            } else if (ev.keyCode === 67) {
+                if (this.selectedCharacterId) {
+                    this.moveToAttackRange(this.selectedCharacterId, true)
                 }
             }
         });
     }
 
+    // TODO texture decals, when hitting bullets
+
     private startSelectedMarkAnim(parentUniqueId: number) {
         const parentMesh = this.getRootMesh(parentUniqueId)
         this._selectedMark.setEnabled(true);
         this._selectedMark.parent = parentMesh;
-        this._selectedMark.position.y = parentMesh.getBoundingInfo().maximum.y + 1;
+        this._selectedMark.position.y = parentMesh.getBoundingInfo().maximum.y + 1.3;
         this._scene.beginAnimation(this._selectedMark, 0, this.FPS * 2, true);
     }
 
@@ -263,9 +326,9 @@ class App {
     }
 
     private getPojectileColor(weapon: Weapon): BABYLON.Color4 {
-        if (weapon.projectileColor != undefined) {
+        if (weapon.projectileColor !== undefined) {
             let projectileColor = weapon.projectileColor.split(',').map((v)=>Number(v));
-            return new BABYLON.Color4(projectileColor[0], projectileColor[1], projectileColor[2], projectileColor[3])
+            return new BABYLON.Color4(projectileColor[0]/256, projectileColor[1]/256, projectileColor[2]/256, projectileColor[3]/256)
         }
     }
 
@@ -289,7 +352,7 @@ class App {
     private setupProjectile() {
         const material = new BABYLON.StandardMaterial("gunProjectile", this._scene);
         material.ambientTexture = this.getTexture("combat/cloud.jpg");
-        material.roughness = 1;
+        material.roughness = 10;
         let projetile = BABYLON.MeshBuilder.CreateSphere("projectile", {diameter: 0.3}, this._scene);
         projetile.material = material;
         projetile.isPickable = false;
@@ -324,94 +387,109 @@ class App {
     }
 
     private getFaction(character: Mesh): string {
-        const tags = this.getTags(character);
-        const factions = ["black", "white"];
-        for (const faction of factions) {
-            if (tags.includes(faction)) {
-                return faction
-            }
-        }
+        return this.charactersTracker[character.uniqueId]?.faction;
     }
 
     private getEnemyFaction(faction: string): string {
         return ["black", "white"].find((v)=>v!=faction)
     }
 
-    private castSpell(attacker: Mesh, weapon: Weapon): boolean {
-        let targets: Mesh[] = this.getSpellTargets(attacker, weapon);
+    private handleHit(attacker: Mesh, weapon: Weapon, allies: Mesh[], enemies: Mesh[]): boolean {
+        let effectiveDamageTotal = 0;
+        let actionsPerformed = 0;
 
-        if (targets.length == 0) {
-            return false;
+        // Filter shielded enemies and trigger shields
+        let enemiesCapped = enemies = enemies.slice(0, weapon.maxTargetsOffense)
+        enemiesCapped = enemiesCapped.filter((enemy)=>{
+            if (this.triggerShield(enemy)) {
+                actionsPerformed++;
+                return false;
+            }
+            return true;
+        })
+        const alliesCapped = allies.slice(0, weapon.maxTargetsDefense);
+
+        if (weapon.deltaArmor !== 0) {
+            const targets = weapon.deltaArmor > 0 ? alliesCapped : enemiesCapped;
+            actionsPerformed += this.updateArmor(targets, weapon.deltaArmor, weapon.reloadTime, attacker.position)
+        }
+
+        if (weapon.deltaMagicResist > 0) {
+            const targets = weapon.deltaMagicResist > 0 ? alliesCapped : enemiesCapped;
+            actionsPerformed += this.updateMagicResist(targets, weapon.deltaMagicResist, weapon.reloadTime, attacker.position)
+        }
+
+        // Trigger direct damage and filter dead enemies
+        if (weapon.magicDamage > 0 || weapon.physicalDamage > 0) {
+            enemiesCapped = enemiesCapped.filter((enemy)=>{
+                const effectiveDamage = this.getEffectiveDamage(weapon.magicDamage, weapon.physicalDamage, enemy.uniqueId);
+                effectiveDamageTotal += effectiveDamage;
+                const updatedHp = this.updateHp(enemy, -effectiveDamage);
+                actionsPerformed++;
+                return updatedHp > 0;
+            })
         }
 
         if (weapon.frostDuration > 0) {
-            this.applyFrostEffect(targets, weapon.frostDuration, attacker.position);
+            actionsPerformed += this.applyFrost(enemiesCapped, weapon.frostDuration, attacker.position);
+        }
+
+        if (weapon.shockDamage > 0) {
+            let color: BABYLON.Color4 = this.getPojectileColor(weapon);
+            actionsPerformed += this.applyShock(enemiesCapped, weapon.shockDamage, attacker.position, color, !weapon.hasProjectile);
+        }
+
+        // Apply weapon effects
+        if (weapon.healAmount > 0) {
+            if (this.applyHeal(allies, weapon.healAmount, attacker.position, weapon.maxTargetsDefense)) {
+                actionsPerformed++;
+            }
         }
 
         if (weapon.burnTotalDamage > 0) {
-            this.applyBurnEffect(targets, weapon.burnDuration, weapon.burnTotalDamage, attacker.position)
+            effectiveDamageTotal += this.applyBurn(enemiesCapped, weapon.burnDuration, weapon.burnTotalDamage, attacker.position)
+            actionsPerformed += enemiesCapped.length;
         }
 
-        if (weapon.specialSpellType == "heal") {
-            this.applyHealEffect(targets, weapon.spellAmount, attacker.position)
+        if (weapon.shieldSeconds > 0) {
+            actionsPerformed += this.createShield(alliesCapped, weapon.shieldSeconds, attacker.position)
         }
 
-        if (weapon.specialSpellType == "increaseArmor") {
-            this.updateArmor(targets, weapon.spellAmount, attacker.position)
+        if (weapon.conversionSeconds > 0) {
+            actionsPerformed += this.convertTarget(enemiesCapped, weapon.conversionSeconds, attacker.position);
         }
 
-        if (weapon.specialSpellType == "shield") {
-            this.createShield(targets, weapon.spellAmount, attacker.position)
+        if (weapon.lifesteal > 0) {
+            const lifestealAmount = effectiveDamageTotal*(weapon.lifesteal/100);
+            this.applyHeal([attacker], lifestealAmount);
         }
-
-        if (weapon.specialSpellType == "increaseMagicResist") {
-            this.updateMagicResist(targets, weapon.spellAmount, attacker.position)
-        }
-
-        if (weapon.specialSpellType == "convert") {
-            this.convertTarget(targets, weapon.spellAmount, attacker.position);
-        }
-
-        let animationName = this.getAttackAnimation(weapon);
-        const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
-        animation.start(false);
-        return true;
+        return actionsPerformed !== 0;
     }
 
-    // x lifesteal
-    // x add animations for sword slash & explosion
-    // chain lightening
-    // x shield: block next attack
-    // x fix hp bar also inverting on direction change
-    // x allow projectiles color customization 
-    // x fix projectile direction
-
-    private shootWeapon(attacker: Mesh, weapon: Weapon): boolean {
-        const target = this.getNearestVisibleTarget(attacker);
-        const horizontalDirection = Math.sign(target.position.x - attacker.position.x)
+    private projectileAttack(attacker: Mesh, weapon: Weapon, allies: Mesh[], enemies: Mesh[]): boolean {
+        const target = this.getNearestVisibleTarget(attacker, enemies);
+        if (!target) {
+            return false;
+        }
+        const horizontalDirection = Math.sign(target.position.x - attacker.position.x) || 1
         const projectileStartPosition = attacker.position.add(
             new Vector3(horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
         );
-        this.faceDirection(attacker, target.position);
         const attackDirection = target.position.subtract(projectileStartPosition).scale(1.15); // TODO: factor to compensate unkown bias
-        const distance = attackDirection.length();
-        if (weapon.range < distance) {
+        const distance = target.position.subtract(projectileStartPosition).length();
+        if (weapon.range <= distance) {
             return false;
         }
-        
-        // attack animation
-        let animationName = this.getAttackAnimation(weapon);
-        const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
-        animation.start(false);
+        this.faceDirection(attacker, target.position);
 
         // Create projectile
         let projectile: Mesh;
         let delayProjectile: number;
-        if (weapon.type == 'gun') {
+        if (weapon.type ==='gun') {
             projectile = this.getGunProjectile(weapon);
             projectile.position = projectileStartPosition.add(new Vector3(0, 1, 0));
             delayProjectile = 300;
-        } else if (weapon.type == "melee") {
+        } else if (weapon.type ==="melee") {
             projectile = this._projetileSword.clone("projectileSwordClone");
             projectile.position = projectileStartPosition.clone();
             delayProjectile = 150;
@@ -434,78 +512,45 @@ class App {
                 return;
             }
             
+            if (weapon.radiusArea > 0) {
+                enemies = enemies.filter((enemy)=>projectile.position.subtract(enemy.position).length() <= weapon.radiusArea)
+                allies = allies.filter((ally)=>ally.position.subtract(attacker.position).length() <= weapon.radiusArea)
+            } else {
+                enemies = [collidedMesh]
+                allies = [attacker]
+            }
+            
+            if (weapon.type ==="gun" && weapon.radiusArea > 0 && (weapon.physicalDamage > 0 || weapon.magicDamage > 0)) {
+                const projectileColor = this.getPojectileColor(weapon);
+                this.animateExplosion(projectile.position, weapon.radiusArea, projectileColor);
+            }
+
+            this.handleHit(attacker, weapon, allies, enemies);
+
             this.stopParticlesSystem(projectile);
             projectile.dispose();
-
-            const hitMeshes: Mesh[] = [];
-            if (weapon.radiusArea > 0) {
-                for (let i = 0; i < enemies.length; i++) {
-                    const distance = projectile.position.subtract(enemies[i].position).length();
-                    if (distance < weapon.radiusArea) {
-                        hitMeshes.push(enemies[i])
-                    }
-                }
-                if (weapon.type == "gun" && (weapon.physicalDamage > 0 || weapon.magicDamage > 0)) {
-                    this.animateExplosion(projectile.position, weapon.radiusArea);
-                }
-            } else {
-                hitMeshes.push(collidedMesh)
-            }
-            // Filter so only in the alive characters are applied effects like frost, fire, etc.
-            const meshesToApplyEffects: Mesh[] = [];
-            let damageInflictedTotal = 0;
-            for (const hitMesh of hitMeshes) {
-                collidedUniqueIds.push(hitMesh.uniqueId);
-                if (this.getTags(hitMesh).includes("shield")) {
-                    this.disableShield(target);
-                    continue;
-                }
-                const effectiveDamage = this.getEffectiveDamage(weapon.magicDamage, weapon.physicalDamage, hitMesh);
-                damageInflictedTotal += effectiveDamage;
-                const updatedHp = this.updateHp(hitMesh, -effectiveDamage);
-                if (updatedHp > 0) {
-                    meshesToApplyEffects.push(hitMesh);
-                }
-            }
-            if (meshesToApplyEffects.length == 0) {
-                return
-            }
-            if (weapon.frostDuration > 0) {
-                this.applyFrostEffect(meshesToApplyEffects, weapon.frostDuration, attacker.position);
-            }
-            if (weapon.burnTotalDamage > 0) {
-                damageInflictedTotal += this.applyBurnEffect(meshesToApplyEffects, weapon.burnDuration, weapon.burnTotalDamage, attacker.position)
-            }
-            if (weapon.shockDamage > 0) {
-                damageInflictedTotal += this.applyShockEffect(meshesToApplyEffects, weapon.shockTargets, weapon.shockDamage, attacker.position, undefined, true)
-            }
-            if (weapon.lifesteal > 0) {
-                const lifestealAmount = damageInflictedTotal*(weapon.lifesteal/100);
-                this.applyHealEffect([attacker], lifestealAmount);
-            }
         };
 
-        const enemies = this.getEnemies(attacker);
         const physicsImpostors = enemies.map((v: Mesh)=>v.physicsImpostor);
         projectile.physicsImpostor.registerOnPhysicsCollide(physicsImpostors, onHit);
 
         setTimeout(() => {
             projectile.setEnabled(true);
 
-            if (weapon.type == 'gun') {
+            if (weapon.type ==='gun') {
                 let time = distance / weapon.projectileSpeed;
                 const forceX = attackDirection.x / time;
                 const forceY = target.position.y + attackDirection.y / time - this.GRAVITY * time * (1/2);
                 const forceZ = attackDirection.z / time;
                 const impulse = new Vector3(forceX, forceY, forceZ).scale(weapon.projectileWeight);
 
-                projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
-                projectile.physicsImpostor.setAngularVelocity(Vector3.One().scale(2))
+                projectile.physicsImpostor?.applyImpulse(impulse, projectile.getAbsolutePosition());
+                projectile.physicsImpostor?.setAngularVelocity(Vector3.One().scale(2))
 
                 
                 new BABYLON.Sound("fireGrenade", "sounds/Fire Grenade.wav", this._scene, null, {autoplay: true, volume: this.getVolume(projectile.position), maxDistance: this.MAX_SOUND_DISTANCE})
 
-            } else if (weapon.type == "melee") {
+            } else if (weapon.type ==="melee") {
                 const direction = BABYLON.Vector3.Normalize(attackDirection);
                 const impulse = direction.scale(weapon.projectileWeight).scale(weapon.projectileSpeed);
                 projectile.physicsImpostor.applyImpulse(impulse, projectile.getAbsolutePosition());
@@ -524,34 +569,70 @@ class App {
         return true;
     }
 
-    private useWeapon(attackerUniqueId: number) {
+    private attackBothHands(attackerUniqueId: number) {
+        let attacked = this.attackSingleHand(attackerUniqueId, this.charactersTracker[attackerUniqueId].rightHand);
 
-        const attacker = this.getRootMesh(attackerUniqueId);
-        const tags = BABYLON.Tags.GetTags(attacker) || [];
-        if (tags.includes("attacking") || tags.includes("frost")) {
-            return;
-        }
-
-        const weapons: Weapon[] = this.getEquippedWeapons(attackerUniqueId);
-        for (let i = 0; i < weapons.length; i++) {
-            const weapon = weapons[i];
-            let attacked = false;
-            if (weapon.type == "spell") {
-                attacked = this.castSpell(attacker, weapon);
-            } else if (weapon.type == 'gun' || weapon.type == "melee") {
-                attacked = this.shootWeapon(attacker, weapon);
-            }
-            if (!attacked) {
-                continue;
-            }
-            BABYLON.Tags.AddTagsTo(attacker, "attacking")
-            setTimeout(() => {
-                BABYLON.Tags.RemoveTagsFrom(attacker, "attacking")
-            }, weapon.reloadTime * 1000);
-        }
+        setTimeout(() => {
+            attacked = this.attackSingleHand(attackerUniqueId, this.charactersTracker[attackerUniqueId].leftHand);
+        }, attacked ? 700 : 0); // wait second projectile To avoid 2 projectiles collision
     }
 
-    private convertTarget(targets: Mesh[], durationSeconds: number, soundOrigin: Vector3) {
+    private attackSingleHand(attackerUniqueId: number, handEquippment: HandEquippment): boolean {
+        const attacker = this.getRootMesh(attackerUniqueId);
+        if (
+            !this.charactersTracker[attackerUniqueId].isAlive || 
+            this.charactersTracker[attackerUniqueId].frozenCounter > 0
+        ) {
+            return false;
+        }
+
+        let allies = this.getAllies(attacker);
+        let enemies = this.getEnemies(attacker);
+        if (allies.length === 0 || enemies.length === 0) {
+            return false;
+        }
+
+        if (!handEquippment?.weapon) {
+            return false;
+        }
+        if (handEquippment.availableAt > Date.now()) {
+            return false;
+        }
+
+        let attacked = false;
+        if (handEquippment.weapon.hasProjectile || handEquippment.weapon.type == "melee") {
+            attacked = this.projectileAttack(attacker, handEquippment.weapon, allies, enemies);
+        } else {
+            if (handEquippment.weapon.range > 0) {
+                enemies = enemies.filter((enemy)=>attacker.position.subtract(enemy.position).length() <= handEquippment.weapon.range)
+                allies = allies.filter((ally)=>ally.position.subtract(attacker.position).length() <= handEquippment.weapon.range)
+            }
+            attacked = this.handleHit(attacker, handEquippment.weapon, allies, enemies);
+        }
+
+        // attack animation
+        if (attacked) {
+            if (this.charactersTracker[attacker.uniqueId].faction === "white") {
+                let animationName = this.getAttackAnimation(handEquippment.weapon);
+                const animation = this.getGroupAnimation(attacker.uniqueId, animationName);
+                animation.start(false);
+            } else {
+                const animation = handEquippment.slotName == slotsNames.leftHand ? "attackLeftHand" : "attackRightHand"
+                this.animateOrc(attacker.uniqueId, animation, false)
+            }
+
+            const availableAt = Date.now() + handEquippment.weapon.reloadTime * 1000;
+            if (handEquippment.slotName === slotsNames.rightHand) {
+                this.charactersTracker[attacker.uniqueId].rightHand.availableAt = availableAt;
+            } else if (handEquippment.slotName === slotsNames.leftHand) {
+                this.charactersTracker[attacker.uniqueId].leftHand.availableAt = availableAt;
+            }
+        }
+        
+        return attacked;
+    }
+
+    private convertTarget(targets: Mesh[], durationSeconds: number, soundOrigin: Vector3): number {
         new BABYLON.Sound("convert", "sounds/curse.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
 
         const particleSystem = new BABYLON.ParticleSystem('convertEffect', 300, this._scene);
@@ -563,6 +644,7 @@ class App {
         particleSystem.maxLifeTime = 2;
         particleSystem.disposeOnStop = true;
 
+        let conversionCounter = 0;
         for (const target of targets) {
             const particleSystemClone = particleSystem.clone("convertEffectClone", target)
             particleSystemClone.start();
@@ -578,35 +660,43 @@ class App {
 
                 particleSystemClone.stop();
             }, durationSeconds*1000);
+
+            conversionCounter++;
         }
         particleSystem.dispose(false);
+        return conversionCounter;
     }
 
-    private applyHealEffect(targets: Mesh[], amountToHeal: number, soundOrigin: Vector3 = null) {
+    private applyHeal(targets: Mesh[], amountToHeal: number, soundOrigin: Vector3 = null, maxTargets: number = undefined): boolean {
+        let targetsHealed = 0;
         for (const target of targets) {
-            this.updateHp(target, amountToHeal, false);
-        }
-        if (soundOrigin) {
-            new BABYLON.Sound("heal", "sounds/heal.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
-        }
-    }
-
-    private applyShockEffect(targets: Mesh[], maxTargets: number, damage: number, attackerPosition: Vector3, color: BABYLON.Color4 = undefined, shockFromAttacker: boolean = false): number {
-        new BABYLON.Sound("eletricShock", "sounds/eletricShock.mp3", this._scene, null, {autoplay: true, volume: this.getVolume(attackerPosition), maxDistance: this.MAX_SOUND_DISTANCE})
-
-        let effectiveDamageTotal = 0;
-        let previousPosition: Vector3;
-        if (shockFromAttacker) {
-            previousPosition = attackerPosition;
-        }
-        for (let i = 0; i < targets.length; i++) {
-            if (i >= maxTargets) {
+            if (maxTargets !== undefined && targetsHealed === maxTargets) {
                 break;
             }
-            const target = targets[i];
-            const effectiveDamage = this.getEffectiveDamage(damage, 0, target);
+            if (this.getHpPercentage(target.uniqueId) === 100) {
+                continue;
+            }
+            this.updateHp(target, amountToHeal, false);
+            targetsHealed += 1;
+        }
+        if (targetsHealed > 0 && soundOrigin) {
+            new BABYLON.Sound("heal", "sounds/heal.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+        }
+        return targetsHealed !== 0;
+    }
+
+    private applyShock(targets: Mesh[], damage: number, attackerPosition: Vector3, color: BABYLON.Color4 = undefined, showShockFromAttacker: boolean = false): number {
+        new BABYLON.Sound("eletricShock", "sounds/eletricShock.mp3", this._scene, null, {autoplay: true, volume: this.getVolume(attackerPosition), maxDistance: this.MAX_SOUND_DISTANCE})
+        
+        let shockCounter = 0;
+        let previousPosition: Vector3;
+        if (showShockFromAttacker) {
+            previousPosition = attackerPosition;
+        }
+
+        for (const target of targets) {
+            const effectiveDamage = this.getEffectiveDamage(damage, 0, target.uniqueId);
             this.updateHp(target, -effectiveDamage, true);
-            effectiveDamageTotal += effectiveDamage;
             const spriteManager = this.getSpriteManager("shockBean")
             
             if (previousPosition) {
@@ -625,11 +715,12 @@ class App {
                 sprite.playAnimation(0, 3, false, 50);
             }
             previousPosition = target.position;
+            shockCounter++;
         }
-        return effectiveDamageTotal;
+        return shockCounter;
     }
 
-    private applyBurnEffect(targets: Mesh[], durationSeconds: number, totalDamage: number, soundOrigin: Vector3): number {
+    private applyBurn(targets: Mesh[], durationSeconds: number, totalDamage: number, soundOrigin: Vector3): number {
         const particleSystem = new BABYLON.ParticleSystem('burnEffect', 300, this._scene);
         particleSystem.emitRate = 50;
         particleSystem.minSize = 0.2;
@@ -653,7 +744,7 @@ class App {
         for (const target of targets) {
             let numberTicks = durationSeconds * (1000 / 100);
             // burn damage is considered physical
-            const effectiveDamage = this.getEffectiveDamage(totalDamage, 0, target);
+            const effectiveDamage = this.getEffectiveDamage(totalDamage, 0, target.uniqueId);
             effectiveDamageTotal += effectiveDamage;
             const burnPerTick = effectiveDamage / numberTicks;
 
@@ -673,7 +764,7 @@ class App {
         return effectiveDamageTotal;
     }
 
-    private applyFrostEffect(targets: Mesh[], durationSeconds: number, soundOrigin: Vector3) {
+    private applyFrost(targets: Mesh[], durationSeconds: number, soundOrigin: Vector3) {
         const particleSystem = new BABYLON.ParticleSystem('frostEffect', 300, this._scene);
         particleSystem.emitRate = 30;
         particleSystem.minSize = 0.2;
@@ -695,30 +786,47 @@ class App {
 
         new BABYLON.Sound("freeze", "sounds/freeze.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
 
+        let frostCounter = 0;
         for (const target of targets) {
             const particleSystemClone = particleSystem.clone("particleSystemClone", target)
             particleSystemClone.start();
-    
-            BABYLON.Tags.AddTagsTo(target, "frost");
-    
-            this.stopGroupAnimations(target.uniqueId);
+
+            this.charactersTracker[target.uniqueId].frozenCounter++;
+            if (this.charactersTracker[target.uniqueId]?.leftHand) {
+                this.charactersTracker[target.uniqueId].leftHand.availableAt += durationSeconds * 1000;
+            }
+            if (this.charactersTracker[target.uniqueId]?.rightHand) {
+                this.charactersTracker[target.uniqueId].rightHand.availableAt += durationSeconds * 1000;
+            }
+
+            if (this.charactersTracker[target.uniqueId].faction === "white") {
+                this.stopGroupAnimations(target.uniqueId);
+            } else {
+                this.charactersTracker[target.uniqueId].sprite.stopAnimation()
+            }
             setTimeout(() => {
-                const tags = BABYLON.Tags.GetTags(target) || [];
-                if (!tags.includes("dead")) {
-                    this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.idle).start(true);
-                }
-                
-                BABYLON.Tags.RemoveTagsFrom(target, "frost");
+                this.charactersTracker[target.uniqueId].frozenCounter--;
                 particleSystemClone.stop();
+
+                if (this.charactersTracker[target.uniqueId].isAlive && this.charactersTracker[target.uniqueId].frozenCounter === 0) {
+                    if (this.charactersTracker[target.uniqueId].faction === "white") {
+                        this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.idle).start(true);
+                    } else {
+                        this.animateOrc(target.uniqueId, "idle", true)
+                    }
+                }
             }, durationSeconds * 1000);
+
+            frostCounter++;
         }
         particleSystem.dispose(false);
+        return frostCounter;
     }
 
-    private getEffectiveDamage(magicDamage: number, physicalDamage: number, target: Mesh) {
-        const metadata: CharacterMetadata = JSON.parse(target.metadata)
-        const magicResist = metadata.magicResist; 
-        const armor = metadata.armor;
+    private getEffectiveDamage(magicDamage: number, physicalDamage: number, uniqueId: number) {
+        const characterData: CharacterData = this.charactersTracker[uniqueId];
+        const magicResist = characterData.magicResist; 
+        const armor = characterData.armor;
         const damage = (magicDamage * (1 - magicResist/100)) + (physicalDamage * (1 - armor/100));
         return damage;
     }
@@ -727,19 +835,23 @@ class App {
         new BABYLON.SpriteManager("explosion", "spritesheets/explosion.png", 15, 192, this._scene);
         new BABYLON.SpriteManager("swordSlash", "spritesheets/swordSlash.png", 6, 400, this._scene);
         new BABYLON.SpriteManager("shockBean", "spritesheets/shockBean.png", 4, 64, this._scene);
+        
+        new BABYLON.SpriteManager("orcBersec", "spritesheets/orcBerserc.png", 90, 96, this._scene);
+        new BABYLON.SpriteManager("orcShaman", "spritesheets/orcShaman.png", 90, 96, this._scene);
+        new BABYLON.SpriteManager("orcWarrior", "spritesheets/orcWarrior.png", 90, 96, this._scene);
     }
 
     private getSpriteManager(name: string): BABYLON.ISpriteManager {
-        return this._scene.spriteManagers.find((sp)=>sp.name == name)
+        return this._scene.spriteManagers.find((sp)=>sp.name ===name)
     }
 
     private animateMeleeSlash(attacker: Mesh, attackStartPosition: Vector3, color: BABYLON.Color4 = undefined) {
-        const horizontalDirection = Math.sign(attacker.position.x - attackStartPosition.x)
+        const horizontalDirection = Math.sign(attacker.position.x - attackStartPosition.x) || 1
         const boundingInfo = attacker.getBoundingInfo();
 
         const spriteManager = this.getSpriteManager("swordSlash")
         const sprite = new BABYLON.Sprite("sprite", spriteManager);
-        sprite.invertU = horizontalDirection == 1 ? false : true;
+        sprite.invertU = horizontalDirection === 1 ? false : true;
         sprite.size = boundingInfo.maximum.y * 3;
         sprite.position = attackStartPosition.add(new Vector3(-horizontalDirection*boundingInfo.maximum.x*2,0,0.1));
         sprite.disposeWhenFinishedAnimating = true;
@@ -768,7 +880,7 @@ class App {
             case "gun":
                 return ANIMATION_LIST.attackGunner;
             case "melee":
-                const isRightHandWeapon = weapon.slotName == slotsNames.rightHand;
+                const isRightHandWeapon = weapon.slotName ===slotsNames.rightHand;
                 return isRightHandWeapon ? ANIMATION_LIST.attackKnight : ANIMATION_LIST.attackAssassin;
             default:
                 return ANIMATION_LIST.attackTech;
@@ -783,78 +895,44 @@ class App {
         }
     }
 
-    // Returns the equipped weapons ordered by damage
-    private getEquippedWeapons(characterUniqueId: number): Weapon[] {
-        return [slotsNames.rightHand, slotsNames.leftHand]
-            .map((slotName) => ({slotName: slotName, material: this._scene.getMaterialById(this.getItemMaterialId(characterUniqueId, slotName))}))
-            .filter((resp) => !!resp?.material)
-            .map((resp) => {
-                const weapon = this.weaponsList.find((weapon) => weapon.name == resp.material.metadata)
-                weapon.slotName = resp.slotName
-                return weapon;
-            })
-            .sort((a, b)=> (b.magicDamage + b.physicalDamage) - (a.magicDamage + a.physicalDamage))
-    }
-    
-    private getSpellTargets(attacker: Mesh, weapon: Weapon): Mesh[] {
-        const isDefensiveSpell = ["heal", "increaseArmor", "increaseMagicResist", "spell"].includes(weapon.specialSpellType);
-        const possibleTargets = isDefensiveSpell ? this.getAllies(attacker) : this.getEnemies(attacker);
-        if (!possibleTargets || possibleTargets.length == 0) {
-            return;
+    private getWeapon(weaponName: string): Weapon {
+        if (!weaponName) {
+            return undefined;
         }
-        possibleTargets.sort((a, b)=>a.position.subtract(attacker.position).length() - b.position.subtract(attacker.position).length())
-
-        const targets: Mesh[] = [];
-        for (let i = 0; i < possibleTargets.length; i++) {
-            const target = possibleTargets[i];
-            const deltaPosition = target.position.subtract(attacker.position);
-            if (deltaPosition.length() > (weapon.spellRange)) {
-                continue;
-            }
-            if (weapon.specialSpellType == "heal" && this.getHpPercentage(target) == 100) {
-                continue;
-            }
-            targets.push(target);
-            if (targets.length >= weapon.spellMaxTargets) {
-                break;
-            }
-        }
-        return targets;
+        return this.weaponsList.find((weapon) => weapon.name === weaponName);
     }
 
-    private getAllies(character: Mesh) {
+    private getAllies(character: Mesh): Mesh[] {
         const allyFaction = this.getFaction(character);
-        return this._scene.getMeshesByTags(`${allyFaction} && !dead`);
+        const allies = this._scene.getMeshesByTags(`${allyFaction} && !dead`);
+        allies.sort((a, b)=>a.position.subtract(character.position).length() - b.position.subtract(character.position).length())
+        return allies || [];
     }
 
-    private getEnemies(attacker: Mesh) {
+    private getEnemies(attacker: Mesh): Mesh[] {
         const enemyFaction = this.getEnemyFaction(this.getFaction(attacker));
         const enemies = this._scene.getMeshesByTags(`${enemyFaction} && !dead`);
         enemies.sort((a, b)=>a.position.subtract(attacker.position).length() - b.position.subtract(attacker.position).length())
-        return enemies;
+        return enemies || [];
     }
 
-    private getNearestVisibleTarget(attacker: Mesh): Mesh {
-        const targets = this.getEnemies(attacker);
-        if (!targets || targets.length == 0) {
-            return;
-        }
-        targets.sort((a, b)=>a.position.subtract(attacker.position).length() - b.position.subtract(attacker.position).length())
-
+    private getNearestVisibleTarget(attacker: Mesh, targets: Mesh[]): Mesh {
         for (let i = 0; i < targets.length; i++) {
             const target = targets[i];
-            const deltaPosition = target.position.subtract(attacker.position);
-
-            const origin = attacker.position;
-            const ray = new BABYLON.Ray(origin, deltaPosition);
+            const horizontalDirection = Math.sign(target.position.x - attacker.position.x) || 1
+            const projectileStartPosition = attacker.position.add(
+                new Vector3(horizontalDirection * this.arcadiansSize.width* (3/4), 0, 0)
+            );
             
-            // let rayHelper = new BABYLON.RayHelper(ray);		
-            // rayHelper.show(this._scene);
+            const deltaPosition = target.position.subtract(projectileStartPosition);
+            const ray = new BABYLON.Ray(projectileStartPosition, deltaPosition);
+            
+            // new BABYLON.RayHelper(ray).show(this._scene);
             attacker.isPickable = false;
-            const hit = this._scene.pickWithRay(ray);
+            const hit = this._scene.pickWithRay(ray, undefined, false);
             attacker.isPickable = true;
 
-            if (targets.some((t)=>t.uniqueId == hit.pickedMesh?.uniqueId)) {
+            if (targets.some((t)=>t.uniqueId === hit.pickedMesh?.uniqueId)) {
                 return hit.pickedMesh as Mesh;
             }
         }
@@ -876,55 +954,22 @@ class App {
         hpBar.rotate(new Vector3(0,1,0), Math.PI);
     }
 
-    private createHpBar(parent: Mesh, maxHp: number) {
+    private createHpBar(parent: Mesh) {
         const boundingInfo = parent.getBoundingInfo();
         const hpBarMax = this._scene.getMeshByName("maxHpBar_original").clone("maxHpBar", parent);
-        hpBarMax.position.y += boundingInfo.maximum.y + 0.5;
-        hpBarMax.metadata = maxHp;
+        hpBarMax.position.y += boundingInfo.maximum.y + 0.8;
         hpBarMax.setEnabled(true);
         const hpBar = this._scene.getMeshByName("hpBar_original").clone("hpBar", parent);
-        hpBar.position.y += boundingInfo.maximum.y + 0.5;
-        hpBar.position.z += 0.01;
-        hpBar.metadata = maxHp;
+        hpBar.position.y += boundingInfo.maximum.y + 0.8;
+        hpBar.position.z += 0.001;
         hpBar.setEnabled(true);
     }
 
-    private getHpPercentage(characterMesh: Mesh) {
-        const hpBar = characterMesh.getChildMeshes(true, (node)=>node.name == "hpBar")[0] as Mesh;
-        const currentHp = Number(hpBar.metadata);
-        const hpBarMax = characterMesh.getChildMeshes(true, (node)=>node.name == "maxHpBar")[0] as Mesh;
-        const maxHp = Number(hpBarMax.metadata);
-        return 100 * currentHp / maxHp;
+    private getHpPercentage(uniqueId: number) {
+        return this.charactersTracker[uniqueId].currentHp / this.charactersTracker[uniqueId].maxHp;
     }
 
-    private updateMagicResist(targets: Mesh[], deltaArmor: number, soundOrigin: Vector3) {
-        new BABYLON.Sound("increaseMagicResist", "sounds/spellGeneric.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
-
-        for (const target of targets) {
-            const meta: CharacterMetadata = JSON.parse(target.metadata)
-            meta.magicResist += deltaArmor;
-            target.metadata = JSON.stringify(meta);
-    
-            const particleSystem = new BABYLON.ParticleSystem('increaseMagicResist', 300, this._scene);
-            particleSystem.particleTexture = this.getTexture('combat/shield.png', true);
-            particleSystem.emitter = target;
-            particleSystem.emitRate = 10;
-            particleSystem.minSize = 0.5;
-            particleSystem.maxSize = 0.5;
-            particleSystem.minLifeTime = 1;
-            particleSystem.maxLifeTime = 2;
-            const color = new BABYLON.Color4(62/255, 175/255, 118/255, 1);
-            particleSystem.color1 = color;
-            particleSystem.color2 = color;
-            particleSystem.start();
-    
-            setTimeout(() => {
-                particleSystem.stop();
-            }, 1000);
-        }
-    }
-
-    private createShield(targets: Mesh[], duration: number, soundOrigin: Vector3) {
+    private createShield(targets: Mesh[], duration: number, soundOrigin: Vector3): number {
         new BABYLON.Sound("increaseArmor", "sounds/magicShield.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
         const multiplierU = 1.4;
         const multiplierV = 1.2;
@@ -961,82 +1006,155 @@ class App {
         easingFunc.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT)
         animation.setEasingFunction(easingFunc);
 
+        let shieldCounter = 0;
         for (const target of targets) {
             const shieldClone = shield.clone("shield", target, false, true);
             shieldClone.position.y += (this.arcadiansSize.height * multiplierV - this.arcadiansSize.height) / 2;
             shieldClone.position.z += (this.arcadiansSize.width * multiplierU - this.arcadiansSize.width) / 2 + 0.1;
             shieldClone.setEnabled(true);
-            BABYLON.Tags.AddTagsTo(target, "shield");
+            this.charactersTracker[target.uniqueId].shieldCounter++;
 
             this._scene.beginDirectAnimation(shieldClone, [animation], 0, totalFrames, true)
 
             setTimeout(()=>{
-                this.disableShield(target);
+                this.triggerShield(target);
             }, duration * 1000)
+            shieldCounter++;
         }
+        return shieldCounter;
     }
 
-    private disableShield(target: Mesh) {
-        BABYLON.Tags.RemoveTagsFrom(target, "shield");
-        const shieldArray = target.getChildMeshes(true, (node)=>node.name == "shield");
-        if (shieldArray.length > 0) {
-            shieldArray[0].dispose();
+    private triggerShield(target: Mesh): boolean {
+        if (this.charactersTracker[target.uniqueId].shieldCounter === 0) {
+            return false;
         }
+        this.charactersTracker[target.uniqueId].shieldCounter--;
+        const shieldArray = target.getChildMeshes(true, (node)=>node.name === "shield");
+        shieldArray[0].dispose();
+        return true;
+        return true;
     }
 
-    private updateArmor(targets: Mesh[], deltaArmor: number, soundOrigin: Vector3) {
-        new BABYLON.Sound("increaseArmor", "sounds/enchant2.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
-
+    private updateMagicResist(targets: Mesh[], deltaMR: number, duration: number, soundOrigin: Vector3): number {
+        if (deltaMR > 0) {
+            new BABYLON.Sound("increaseMagicResist", "sounds/spellGeneric.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+        } else {
+            new BABYLON.Sound("decreaseMagicResist", "sounds/debuff.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+        }
+        let armorUpdateCounter = 0;
         for (const target of targets) {
-            const meta: CharacterMetadata = JSON.parse(target.metadata)
-            meta.armor += deltaArmor;
-            target.metadata = JSON.stringify(meta);
+            this.charactersTracker[target.uniqueId].magicResist = Math.max(this.charactersTracker[target.uniqueId].magicResist + deltaMR, 0);
     
-            const particleSystem = new BABYLON.ParticleSystem('increaseArmor', 300, this._scene);
+            const particleSystem = new BABYLON.ParticleSystem('increaseMagicResist', 300, this._scene);
             particleSystem.particleTexture = this.getTexture('combat/shield.png', true);
             particleSystem.emitter = target;
-            particleSystem.emitRate = 30;
-            particleSystem.minSize = 0.2;
-            particleSystem.maxSize = 0.4;
+            particleSystem.emitRate = 12;
+            particleSystem.minSize = 0.5;
+            particleSystem.maxSize = 0.5;
             particleSystem.minLifeTime = 1;
             particleSystem.maxLifeTime = 2;
-            const color = new BABYLON.Color4(0,0.5,1, 1);
+            let color: BABYLON.Color4;
+            if (deltaMR > 0) {
+                color = new BABYLON.Color4(62/255, 175/255, 118/255, 1);
+            } else {
+                particleSystem.direction1 = new Vector3(0,-1,0)
+                particleSystem.direction2 = new Vector3(0,-1,0)
+                color = new BABYLON.Color4(1, 0, 0, 1);
+            }
             particleSystem.color1 = color;
             particleSystem.color2 = color;
             particleSystem.start();
     
             setTimeout(() => {
+                const meta: CharacterData = JSON.parse(target.metadata)
+                meta.magicResist -= deltaMR;
+                meta.magicResist = Math.max(meta.magicResist-deltaMR, 0);
                 particleSystem.stop();
-            }, 1000);
+            }, duration * 1000);
+
+            armorUpdateCounter++;
         }
+        return armorUpdateCounter;
+    }
+
+    private updateArmor(targets: Mesh[], deltaArmor: number, duration: number, soundOrigin: Vector3): number {
+        if (deltaArmor > 0) {
+            new BABYLON.Sound("increaseArmor", "sounds/enchant2.ogg", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+        } else {
+            new BABYLON.Sound("decreaseArmor", "sounds/debuff.wav", this._scene, null, {autoplay: true, volume: this.getVolume(soundOrigin), maxDistance: this.MAX_SOUND_DISTANCE})
+        }
+
+        let armorUpdateCounter = 0;
+        for (const target of targets) {
+            this.charactersTracker[target.uniqueId].armor = Math.max(this.charactersTracker[target.uniqueId].armor+deltaArmor, 0);
+    
+            const particleSystem = new BABYLON.ParticleSystem('increaseArmor', 300, this._scene);
+            particleSystem.particleTexture = this.getTexture('combat/shield.png', true);
+            particleSystem.emitter = target;
+            particleSystem.emitRate = 12;
+            particleSystem.minSize = 0.5;
+            particleSystem.maxSize = 0.5;
+            particleSystem.minLifeTime = 1;
+            particleSystem.maxLifeTime = 2;
+
+            let color: BABYLON.Color4;
+            if (deltaArmor > 0) {
+                color = new BABYLON.Color4(0,0.5,1, 1);
+            } else {
+                color = new BABYLON.Color4(1, 0, 0, 1);
+                particleSystem.direction1 = new Vector3(0,-1,0)
+                particleSystem.direction2 = new Vector3(0,-1,0)
+            }
+            particleSystem.color1 = color;
+            particleSystem.color2 = color;
+            particleSystem.start();
+    
+            setTimeout(() => {
+                this.charactersTracker[target.uniqueId].armor = Math.max(this.charactersTracker[target.uniqueId].armor-deltaArmor, 0);
+                particleSystem.stop();
+            }, duration * 1000);
+
+            armorUpdateCounter++;
+        }
+        return armorUpdateCounter;
     }
 
     private updateHp(target: Mesh, deltaHp: number, animateHit: boolean = true): number {
-        if (this.getTags(target).includes("dead")) {
+        const character = this.charactersTracker[target.uniqueId];
+        if (!character.isAlive) {
             return 0;
         }
-        const hpBar = target.getChildMeshes(true, (node)=>node.name == "hpBar")[0] as Mesh;
-        const hpBarMax = target.getChildMeshes(true, (node)=>node.name == "maxHpBar")[0] as Mesh;
-        const maxHp = Number(hpBarMax.metadata);
-        const currentHp = Number(hpBar.metadata);
+        const hpBar = target.getChildMeshes(true, (node)=>node.name ==="hpBar")[0] as Mesh;
+        const hpBarMax = target.getChildMeshes(true, (node)=>node.name ==="maxHpBar")[0] as Mesh;
+        const maxHp = character.maxHp
+        const currentHp = character.currentHp;
         const updatedHp = Math.max(Math.min(currentHp + deltaHp, maxHp), 0);
         deltaHp = updatedHp - currentHp;
-        if (updatedHp == 0) {
-            this.stopGroupAnimations(target.uniqueId);
-            const animation = this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.death);
-            animation.start(false);
+        this.charactersTracker[target.uniqueId].currentHp = updatedHp;
+        if (updatedHp === 0) {
+            if (character.faction === "white") {
+                this.stopGroupAnimations(target.uniqueId);
+                const animation = this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.death);
+                animation.start(false);
+            } else if (character.faction === "black") {
+                this.animateOrc(target.uniqueId, "death", false);
+            }
             target.physicsImpostor.dispose();
             target.isPickable = false;
-            hpBar.dispose();
-            hpBarMax.dispose();
+            hpBar?.dispose();
+            hpBarMax?.dispose();
             
             BABYLON.Tags.AddTagsTo(target, "dead");
             BABYLON.Tags.RemoveTagsFrom(target, "arcadian");
 
             new BABYLON.Sound("hit", "sounds/die.mp3", this._scene, null, {autoplay: true, volume: this.getVolume(target.position), maxDistance: this.MAX_SOUND_DISTANCE})
         } else if (deltaHp < 0 && animateHit) {
-            const animation = this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.hit);
-            animation.start(false);
+            if (character.faction === "white") {
+                const animation = this.getGroupAnimation(target.uniqueId, ANIMATION_LIST.hit);
+                animation.start(false);
+            } else if (character.faction === "black") {
+                this.animateOrc(target.uniqueId, "hurt", false);
+            }
 
             const hitSounds = ["hit1.mp3", "hit5.mp3"];
             const randomHitSound = hitSounds[Math.floor(Math.random()*(hitSounds.length-1))]
@@ -1069,12 +1187,89 @@ class App {
         const maxHpBarWidth = 1;
         hpBar.position.x -= (deltaHp / maxHp * maxHpBarWidth) / 2;
         hpBar.scaling.x = updatedHp / maxHp;
-        hpBar.metadata = updatedHp;
         return updatedHp;
     }
 
     private getVolume(sourcePosition: Vector3) {
         return 1 - this._scene.cameras[0].position.subtract(sourcePosition).length()/this.MAX_SOUND_DISTANCE
+    }
+
+    private createOrc() {
+        const spriteManager = this.getSpriteManager("orcBersec")
+            
+        const sprite = new BABYLON.Sprite("sprite", spriteManager);
+
+        const size = 4;
+        const position = new Vector3(this.fieldFimensions.x/2 - 20, size*(1/2) + 0.1, this.fieldFimensions.z/2);
+        sprite.size = size;
+        sprite.position = position.clone()
+        sprite.invertU = true;
+
+        const diameter = size/5
+        const height = size*(3/5);
+        let body = BABYLON.MeshBuilder.CreateCylinder("orcBody", {diameter: diameter, height: height}, this._scene);
+        body.position = position.clone();
+        body.position.y = 1.30;
+        body.visibility = 0;
+        body.physicsImpostor = new BABYLON.PhysicsImpostor(body, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 50, restitution: 0.3, friction: 0.3}, this._scene);
+        body.physicsImpostor.physicsBody.angularDamping = 1;
+        body.checkCollisions = true;
+        const deltaPosition = body.position.subtract(sprite.position);
+        this._scene.registerBeforeRender(()=>{
+            sprite.position = body.position.subtract(deltaPosition)
+        })
+        BABYLON.Tags.AddTagsTo(body, "black");
+
+        this.createHpBar(body);
+
+        const characterData: CharacterData = {
+            uniqueId: body.uniqueId,
+            faction: "black",
+            magicResist: 5,
+            armor: 5,
+            movementSpeed: 4,
+            maxHp: 100,
+            currentHp: 100,
+            isAlive: true,
+            frozenCounter: 0,
+            shieldCounter: 0,
+            sprite: sprite,
+            rightHand: {
+                weapon: this.getWeapon("Valorous Blade"),
+                availableAt: 0, 
+                slotName: slotsNames.rightHand,
+            },
+            leftHand: {
+                weapon: this.getWeapon("Valorous Blade"),
+                availableAt: 0, 
+                slotName: slotsNames.leftHand,
+            }
+        }
+        this.charactersTracker[body.uniqueId] = characterData;
+        this.animateOrc(body.uniqueId, 'idle', true)
+
+        // setTimeout(() => {
+        //     this.moveToAttackRange(body.uniqueId, true)
+        // }, 2000);
+    }
+
+    private animateOrc(
+        uniqueId: number, 
+        animation: 'idle' | 'walk' | 'run' | 'attackSpecial' | 'attackLeftHand' | 'attackRightHand' | 'attackStabbed' |'jump' | 'hurt' | 'death', 
+        loop: boolean
+    ) {
+        const onAnimationEnd = ()=>{
+            if (!loop && animation != 'death') {
+                this.animateOrc(uniqueId, 'idle', true)
+            }
+        }
+        this.charactersTracker[uniqueId].sprite.playAnimation(
+            orcAnimationMap[animation].start, 
+            orcAnimationMap[animation].end, 
+            loop, 
+            100,
+            onAnimationEnd
+        );
     }
 
     private async loadArcadian(arcadianId: number, position: Vector3 = Vector3.Zero()) {
@@ -1084,19 +1279,29 @@ class App {
         const attributes: MetadataSlot[] = metadata.attributes;
 
         // body to detect interactions
-        let root = BABYLON.MeshBuilder.CreateCylinder("root", {diameter: this.arcadiansSize.width, height: this.arcadiansSize.height});
-        // TODO: set magic resist and armor based on the items equipped
-        const characterMetadata: CharacterMetadata = {
-            magicResist: 10,
+        let root = BABYLON.MeshBuilder.CreateCylinder(
+            "arcadian_" + arcadianId, 
+            {diameter: this.arcadiansSize.width, height: this.arcadiansSize.height},
+            this._scene
+        );
+        const characterData: CharacterData = {
+            uniqueId: root.uniqueId,
+            faction: "white",
+            magicResist: 5,
             armor: 5,
+            movementSpeed: 4,
+            maxHp: 100,
+            currentHp: 100,
+            isAlive: true,
+            frozenCounter: 0,
+            shieldCounter: 0
         }
-        root.metadata = JSON.stringify(characterMetadata);
-        root.name = "arcadian_" + arcadianId;
+        this.charactersTracker[root.uniqueId] = characterData;
         BABYLON.Tags.AddTagsTo(root, "arcadian");
-        BABYLON.Tags.AddTagsTo(root, ["black", "white"][Math.floor(Math.random()*2)]);
+        BABYLON.Tags.AddTagsTo(root, "white");
         root.visibility = 0;
         root.position = position;
-        root.physicsImpostor = new BABYLON.PhysicsImpostor(root, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.3, friction: 0.3});
+        root.physicsImpostor = new BABYLON.PhysicsImpostor(root, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.3, friction: 0.3}, this._scene);
         root.physicsImpostor.physicsBody.angularDamping = 1;
         root.checkCollisions = true;
         const nodeUniqueId = root.uniqueId;
@@ -1119,11 +1324,11 @@ class App {
         for (const att of attributes) {
             const slotName = att.trait_type;
             
-            if (slotName == slotsNames.class || slotName == slotsNames.gender || slotName == slotsNames.background) 
+            if (slotName ===slotsNames.class || slotName ===slotsNames.gender || slotName ===slotsNames.background) 
                 continue;
 
-            const itemsSlot = this._stack.find((v)=>v.name == slotName)
-            const itemSlot = itemsSlot.layer.find((v)=>v.name == att.value)
+            const itemsSlot = this._stack.find((v)=>v.name ===slotName)
+            const itemSlot = itemsSlot.layer.find((v)=>v.name ===att.value)
 
             const itemFilename = itemSlot.src.split("/")[1];
             const itemPath = "parts/" + itemFilename;
@@ -1134,22 +1339,41 @@ class App {
             texture.name = itemFilename;
             texture.hasAlpha = true;
 
-            const material = childMeshes.find((mesh)=>mesh.material.id == slotName).material
-            material.id = nodeUniqueId + this.SEPARATOR + slotName;
-
+            const material = childMeshes.find((mesh)=>mesh.material.id ===slotName).material;
             (material as any).albedoTexture = texture;
             material.name = slotName;
 
-            if (slotName == slotsNames.rightHand || slotName == slotsNames.leftHand) {
-                material.metadata = att.value.slice(0,-2) || "";
+            if (slotName ===slotsNames.rightHand) {
+                const weaponName = att.value.slice(0,-2);
+                characterData.rightHand = {
+                    weapon: this.getWeapon(weaponName), 
+                    availableAt: 0,
+                    slotName: slotName
+                }
+            } else if (slotName ===slotsNames.leftHand) {
+                const weaponName = att.value.slice(0,-2);
+                characterData.leftHand = {
+                    weapon: this.getWeapon(weaponName), 
+                    availableAt: 0,
+                    slotName: slotName
+                }
+            } else if (slotName ===slotsNames.top || slotName === slotsNames.bottom || slotName === slotsNames.headgear) {
+                const item = this.itemsRarity.find((v=>v.name === att.value))
+                if (item) {
+                    const rarityMultiplier = this.getRarityMultiplier(item.rarity)
+                    const maxHp = 2 * rarityMultiplier;
+                    characterData.armor += 2 * rarityMultiplier;
+                    characterData.magicResist += 2 * rarityMultiplier;
+                    characterData.movementSpeed += 0.2 * rarityMultiplier;
+                    characterData.maxHp += maxHp;
+                    characterData.currentHp += maxHp;
+                }
             } else {
                 material.metadata = att.value || "";
             }
         }
-
         // Set hp bars
-        const maxHp = 100;
-        this.createHpBar(root, maxHp);
+        this.createHpBar(root);
 
         root.actionManager = new BABYLON.ActionManager(this._scene);
         root.actionManager.registerAction(
@@ -1163,29 +1387,79 @@ class App {
 
         const animation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.idle);
         animation.start(true);
+
+
+        // setTimeout(() => {
+        //     this.moveToAttackRange(root.uniqueId, true)
+        // }, 5000);
+    }
+
+    private getRarityMultiplier(rarity: ItemRarity["rarity"]) {
+        const allRarities = ["Common", "Uncommon", "Rare", "Legendary", "Epic"]
+        const index = allRarities.findIndex((r)=> r == rarity);
+        return index === -1 ? 0 : index;
     }
 
     private faceDirection(character: Mesh, pointToLook: Vector3) {
         const horizontalDirection = Math.sign(pointToLook.x - character.position.x) // -1 | 1
-        const characterMesh = character.getChildMeshes(true, (node)=>node.name == "body")[0]
-        if (characterMesh.scaling.x == horizontalDirection) {
-            characterMesh.scaling.x = -horizontalDirection;
+        if (this.charactersTracker[character.uniqueId].faction === "white") {
+            const characterMesh = character.getChildMeshes(true, (node)=>node.name ==="body")[0]
+            if (characterMesh.scaling.x === horizontalDirection) {
+                characterMesh.scaling.x = -horizontalDirection;
+            }
+        } else {
+            this.charactersTracker[character.uniqueId].sprite.invertU = horizontalDirection === 1 ? true : false;
         }
     }
 
-    private moveCharacter(nodeUniqueId: number, destination: Vector3) {
-        const characterMesh = this.getRootMesh(nodeUniqueId);
-        
-        const tags = BABYLON.Tags.GetTags(characterMesh) || [];
-        if (tags.includes("frost")) {
+    private moveToAttackRange(characterId: number, attack: boolean) {
+        const attacker = this._scene.getMeshByUniqueId(characterId) as Mesh;
+        const enemies = this.getEnemies(attacker);
+        const nearestEnemy = this.getNearestVisibleTarget(
+            attacker,
+            enemies
+        );
+
+        if (!nearestEnemy) {
             return;
         }
-        destination.y = characterMesh.position.y;
-        // TODO: speed should come from equippments
-        const speed = 4;
-        let distance = destination.subtract(characterMesh.position);
 
-        this.faceDirection(characterMesh, destination);
+        const delta = nearestEnemy.position.subtract(attacker.position);
+        const distance = delta.length();
+        const characterData = this.charactersTracker[characterId];
+        const maxRange =  Math.max(characterData.rightHand?.weapon?.range || 0, characterData.leftHand?.weapon?.range || 0);
+        if (maxRange === 0) {
+            return;
+        }
+
+        let destination: Vector3;
+        if (maxRange && distance > maxRange) {
+            delta.normalize().scaleInPlace(distance - maxRange);
+            destination = attacker.position.add(delta);
+        } else {
+            destination = attacker.position.clone();
+        }
+
+        let onArrival: ()=>void;
+        if (attack) {
+            onArrival = ()=>{
+                this.attackBothHands(attacker.uniqueId)
+            }
+        }
+        this.moveCharacter(attacker.uniqueId, destination, onArrival)
+    }
+
+    private moveCharacter(characterId: number, destination: Vector3, onArrival: ()=>void = ()=>{}) {
+        const character = this.getRootMesh(characterId);
+        
+        if (this.charactersTracker[characterId].frozenCounter > 0) {
+            return;
+        }
+        destination.y = character.position.y;
+        const speed = this.charactersTracker[characterId].movementSpeed;
+        let distance = destination.subtract(character.position);
+
+        this.faceDirection(character, destination);
 
         const animationName = "moveAnimation";
         var animation = new BABYLON.Animation(
@@ -1198,22 +1472,32 @@ class App {
 
         const totalFrames = this.FPS * distance.length() / speed;
         var keys = [
-            { frame: 0, value: characterMesh.position },
+            { frame: 0, value: character.position },
             { frame: totalFrames, value: destination }
         ];
         animation.setKeys(keys);
 
-        characterMesh.animations.push(animation);
+        character.animations.push(animation);
 
-        this._scene.stopAnimation(characterMesh, animationName);
+        this._scene.stopAnimation(character, animationName);
 
-        const groupAnimation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.walk);
-        groupAnimation.start(true);
+        if (this.charactersTracker[character.uniqueId].faction === "white") {
+            const groupAnimation = this.getGroupAnimation(characterId, ANIMATION_LIST.walk);
+            groupAnimation.start(true);
+        } else {
+            this.animateOrc(character.uniqueId, "walk", true);
+        }
 
-        this._scene.beginDirectAnimation(characterMesh, [animation], 0, totalFrames, false, 1, () => {
-            this.stopGroupAnimations(nodeUniqueId);
-            const animation = this.getGroupAnimation(nodeUniqueId, ANIMATION_LIST.idle);
-            animation.start(true);
+        this._scene.beginDirectAnimation(character, [animation], 0, totalFrames, false, 1, () => {
+
+            if (this.charactersTracker[character.uniqueId].faction === "white") {
+                this.stopGroupAnimations(characterId);
+                const animation = this.getGroupAnimation(characterId, ANIMATION_LIST.idle);
+                animation.start(true);
+            } else {
+                this.animateOrc(character.uniqueId, "idle", true);
+            }
+            onArrival();
         })
     }
 
@@ -1254,10 +1538,10 @@ class App {
     }
 
     private getRootMesh(nodeUniqueId: number): Mesh {
-        return this._scene.rootNodes.find((v)=>v.uniqueId == nodeUniqueId) as Mesh;
+        return this._scene.rootNodes.find((v)=>v.uniqueId ===nodeUniqueId) as Mesh;
     }
     private stopGroupAnimations(uniqueId: number) {
-        const activeAnimations = this._scene.animationGroups.filter((v)=>v.isPlaying && v.name.split(this.SEPARATOR)[0] == uniqueId.toString());
+        const activeAnimations = this._scene.animationGroups.filter((v)=>v.isPlaying && v.name.split(this.SEPARATOR)[0] ===uniqueId.toString());
         activeAnimations.forEach((v)=>v.stop())
     }
     private getGroupAnimation(uniqueId: number, animationName: string) {
@@ -1266,10 +1550,6 @@ class App {
 
     private getGroupAnimationName(animatedUniqueId: number, animationName: string): string {
         return animatedUniqueId + this.SEPARATOR + animationName
-    }
-
-    private getItemMaterialId(characterUniqueId: number, slotName: string): string {
-        return characterUniqueId + this.SEPARATOR + slotName;
     }
 
     private async createScene() {
@@ -1332,14 +1612,17 @@ class App {
         this.weaponsList = weaponsList.map((weapon)=> {
             return this.convertKeysToNumbers(weapon);
         })
+        this.itemsRarity = (await fetch("itemsRarity.json").then((res)=>res.json()))
     }
     private convertKeysToNumbers(obj: any) {
         const convertedObj = {};
         for (let key in obj) {
             const parsed = parseFloat(obj[key]);
             const numericKey = isNaN(parsed) ? obj[key] : parsed;
-            if (key == "projectileColor") {
+            if (["projectileColor"].includes(key)) {
                 convertedObj[key] = obj[key];
+            } else if (["hasProjectile"].includes(key)) {
+                convertedObj[key] = obj[key] ==="TRUE" ? true : false
             } else {
                 convertedObj[key] = numericKey;
             }

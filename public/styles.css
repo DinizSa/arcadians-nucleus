@@ -1,0 +1,22 @@
+
+.root {
+    position: absolute; 
+    right: 0%; 
+    top: 0%;
+}
+.container {
+    position: relative; 
+    background-color: rgb(133, 132, 124);
+    width: 200px;
+    padding: 10px;
+    border: 5px solid rgb(75, 75, 65);
+    border-radius: 10px;
+    border-top-right-radius: 0;
+
+    display: grid;
+    grid-template-columns: 10% 90%;
+    grid-column-gap: 20px;
+    grid-row-gap: 0px;
+    justify-items: stretch;
+    align-items: center;
+}

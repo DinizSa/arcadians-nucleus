@@ -75,7 +75,7 @@ interface HandEquippment {
 }
 
 interface CharacterData {
-    faction: 'white' | 'black';
+    faction: "Sun" | 'Moon';
     subFaction: 'arcadian' | 'orcBerserc' | 'orcShaman' | 'orcWarrior' | "vikingAxe" | "vikingSword" | "vikingSpear";
     uniqueId: number;
     armor: number; // percentage or physical damage ignored
@@ -135,16 +135,18 @@ interface AnimationMap {
 }
 interface AnimationStartStop {[key: string]: AnimationMap};
 
-interface CharacterSetup {
+interface SpriteCharacterSetup {
     category: 'orcBerserc' | 'orcShaman' | 'orcWarrior' | 'vikingAxe' | 'vikingSword' | 'vikingSpear';
     leftHandEquippment: string;
     rightHandEquippment: string;
-    animations: AnimationStartStop
+    animations: AnimationStartStop;
+    size: number;
 }
-const orcBerserkData: CharacterSetup = {
+const orcBerserkData: SpriteCharacterSetup = {
     category: 'orcBerserc',
     leftHandEquippment: "Reaperblade",
     rightHandEquippment: "Valorous Blade",
+    size: 4,
     animations: {
         idle: {start: 0, end: 4},
         walk: {start: 9, end: 15},
@@ -157,10 +159,11 @@ const orcBerserkData: CharacterSetup = {
     }
 }
 
-const orcShamanData: CharacterSetup = {
+const orcShamanData: SpriteCharacterSetup = {
     category: 'orcShaman',
     leftHandEquippment: "Constellation Scribe",
     rightHandEquippment: "Royal Wand of Power",
+    size: 4,
     animations: {
         idle: {start: 0, end: 4},
         walk: {start: 9, end: 15},
@@ -172,10 +175,11 @@ const orcShamanData: CharacterSetup = {
         death: {start: 81, end: 85},
     }
 }
-const orcWarriorData: CharacterSetup = {
+const orcWarriorData: SpriteCharacterSetup = {
     category: 'orcWarrior',
     leftHandEquippment: "Axe of Strings",
     rightHandEquippment: "Common Axe",
+    size: 4,
     animations: {
         idle: {start: 0, end: 4},
         walk: {start: 9, end: 15},
@@ -187,10 +191,11 @@ const orcWarriorData: CharacterSetup = {
         death: {start: 81, end: 84},
     }
 }
-const vikingAxeData: CharacterSetup = {
+const vikingAxeData: SpriteCharacterSetup = {
     category: 'vikingAxe',
     leftHandEquippment: "Ichika's Doomblade",
     rightHandEquippment: "Iron Fist",
+    size: 4,
     animations: {
         idle: {start: 0, end: 5},
         walk: {start: 9, end: 16},
@@ -204,10 +209,11 @@ const vikingAxeData: CharacterSetup = {
     }
 }
 
-const vikingSwordData: CharacterSetup = {
+const vikingSwordData: SpriteCharacterSetup = {
     category: 'vikingSword',
     leftHandEquippment: "Neuromantic Saber",
     rightHandEquippment: "Kite Shield",
+    size: 4,
     animations: {
         idle: {start: 0, end: 4},
         walk: {start: 9, end: 16},
@@ -220,10 +226,11 @@ const vikingSwordData: CharacterSetup = {
     }
 }
 
-const vikingSpearData: CharacterSetup = {
+const vikingSpearData: SpriteCharacterSetup = {
     category: 'vikingSpear',
     leftHandEquippment: "Squire's Lance",
     rightHandEquippment: "Shining Barrier",
+    size: 4,
     animations: {
         idle: {start: 0, end: 4},
         walk: {start: 9, end: 16},
@@ -236,7 +243,7 @@ const vikingSpearData: CharacterSetup = {
     }
 }
 
-const charactersSetup: {[key: string]: CharacterSetup} = {
+const charactersSetup: {[key: string]: SpriteCharacterSetup} = {
     orcBerserc: orcBerserkData,
     orcShaman: orcShamanData,
     orcWarrior: orcWarriorData,
@@ -335,6 +342,7 @@ class App {
             if (event.button ===0 && pickInfo.hit) {
                 if (this.selectedCharacterId && pickInfo.hit && pickInfo.pickedMesh.metadata === "ground") {
                     this.moveCharacter(this.selectedCharacterId, pickInfo.pickedPoint);
+                } else if (!this.selectedCharacterId && pickInfo.hit && pickInfo.pickedMesh.metadata === "ground") {
                     this.selectedCharacterId = 0;
                     this._selectedMark.setEnabled(false);
                 } else {
@@ -365,11 +373,30 @@ class App {
                         this.charactersTracker[this.selectedCharacterId].rightHand
                     );
                 }
+            } else if (ev.keyCode == 27) {
+                this.selectedCharacterId = 0;
+                this._selectedMark.setEnabled(false);
             }
         });
+
+        this._scene.registerAfterRender(()=>{
+            this.updateInfoBanner()
+        })
     }
 
-    // TODO texture decals, when hitting bullets
+    private updateInfoBanner() {
+        if (this.selectedCharacterId) {
+            const character = this.charactersTracker[this.selectedCharacterId]
+            document.getElementById("root").hidden = false;
+            document.getElementById("currentHp").textContent = `${character.currentHp.toPrecision(3)}`;
+            document.getElementById("maximumHp").textContent = `${character.maxHp}`;
+            document.getElementById("armor").textContent = `${character.armor}`;
+            document.getElementById("magicResist").textContent = `${character.magicResist}`;
+            document.getElementById("faction").textContent = `${character.faction}`;
+        } else {
+            document.getElementById("root").hidden = true;
+        }
+    }
 
     private startSelectedMarkAnim(parentUniqueId: number) {
         const parentMesh = this.getRootMesh(parentUniqueId)
@@ -482,18 +509,6 @@ class App {
         projetileSword.setEnabled(false);
         projetileSword.checkCollisions = true;
         this._projetileSword = projetileSword;
-    }
-
-    private getTags(mesh: Mesh) : string[] {
-        return BABYLON.Tags.GetTags(mesh) || [];
-    }
-
-    private getFaction(character: Mesh): "black" | "white" {
-        return this.charactersTracker[character.uniqueId]?.faction;
-    }
-
-    private getEnemyFaction(faction: string): "black" | "white" {
-        return ["black", "white"].find((v)=>v!=faction) as "black" | "white"
     }
 
     private handleHit(attacker: Mesh, weapon: Weapon, allies: Mesh[], enemies: Mesh[]): boolean {
@@ -981,6 +996,18 @@ class App {
         return this.weaponsList.find((weapon) => weapon.name === weaponName);
     }
 
+    private getTags(mesh: Mesh) : string[] {
+        return BABYLON.Tags.GetTags(mesh) || [];
+    }
+
+    private getFaction(character: Mesh): "Moon" | "Sun" {
+        return this.charactersTracker[character.uniqueId]?.faction;
+    }
+
+    private getEnemyFaction(faction: string): "Moon" | "Sun" {
+        return ["Moon", "Sun"].find((v)=>v!=faction) as "Moon" | "Sun"
+    }
+    
     private getAllies(character: Mesh): Mesh[] {
         const allyFaction = this.getFaction(character);
         const allies = this._scene.getMeshesByTags(`${allyFaction} && !dead`);
@@ -1219,7 +1246,6 @@ class App {
             this.charactersTracker[target.uniqueId].isAlive = false;
             
             BABYLON.Tags.AddTagsTo(target, "dead");
-            BABYLON.Tags.RemoveTagsFrom(target, "arcadian");
 
             new BABYLON.Sound("hit", "sounds/die.mp3", this._scene, null, {autoplay: true, volume: this.getVolume(target.position), maxDistance: this.MAX_SOUND_DISTANCE})
         } else if (deltaHp < 0 && animateHit) {
@@ -1290,13 +1316,12 @@ class App {
         this._scene.registerBeforeRender(()=>{
             sprite.position = body.position.subtract(deltaPosition)
         })
-        BABYLON.Tags.AddTagsTo(body, "black");
 
         this.createHpBar(body);
 
         const characterData: CharacterData = {
             uniqueId: body.uniqueId,
-            faction: "black",
+            faction: "Moon",
             subFaction: orcName,
             magicResist: 5,
             armor: 5,
@@ -1320,6 +1345,7 @@ class App {
         }
         this.charactersTracker[body.uniqueId] = characterData;
         this.animateSpriteCharacter(body.uniqueId, 'idle', true);
+        BABYLON.Tags.AddTagsTo(body, characterData.faction);
     }
 
     private animateCharacter(
@@ -1406,7 +1432,7 @@ class App {
         );
         const characterData: CharacterData = {
             uniqueId: root.uniqueId,
-            faction: "white",
+            faction: "Sun",
             subFaction: "arcadian",
             magicResist: 5,
             armor: 5,
@@ -1418,8 +1444,7 @@ class App {
             shieldCounter: 0
         }
         this.charactersTracker[root.uniqueId] = characterData;
-        BABYLON.Tags.AddTagsTo(root, "arcadian");
-        BABYLON.Tags.AddTagsTo(root, "white");
+        BABYLON.Tags.AddTagsTo(root, characterData.faction);
         root.visibility = 0;
         root.position = position;
         root.physicsImpostor = new BABYLON.PhysicsImpostor(root, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 70, restitution: 0.3, friction: 0.3}, this._scene);

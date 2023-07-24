@@ -2,9 +2,36 @@
 <html>
     <head>
         <script src="https://unpkg.com/merge-images"></script>
+        <link rel="stylesheet" href="styles.css">
         <meta charset="UTF-8">
         <title>GAME</title>
     </head>
     <body>
+        <div id="root" class="root" hidden>
+            <div id="container" class="container">
+                <img src="/icons/hearth.png" class="">
+                <p class="text">Health: 
+                    <span id="currentHp">3</span>
+                    /
+                    <span id="maximumHp">5</span>
+                </p>
+                <img src="/icons/shieldArmor.png" class="icon">
+                <p class="text">Armor: 
+                    <span id="armor">3</span>
+                </p>
+                <img src="/icons/shieldMagicResist.png" class="icon">
+                <p class="text">Magic Resist: 
+                    <span id="magicResist">3</span>
+                </p>
+                <img src="/icons/shoes.png" class="icon">
+                <p class="text">Speed: 
+                    <span id="magicResist">3</span>
+                </p>
+                <img src="/icons/flag.png" class="icon">
+                <p class="text">Faction: 
+                    <span id="faction">Arcadia</span>
+                </p>
+            </div>
+        </div>
     </body>
 </html>

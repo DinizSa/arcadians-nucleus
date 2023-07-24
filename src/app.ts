@@ -311,17 +311,17 @@ class App {
         this.setupSpriteManagers();
 
         const rowsArcadians = 1;
-        const colsArcadians = 8;
+        const colsArcadians = 6;
         const distanceArcadians = 4;
         const startX = this.fieldFimensions.x/2 - (rowsArcadians/2) * distanceArcadians + 10;
         const startZ = this.fieldFimensions.z/2 - (colsArcadians/2) * distanceArcadians;
 
-        this.createSpriteCharacter('orcBerserc', this.fieldFimensions.x/2 - 8, this.fieldFimensions.z/2 - 10)
-        this.createSpriteCharacter('orcShaman', this.fieldFimensions.x/2 - 9, this.fieldFimensions.z/2 - 6)
-        this.createSpriteCharacter('orcWarrior', this.fieldFimensions.x/2 - 10, this.fieldFimensions.z/2 - 2)
-        this.createSpriteCharacter('vikingAxe', this.fieldFimensions.x/2 - 11, this.fieldFimensions.z/2 + 2)
-        this.createSpriteCharacter('vikingSword', this.fieldFimensions.x/2 - 12, this.fieldFimensions.z/2 + 6)
-        this.createSpriteCharacter('vikingSpear', this.fieldFimensions.x/2 - 13, this.fieldFimensions.z/2 + 10)
+        this.createSpriteCharacter('orcBerserc', this.fieldFimensions.x/2 - 4, this.fieldFimensions.z/2 - 10)
+        this.createSpriteCharacter('orcShaman', this.fieldFimensions.x/2 - 5, this.fieldFimensions.z/2 - 6)
+        this.createSpriteCharacter('orcWarrior', this.fieldFimensions.x/2 - 6, this.fieldFimensions.z/2 - 2)
+        this.createSpriteCharacter('vikingAxe', this.fieldFimensions.x/2 - 7, this.fieldFimensions.z/2 + 2)
+        this.createSpriteCharacter('vikingSword', this.fieldFimensions.x/2 - 8, this.fieldFimensions.z/2 + 6)
+        this.createSpriteCharacter('vikingSpear', this.fieldFimensions.x/2 - 9, this.fieldFimensions.z/2 + 10)
         for (let i = 0; i < rowsArcadians; i++) {
             for (let j = 0; j < colsArcadians; j++) {
                 const counter = 1 + i * rowsArcadians + j;

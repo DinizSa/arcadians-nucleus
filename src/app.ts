@@ -3,11 +3,8 @@ import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import * as BABYLON from "@babylonjs/core/Legacy/legacy";
 import mergeImages from 'merge-images';
-
 import { Engine, Scene, Vector3, Mesh, HemisphericLight, Color3, FreeCamera, SceneLoader } from "@babylonjs/core";
 import * as CANNON from "cannon";
-
-// bug: when the target moves, the attacker continues moving to the target initial position
 
 interface MetadataSlot {
     // item_contract_address: string,
@@ -75,7 +72,7 @@ interface HandEquippment {
 }
 
 interface CharacterData {
-    faction: "Sun" | 'Moon';
+    faction: 'Sun' | 'Moon';
     subFaction: 'arcadian' | 'orcBerserc' | 'orcShaman' | 'orcWarrior' | "vikingAxe" | "vikingSword" | "vikingSpear";
     uniqueId: number;
     armor: number; // percentage or physical damage ignored
@@ -136,7 +133,7 @@ interface AnimationMap {
 interface AnimationStartStop {[key: string]: AnimationMap};
 
 interface SpriteCharacterSetup {
-    category: 'orcBerserc' | 'orcShaman' | 'orcWarrior' | 'vikingAxe' | 'vikingSword' | 'vikingSpear';
+    category: CharacterData["subFaction"];
     leftHandEquippment: string;
     rightHandEquippment: string;
     animations: AnimationStartStop;
@@ -1290,7 +1287,7 @@ class App {
         return 1 - this._scene.cameras[0].position.subtract(sourcePosition).length()/this.MAX_SOUND_DISTANCE
     }
 
-    private createSpriteCharacter(orcName: 'orcBerserc' | 'orcShaman' | 'orcWarrior' | 'vikingAxe' | 'vikingSword' | 'vikingSpear', positionX: number, positionZ: number) {
+    private createSpriteCharacter(orcName: CharacterData["subFaction"], positionX: number, positionZ: number) {
         const orcData = charactersSetup[orcName];
         const spriteManager = this.getSpriteManager(orcName)
             
